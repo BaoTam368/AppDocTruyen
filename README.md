@@ -1,6 +1,11 @@
 # AppDocTruyen
-## I. Phần layout (lưu ý ảnh có thể mờ tại tui lười zoom cắt ảnh cho rõ nhưng chủ yếu nhìn được rằng cần thiết kế ở đâu rồi vô figma xem thôi)
+
+## I. Phần layout 
+
+## Lưu ý ảnh có thể mờ tại tui lười zoom cắt ảnh cho rõ nhưng chủ yếu nhìn được rằng cần thiết kế ở đâu rồi vô figma xem thôi và những phần không được liệt kê trong đây thì là những phần dùng lại các fragment hoặc list, item cũ những vẫn phải thiết kế 
+
 link figma: https://www.figma.com/design/iQwa0EWvV8KwUv3VbN2U1j/DOANGiaoTiepNguoi-May--Copy-?node-id=0-1&p=f&t=GOrT1cSCXTGfL6br-0
+
 1) activity_login/register
 
 <img width="160" height="338" alt="image" src="https://github.com/user-attachments/assets/d884d130-9888-44d6-85f8-e2396e9da113" />
