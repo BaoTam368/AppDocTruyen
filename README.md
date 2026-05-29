@@ -1,4 +1,4 @@
-<img width="288" height="485" alt="image" src="https://github.com/user-attachments/assets/e01cad9b-c9f6-4811-99f6-143450ca9ad2" /># AppDocTruyen
+# AppDocTruyen
 ## I. Phần layout (lưu ý ảnh có thể mờ tại tui lười zoom cắt ảnh cho rõ nhưng chủ yếu nhìn được rằng cần thiết kế ở đâu rồi vô figma xem thôi)
 link figma: https://www.figma.com/design/iQwa0EWvV8KwUv3VbN2U1j/DOANGiaoTiepNguoi-May--Copy-?node-id=0-1&p=f&t=GOrT1cSCXTGfL6br-0
 1) activity_login/register
