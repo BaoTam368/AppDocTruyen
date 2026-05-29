@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <!--    Màu chủ đạo-->
+    <color name="brand_blue">#00BCD4</color>
+    <!-- Màu đỏ cho badge HOT/NEW trên góc ảnh truyện -->
+    <color name="badge_red">#FF5722</color>
+    <!-- Màu xanh lá cây của các icon tròn danh mục -->
+    <color name="green_category">#4CAF50</color>
+</resources>
