@@ -8,4 +8,7 @@
     <color name="badge_red">#FF5722</color>
     <!-- Màu xanh lá cây của các icon tròn danh mục -->
     <color name="green_category">#4CAF50</color>
+    <color name="brand_blue_light">#E0F7FA</color>
+    <color name="gray_bg">#D1D1D1</color>
+    <color name="gray_btn">#F5F5F5</color>
 </resources>
