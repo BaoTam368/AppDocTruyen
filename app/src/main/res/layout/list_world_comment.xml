@@ -17,9 +17,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="10dp" />
-<!--        nên thay bằng recyclerView để có thể tái suwr dụng lại các item đã bị cuộn mất-->
-
-
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

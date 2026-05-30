@@ -99,7 +99,7 @@
                         android:layout_width="32dp"
                         android:layout_height="32dp"
                         android:src="@drawable/ic_favourite"
-                        app:tint="#FF0000" />
+                        app:tint="#00ACC1" />
 
                     <TextView
                         android:id="@+id/num_favourites"
@@ -124,7 +124,7 @@
                         android:layout_width="32dp"
                         android:layout_height="32dp"
                         android:src="@drawable/ic_comment"
-                        app:tint="#000000" />
+                        app:tint="#00ACC1" />
 
                     <TextView
                         android:id="@+id/num_comment"
