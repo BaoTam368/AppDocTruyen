@@ -43,4 +43,8 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    // Thư viện Retrofit để gọi API
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    // Thư viện Gson để dịch JSON của MangaDex thành Object Java
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 }

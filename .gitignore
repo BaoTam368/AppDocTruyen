@@ -1,15 +1,31 @@
+# Bỏ qua các file cài đặt/cấu hình của Android Studio và IntelliJ
+.idea/
 *.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+*.ipr
+*.iws
+
+# Bỏ qua các thư mục sinh ra trong quá trình Build (chạy app)
+.gradle/
+build/
+*/build/
+/captures/
+.externalNativeBuild/
+.cxx/
+
+# Bỏ qua các file cấu hình cục bộ của từng máy (Chứa đường dẫn SDK máy mỗi người)
 local.properties
+
+# Bỏ qua các file chạy ứng dụng (App đã build)
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+
+# Bỏ qua các file rác của Hệ điều hành (Mac / Windows)
+.DS_Store
+Thumbs.db
+
+# Bỏ qua các file bảo mật (Chứa chữ ký điện tử, mật khẩu)
+*.jks
+*.keystore
