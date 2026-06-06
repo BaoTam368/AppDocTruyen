@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_bookshelf"
+        android:icon="@drawable/ic_book"
+        android:title="Tủ Sách" />
+
+    <item
+        android:id="@+id/nav_comic"
+        android:icon="@drawable/ic_comic"
+        android:title="Truyện" />
+
+    <item
+        android:id="@+id/nav_world"
+        android:icon="@drawable/ic_world"
+        android:title="Thế Giới" />
+
+    <item
+        android:id="@+id/nav_group"
+        android:icon="@drawable/ic_group"
+        android:title="Nhóm Dịch" />
+
+    <item
+        android:id="@+id/nav_profile"
+        android:icon="@drawable/ic_person"
+        android:title="Tôi" />
+
+</menu>
