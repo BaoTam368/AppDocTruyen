@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.appdoctruyen"
-        minSdk = 21
+        minSdk = 24
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -30,8 +30,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 }
 
@@ -43,4 +43,11 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    // Thư viện Retrofit để gọi API
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    // Thư viện Gson để dịch JSON của MangaDex thành Object Java
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    // Thư viện Glide để load ảnh mượt mà cho truyện tranh
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
 }
