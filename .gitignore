@@ -14,18 +14,34 @@ build/
 
 # Bỏ qua các file cấu hình cục bộ của từng máy (Chứa đường dẫn SDK máy mỗi người)
 local.properties
+# Gradle
+.gradle/
+build/
+*/build/
 
-# Bỏ qua các file chạy ứng dụng (App đã build)
+# Android Studio / IntelliJ IDEA
+.idea/
+
+Thumbs.db
+
+# Logs
+*.log
+
+# Keystore / signing files
+*.jks
+*.keystore
+*.p12
+*.pem
+
+# Generated APK / AAB
 *.apk
 *.aab
 *.ap_
-*.dex
-*.class
+*.aar
 
-# Bỏ qua các file rác của Hệ điều hành (Mac / Windows)
-.DS_Store
-Thumbs.db
+# Caches
+.cxx/
+.externalNativeBuild/
 
-# Bỏ qua các file bảo mật (Chứa chữ ký điện tử, mật khẩu)
-*.jks
-*.keystore
+# Kotlin / Java generated
+out/
