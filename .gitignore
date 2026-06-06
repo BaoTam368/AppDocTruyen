@@ -13,3 +13,34 @@
 .externalNativeBuild
 .cxx
 local.properties
+# Gradle
+.gradle/
+build/
+*/build/
+
+# Android Studio / IntelliJ IDEA
+.idea/
+
+Thumbs.db
+
+# Logs
+*.log
+
+# Keystore / signing files
+*.jks
+*.keystore
+*.p12
+*.pem
+
+# Generated APK / AAB
+*.apk
+*.aab
+*.ap_
+*.aar
+
+# Caches
+.cxx/
+.externalNativeBuild/
+
+# Kotlin / Java generated
+out/
