@@ -1,3 +1,97 @@
 <resources>
     <string name="app_name">AppDocTruyen</string>
+    <string name="title_app_motto">ĐỌC TRUYỆN VIP</string>
+
+
+    <string name="btn_login">Đăng Nhập</string>
+    <string name="tv_forgot_password">Bạn quên mật khẩu ư?</string>
+    <string name="text_or">OR</string>
+    <string name="btn_register">Tạo tài khoản mới</string>
+    <string name="hint_username">Nhập tài khoản:...</string>
+    <string name="hint_password">Nhập mật khẩu:...</string>
+
+    <string name="title_register">Đăng Ký</string>
+    <string name="hint_email_phone">Email hoặc số điện thoại:...</string>
+    <string name="hint_confirm_password">Nhập lại mật khẩu:...</string>
+
+
+    <string name="menu_bookshelf">Tủ Sách</string>
+    <string name="menu_stories">Truyện</string>
+    <string name="menu_world">Thế Giới</string>
+    <string name="menu_translation_team">Nhóm Dịch</string>
+    <string name="menu_profile">Tôi</string>
+
+    <string name="tab_following">Theo Dõi</string>
+    <string name="tab_recent">Vừa Xem</string>
+    <string name="tab_downloaded">Đã Tải</string>
+
+    <string name="text_no_downloaded_stories">Không có truyện đã tải</string>
+
+
+    <string name="hint_search_comic">Tìm kiếm truyện....</string>
+
+    <string name="cat_genres">Thể loại</string>
+    <string name="cat_top_user">Top User</string>
+    <string name="cat_new_comics">Truyện mới</string>
+    <string name="cat_hot">HOT</string>
+
+
+    <string name="title_recently_updated">Mới cập nhật</string>
+
+
+    <string name="title_search_activity">Tìm Kiếm Truyện Tranh</string>
+    <string name="title_top_search">Top tìm kiếm:</string>
+
+
+    <string name="title_chapter_list">Danh sách chương</string>
+
+
+    <string name="title_filter_activity">Thể Loại</string>
+    <string name="lbl_status">Trạng Thái:</string>
+    <string name="lbl_sort">Xếp Theo:</string>
+    <string name="lbl_genres">Thể Loại:</string>
+    <string name="btn_ok">OK</string>
+
+
+    <string name="title_top_user_activity">Danh Sách Top User</string>
+    <string name="title_leaderboard_rank">BẢNG XẾP HẠNG CƯỜNG GIẢ</string>
+
+
+    <string name="title_notification_activity">Thông Báo Của Bạn</string>
+
+    <string name="lbl_user_level_mock">Cấp</string>
+    <string name="title_user_fragment">User</string>
+    <string name="stat_xu">Xu</string>
+    <string name="stat_following">Theo dõi</string>
+    <string name="stat_comments">Bình luận</string>
+    <string name="stat_likes">Đã thích</string>
+
+    <string name="lbl_posts">Bài Viết</string>
+
+    <string name="lbl_choose_payment_method">Vui lòng chọn phương thức:</string>
+    <string name="method_phone_card">Nạp Qua Thẻ Cào Điện Thoại</string>
+    <string name="method_banking">Nạp Qua Ngân Hàng</string>
+    <string name="method_momo">Nạp Qua Ví Momo</string>
+    <string name="method_earn_coins">Làm Nhiệm Vụ Kiếm Xu</string>
+
+    <string name="lbl_notice_title">Chú Ý</string>
+    <string name="note_rate_highlight">10 Xu = 1000đ</string>
+    <string name="note_rate_rest"> nạp 10k tương ứng với 100 xu.</string>
+    <string name="note_vip_info">Xu dùng để mở chap VIP trên app, cần dùng 2 Xu để mở khóa 1 chap VIP.</string>
+    <string name="note_ads_info">Bạn có thể xem quảng cáo sẽ nhận 5-10 xu tùy vào độ dài quảng cáo.</string>
+
+    <string name="lbl_section_settings">Cài Đặt</string>
+    <string name="option_auto_vip">Mở chương VIP tự động</string>
+    <string name="option_dark_mode">Chế độ nền tối</string>
+
+
+    <string name="lbl_section_functions">Chức Năng</string>
+    <string name="func_watch_ads">Xem quảng cáo nhận xu</string>
+    <string name="func_notifications">Thông báo của bạn</string>
+    <string name="func_top_up">Nạp xu</string>
+    <string name="func_join_team">Đăng ký nhóm dịch</string>
+    <string name="func_change_info">Đổi thông tin tài khoản</string>
+    <string name="func_support">Hỗ trợ người dùng</string>
+    <string name="func_terms">Điều khoản sử dụng</string>
+    <string name="func_logout">Đăng xuất</string>
 </resources>
