@@ -1,104 +1,146 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://android.com"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="?android:attr/windowBackground">
+    android:background="?android:attr/windowBackground"
+    android:orientation="vertical">
 
-    <!-- Header -->
-    <LinearLayout
-        android:id="@+id/headerBookshelf"
+        <!-- Header -->
+        <LinearLayout
+            android:id="@+id/headerBookshelf"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/brand_blue"
+            android:gravity="center"
+            android:padding="14dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tủ Sách"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- 3 Tab: Theo Dõi / Vừa Xem / Đã Tải -->
+<!--        <LinearLayout-->
+<!--            android:id="@+id/tabContainerBookshelf"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:gravity="center"-->
+<!--            android:orientation="horizontal"-->
+<!--            android:paddingTop="10dp"-->
+<!--            android:paddingBottom="10dp"-->
+<!--            android:paddingStart="8dp"-->
+<!--            android:paddingEnd="8dp">-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/tabFollowing"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:layout_marginEnd="4dp"-->
+<!--                android:background="@drawable/bg_tab_selected"-->
+<!--                android:gravity="center"-->
+<!--                android:paddingTop="8dp"-->
+<!--                android:paddingBottom="8dp"-->
+<!--                android:text="Theo Dõi"-->
+<!--                android:textColor="@color/white"-->
+<!--                android:textSize="14sp"-->
+<!--                android:textStyle="bold" />-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/tabRecentlyRead"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:layout_marginStart="4dp"-->
+<!--                android:layout_marginEnd="4dp"-->
+<!--                android:background="@drawable/bg_tab_unselected"-->
+<!--                android:gravity="center"-->
+<!--                android:paddingTop="8dp"-->
+<!--                android:paddingBottom="8dp"-->
+<!--                android:text="Vừa Xem"-->
+<!--                android:textColor="@color/tab_unselected_text"-->
+<!--                android:textSize="14sp" />-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/tabDownloaded"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:layout_marginStart="4dp"-->
+<!--                android:background="@drawable/bg_tab_unselected"-->
+<!--                android:gravity="center"-->
+<!--                android:paddingTop="8dp"-->
+<!--                android:paddingBottom="8dp"-->
+<!--                android:text="Đã Tải"-->
+<!--                android:textColor="@color/tab_unselected_text"-->
+<!--                android:textSize="14sp" />-->
+<!--        </LinearLayout>-->
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tab_layout_bookshelf"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/brand_blue"
-        android:gravity="center"
-        android:padding="14dp">
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginVertical="10dp"
+        android:background="@android:color/transparent"
+        app:tabBackground="@drawable/bg_tab_unselected"
+        app:tabSelectedBackground="@drawable/bg_tab_selected"
+        app:tabIndicatorHeight="0dp"
+        app:tabTextColor="@color/text_secondary_light"
+        app:tabSelectedTextColor="@color/white"
+        app:tabMode="fixed"
+        app:tabGravity="fill"
+        app:tabPaddingStart="0dp"
+        app:tabPaddingEnd="0dp">
 
-        <TextView
+        <!-- Các thẻ con để vẽ nháp hiển thị ngay lúc thiết kế -->
+        <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tủ Sách"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-    </LinearLayout>
+            android:text="Theo Dõi" />
 
-    <!-- 3 Tab: Theo Dõi / Vừa Xem / Đã Tải -->
-    <LinearLayout
-        android:id="@+id/tabContainerBookshelf"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp">
-
-        <TextView
-            android:id="@+id/tabFollowing"
-            android:layout_width="0dp"
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginEnd="4dp"
-            android:background="@drawable/bg_tab_selected"
-            android:gravity="center"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:text="Theo Dõi"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:text="Vừa Xem" />
 
-        <TextView
-            android:id="@+id/tabRecentlyRead"
-            android:layout_width="0dp"
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="4dp"
-            android:background="@drawable/bg_tab_unselected"
-            android:gravity="center"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:text="Vừa Xem"
-            android:textColor="@color/tab_unselected_text"
-            android:textSize="14sp" />
+            android:text="Đã Tải" />
 
-        <TextView
-            android:id="@+id/tabDownloaded"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="4dp"
-            android:background="@drawable/bg_tab_unselected"
-            android:gravity="center"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:text="Đã Tải"
-            android:textColor="@color/tab_unselected_text"
-            android:textSize="14sp" />
-    </LinearLayout>
+    </com.google.android.material.tabs.TabLayout>
 
-    <!-- RecyclerView danh sách truyện dạng grid 3 cột -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewBookshelf"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/view_pager_bookshelf"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:padding="8dp" />
+        android:layout_weight="1" />
 
-    <!-- Empty State -->
-    <TextView
-        android:id="@+id/tvEmptyBookshelf"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:text="Không có truyện đã tải"
-        android:textColor="@color/text_secondary_light"
-        android:textSize="16sp"
-        android:visibility="gone" />
+<!--        &lt;!&ndash; RecyclerView danh sách truyện dạng grid 3 cột &ndash;&gt;-->
+<!--        <androidx.recyclerview.widget.RecyclerView-->
+<!--            android:id="@+id/recyclerViewBookshelf"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="0dp"-->
+<!--            android:layout_weight="1"-->
+<!--            android:clipToPadding="false"-->
+<!--            android:padding="8dp" />-->
+
+<!--        &lt;!&ndash; Empty State &ndash;&gt;-->
+<!--        <TextView-->
+<!--            android:id="@+id/tvEmptyBookshelf"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="0dp"-->
+<!--            android:layout_weight="1"-->
+<!--            android:gravity="center"-->
+<!--            android:text="Không có truyện đã tải"-->
+<!--            android:textColor="@color/text_secondary_light"-->
+<!--            android:textSize="16sp"-->
+<!--            android:visibility="gone" />-->
 
 </LinearLayout>

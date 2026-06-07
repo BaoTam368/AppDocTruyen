@@ -4,26 +4,26 @@
     <item
         android:id="@+id/nav_bookshelf"
         android:icon="@drawable/ic_book"
-        android:title="Tủ Sách" />
+        android:title="@string/menu_bookshelf" />
 
     <item
-        android:id="@+id/nav_comic"
+        android:id="@+id/nav_stories"
         android:icon="@drawable/ic_comic"
-        android:title="Truyện" />
+        android:title="@string/menu_stories" />
 
     <item
         android:id="@+id/nav_world"
         android:icon="@drawable/ic_world"
-        android:title="Thế Giới" />
+        android:title="@string/menu_world" />
 
     <item
-        android:id="@+id/nav_group"
+        android:id="@+id/nav_translation_team"
         android:icon="@drawable/ic_group"
-        android:title="Nhóm Dịch" />
+        android:title="@string/menu_translation_team" />
 
     <item
         android:id="@+id/nav_profile"
         android:icon="@drawable/ic_person"
-        android:title="Tôi" />
+        android:title="@string/menu_profile" />
 
 </menu>

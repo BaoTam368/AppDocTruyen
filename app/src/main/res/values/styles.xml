@@ -9,4 +9,15 @@
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
     </style>
+
+    <style name="SettingsRowStyle">
+        <item name="android:orientation">horizontal</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+
+    <style name="SettingsTextStyle">
+        <item name="android:textColor">@color/text_primary_light</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:layout_marginStart">12dp</item>
+    </style>
 </resources>
