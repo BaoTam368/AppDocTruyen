@@ -23,12 +23,15 @@
     <color name="text_primary_light">#212121</color>
     <color name="text_secondary_light">#757575</color>
     <color name="hint_color_light">#757575</color>
+    <color name="gray_bg">#F2F2F2</color>
+    <color name="gray_btn">#E0E0E0</color>
 
     <!-- Thanh điều hướng dưới -->
     <color name="bottom_nav_bg_light">#FFFFFF</color>
     <color name="bottom_nav_inactive_light">#757575</color>
 
     <!-- 3. BỘ MÀU DÀNH CHO CHẾ ĐỘ TỐI (DARK MODE) -->
+    <color name="dark_background">#1A1A2E</color>
     <color name="bg_app_dark">#1A1A2E</color>
     <color name="bg_card_dark">#252540</color>
     <color name="bottom_nav_bg_dark">#1E1E30</color>

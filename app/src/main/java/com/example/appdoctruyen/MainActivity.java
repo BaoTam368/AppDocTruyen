@@ -34,11 +34,11 @@ public class MainActivity extends AppCompatActivity {
 
             if (itemId == R.id.nav_bookshelf) {
                 selectedFragment = new BookshelfFragment();
-            } else if (itemId == R.id.nav_comic) {
+            } else if (itemId == R.id.nav_stories) {
                 selectedFragment = new ComicHomeFragment();
             } else if (itemId == R.id.nav_world) {
                 selectedFragment = new WorldFragment();
-            } else if (itemId == R.id.nav_group) {
+            } else if (itemId == R.id.nav_translation_team) {
                 selectedFragment = new BookshelfGroupFragment();
             } else if (itemId == R.id.nav_profile) {
                 selectedFragment = new ProfileFragment();
