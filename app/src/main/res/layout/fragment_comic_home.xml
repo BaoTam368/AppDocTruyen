@@ -24,7 +24,7 @@
                 android:id="@+id/iv_avatar"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
-                android:src="@android:drawable/ic_menu_report_image" />
+                android:src="@drawable/ic_user_avatar" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -54,16 +54,37 @@
                 android:id="@+id/iv_notification"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:src="@android:drawable/ic_popup_reminder" />
+                android:src="@drawable/ic_notification" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="14dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="6dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Truyện nổi bật"
+                android:textColor="@color/text_primary_light"
+                android:textSize="16sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_featured_comics"
             android:layout_width="match_parent"
-            android:layout_height="180dp"
+            android:layout_height="190dp"
             android:clipToPadding="false"
-            android:paddingHorizontal="12dp"
+            android:nestedScrollingEnabled="false"
             android:orientation="horizontal"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_comic_large" />
 
@@ -77,110 +98,154 @@
 
             <!-- Danh mục 1: Thể Loại -->
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
+                android:orientation="horizontal"
+                android:paddingHorizontal="12dp"
+                android:paddingTop="18dp"
+                android:paddingBottom="14dp"
+                android:weightSum="4">
 
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/iv_cat_genres"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/ic_cat_genres"
-                    app:shapeAppearanceOverlay="@style/CircleImageViewStyle"
-                    app:strokeColor="@color/green_category"
-                    app:strokeWidth="2dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
+                <!-- Danh mục 1: Thể loại -->
+                <LinearLayout
+                    android:id="@+id/layout_cat_genres"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="@string/cat_genres"
-                    android:textColor="@color/text_primary_light"
-                    android:textSize="12sp" />
-            </LinearLayout>
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
 
-            <!-- Danh mục 2: Top User -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
+                    <FrameLayout
+                        android:layout_width="58dp"
+                        android:layout_height="58dp"
+                        android:background="@drawable/bg_category_circle"
+                        android:padding="12dp">
 
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/iv_cat_top_user"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/ic_cat_top_user"
-                    app:shapeAppearanceOverlay="@style/CircleImageViewStyle"
-                    app:strokeColor="@color/green_category"
-                    app:strokeWidth="2dp" />
+                        <ImageView
+                            android:id="@+id/iv_cat_genres"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="centerInside"
+                            android:src="@drawable/ic_cat_genres" />
+                    </FrameLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="7dp"
+                        android:ellipsize="end"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:text="@string/cat_genres"
+                        android:textColor="@color/text_primary_light"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <!-- Danh mục 2: Top User -->
+                <LinearLayout
+                    android:id="@+id/layout_cat_top_user"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="@string/cat_top_user"
-                    android:textColor="@color/text_primary_light"
-                    android:textSize="12sp" />
-            </LinearLayout>
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
 
-            <!-- Danh mục 3: Truyện Mới -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
+                    <FrameLayout
+                        android:layout_width="58dp"
+                        android:layout_height="58dp"
+                        android:background="@drawable/bg_category_circle"
+                        android:padding="12dp">
 
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/iv_cat_new"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/ic_cat_new"
-                    app:shapeAppearanceOverlay="@style/CircleImageViewStyle"
-                    app:strokeColor="@color/green_category"
-                    app:strokeWidth="2dp" />
+                        <ImageView
+                            android:id="@+id/iv_cat_top_user"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="centerInside"
+                            android:src="@drawable/ic_cat_top_user" />
+                    </FrameLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="7dp"
+                        android:ellipsize="end"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:text="@string/cat_top_user"
+                        android:textColor="@color/text_primary_light"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <!-- Danh mục 3: Truyện mới -->
+                <LinearLayout
+                    android:id="@+id/layout_cat_new"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="@string/cat_new_comics"
-                    android:textColor="@color/text_primary_light"
-                    android:textSize="12sp" />
-            </LinearLayout>
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
 
-            <!-- Danh mục 4: HOT -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
+                    <FrameLayout
+                        android:layout_width="58dp"
+                        android:layout_height="58dp"
+                        android:background="@drawable/bg_category_circle"
+                        android:padding="12dp">
 
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/iv_cat_hot"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/ic_cat_hot"
-                    app:shapeAppearanceOverlay="@style/CircleImageViewStyle"
-                    app:strokeColor="@color/green_category"
-                    app:strokeWidth="2dp" />
+                        <ImageView
+                            android:id="@+id/iv_cat_new"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="centerInside"
+                            android:src="@drawable/ic_cat_new" />
+                    </FrameLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="7dp"
+                        android:ellipsize="end"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:text="@string/cat_new_comics"
+                        android:textColor="@color/text_primary_light"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <!-- Danh mục 4: HOT -->
+                <LinearLayout
+                    android:id="@+id/layout_cat_hot"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="@string/cat_hot"
-                    android:textColor="@color/text_primary_light"
-                    android:textSize="12sp" />
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <FrameLayout
+                        android:layout_width="58dp"
+                        android:layout_height="58dp"
+                        android:background="@drawable/bg_category_circle"
+                        android:padding="12dp">
+
+                        <ImageView
+                            android:id="@+id/iv_cat_hot"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="centerInside"
+                            android:src="@drawable/ic_cat_hot" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="7dp"
+                        android:ellipsize="end"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:text="@string/cat_hot"
+                        android:textColor="@color/text_primary_light"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
             </LinearLayout>
         </LinearLayout>
 
@@ -205,8 +270,7 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:contentDescription="Xem thêm"
-                android:rotation="180"
-                android:src="@android:drawable/ic_media_next" />
+                android:src="@drawable/ic_menu_forward" />
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
