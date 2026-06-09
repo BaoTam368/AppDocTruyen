@@ -22,11 +22,9 @@ public class ComicHomeFragment extends Fragment {
 
     private RecyclerView rvFeaturedComics;
     private RecyclerView rvRecentlyUpdated;
-
     private List<Comic> featuredList;
     private List<Comic> recentList;
-
-    private BookshelfAdapter featuredAdapter;
+    private FeaturedComicAdapter featuredAdapter;
     private BookshelfAdapter recentAdapter;
 
     @Nullable
@@ -53,12 +51,13 @@ public class ComicHomeFragment extends Fragment {
         featuredList.add(new Comic(2, "Doraemon", R.drawable.placeholder_comic, "Chapter 200"));
         featuredList.add(new Comic(3, "Conan", R.drawable.placeholder_comic, "Chapter 1050"));
 
-        featuredAdapter = new BookshelfAdapter(requireContext(), featuredList,
+        featuredAdapter = new FeaturedComicAdapter(requireContext(), featuredList,
                 (comic, position) -> openComicDetail(comic));
 
         rvFeaturedComics.setLayoutManager(
                 new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         );
+        rvFeaturedComics.setNestedScrollingEnabled(false);
         rvFeaturedComics.setAdapter(featuredAdapter);
     }
 

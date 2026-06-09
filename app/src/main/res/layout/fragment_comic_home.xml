@@ -64,7 +64,7 @@
             android:orientation="horizontal"
             android:paddingHorizontal="14dp"
             android:paddingTop="8dp"
-            android:paddingBottom="6dp">
+            android:paddingBottom="4dp">
 
             <TextView
                 android:layout_width="0dp"
@@ -74,6 +74,7 @@
                 android:textColor="@color/text_primary_light"
                 android:textSize="16sp"
                 android:textStyle="bold" />
+
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
@@ -92,161 +93,151 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="16dp"
+            android:paddingHorizontal="12dp"
+            android:paddingTop="18dp"
+            android:paddingBottom="14dp"
             android:weightSum="4">
 
-            <!-- Danh mục 1: Thể Loại -->
+            <!-- Danh mục 1: Thể loại -->
             <LinearLayout
-                android:layout_width="match_parent"
+                android:id="@+id/layout_cat_genres"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingHorizontal="12dp"
-                android:paddingTop="18dp"
-                android:paddingBottom="14dp"
-                android:weightSum="4">
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
 
-                <!-- Danh mục 1: Thể loại -->
-                <LinearLayout
-                    android:id="@+id/layout_cat_genres"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
+                <FrameLayout
+                    android:layout_width="58dp"
+                    android:layout_height="58dp"
+                    android:background="@drawable/bg_category_circle"
+                    android:padding="12dp">
 
-                    <FrameLayout
-                        android:layout_width="58dp"
-                        android:layout_height="58dp"
-                        android:background="@drawable/bg_category_circle"
-                        android:padding="12dp">
-
-                        <ImageView
-                            android:id="@+id/iv_cat_genres"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:scaleType="centerInside"
-                            android:src="@drawable/ic_cat_genres" />
-                    </FrameLayout>
-
-                    <TextView
+                    <ImageView
+                        android:id="@+id/iv_cat_genres"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="7dp"
-                        android:ellipsize="end"
-                        android:gravity="center"
-                        android:maxLines="1"
-                        android:text="@string/cat_genres"
-                        android:textColor="@color/text_primary_light"
-                        android:textSize="12sp" />
-                </LinearLayout>
+                        android:layout_height="match_parent"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_cat_genres" />
+                </FrameLayout>
 
-                <!-- Danh mục 2: Top User -->
-                <LinearLayout
-                    android:id="@+id/layout_cat_top_user"
-                    android:layout_width="0dp"
+                <TextView
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_marginTop="7dp"
+                    android:ellipsize="end"
                     android:gravity="center"
-                    android:orientation="vertical">
-
-                    <FrameLayout
-                        android:layout_width="58dp"
-                        android:layout_height="58dp"
-                        android:background="@drawable/bg_category_circle"
-                        android:padding="12dp">
-
-                        <ImageView
-                            android:id="@+id/iv_cat_top_user"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:scaleType="centerInside"
-                            android:src="@drawable/ic_cat_top_user" />
-                    </FrameLayout>
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="7dp"
-                        android:ellipsize="end"
-                        android:gravity="center"
-                        android:maxLines="1"
-                        android:text="@string/cat_top_user"
-                        android:textColor="@color/text_primary_light"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <!-- Danh mục 3: Truyện mới -->
-                <LinearLayout
-                    android:id="@+id/layout_cat_new"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <FrameLayout
-                        android:layout_width="58dp"
-                        android:layout_height="58dp"
-                        android:background="@drawable/bg_category_circle"
-                        android:padding="12dp">
-
-                        <ImageView
-                            android:id="@+id/iv_cat_new"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:scaleType="centerInside"
-                            android:src="@drawable/ic_cat_new" />
-                    </FrameLayout>
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="7dp"
-                        android:ellipsize="end"
-                        android:gravity="center"
-                        android:maxLines="1"
-                        android:text="@string/cat_new_comics"
-                        android:textColor="@color/text_primary_light"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <!-- Danh mục 4: HOT -->
-                <LinearLayout
-                    android:id="@+id/layout_cat_hot"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <FrameLayout
-                        android:layout_width="58dp"
-                        android:layout_height="58dp"
-                        android:background="@drawable/bg_category_circle"
-                        android:padding="12dp">
-
-                        <ImageView
-                            android:id="@+id/iv_cat_hot"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:scaleType="centerInside"
-                            android:src="@drawable/ic_cat_hot" />
-                    </FrameLayout>
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="7dp"
-                        android:ellipsize="end"
-                        android:gravity="center"
-                        android:maxLines="1"
-                        android:text="@string/cat_hot"
-                        android:textColor="@color/text_primary_light"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
+                    android:maxLines="1"
+                    android:text="@string/cat_genres"
+                    android:textColor="@color/text_primary_light"
+                    android:textSize="12sp" />
             </LinearLayout>
+
+            <!-- Danh mục 2: Top User -->
+            <LinearLayout
+                android:id="@+id/layout_cat_top_user"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <FrameLayout
+                    android:layout_width="58dp"
+                    android:layout_height="58dp"
+                    android:background="@drawable/bg_category_circle"
+                    android:padding="12dp">
+
+                    <ImageView
+                        android:id="@+id/iv_cat_top_user"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_cat_top_user" />
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="7dp"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="@string/cat_top_user"
+                    android:textColor="@color/text_primary_light"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <!-- Danh mục 3: Truyện mới -->
+            <LinearLayout
+                android:id="@+id/layout_cat_new"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <FrameLayout
+                    android:layout_width="58dp"
+                    android:layout_height="58dp"
+                    android:background="@drawable/bg_category_circle"
+                    android:padding="12dp">
+
+                    <ImageView
+                        android:id="@+id/iv_cat_new"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_cat_new" />
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="7dp"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="@string/cat_new_comics"
+                    android:textColor="@color/text_primary_light"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <!-- Danh mục 4: HOT -->
+            <LinearLayout
+                android:id="@+id/layout_cat_hot"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <FrameLayout
+                    android:layout_width="58dp"
+                    android:layout_height="58dp"
+                    android:background="@drawable/bg_category_circle"
+                    android:padding="12dp">
+
+                    <ImageView
+                        android:id="@+id/iv_cat_hot"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_cat_hot" />
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="7dp"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="@string/cat_hot"
+                    android:textColor="@color/text_primary_light"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
         </LinearLayout>
 
         <LinearLayout
