@@ -25,69 +25,69 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-<!--    &lt;!&ndash; 3 Tab: Tất Cả / Nổi Tiếng / Số Truyện &ndash;&gt;-->
-<!--    <LinearLayout-->
-<!--        android:id="@+id/tabContainerGroup"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:gravity="center"-->
-<!--        android:orientation="horizontal"-->
-<!--        android:paddingTop="10dp"-->
-<!--        android:paddingBottom="10dp"-->
-<!--        android:paddingStart="8dp"-->
-<!--        android:paddingEnd="8dp">-->
+    <!-- 3 Tab: Tất Cả / Nổi Tiếng / Số Truyện -->
+    <LinearLayout
+        android:id="@+id/tabContainerGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp">
 
-<!--        <TextView-->
-<!--            android:id="@+id/tabAll"-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_weight="1"-->
-<!--            android:layout_marginEnd="4dp"-->
-<!--            android:background="@drawable/bg_tab_selected"-->
-<!--            android:gravity="center"-->
-<!--            android:paddingTop="8dp"-->
-<!--            android:paddingBottom="8dp"-->
-<!--            android:text="Tất Cả"-->
-<!--            android:textColor="@color/white"-->
-<!--            android:textSize="14sp"-->
-<!--            android:textStyle="bold" />-->
+        <TextView
+            android:id="@+id/tabAll"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/bg_tab_selected"
+            android:gravity="center"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:text="Tất Cả"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold" />
 
-<!--        <TextView-->
-<!--            android:id="@+id/tabFamous"-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_weight="1"-->
-<!--            android:layout_marginStart="4dp"-->
-<!--            android:layout_marginEnd="4dp"-->
-<!--            android:background="@drawable/bg_tab_unselected"-->
-<!--            android:gravity="center"-->
-<!--            android:paddingTop="8dp"-->
-<!--            android:paddingBottom="8dp"-->
-<!--            android:text="Nổi Tiếng"-->
-<!--            android:textColor="@color/tab_unselected_text"-->
-<!--            android:textSize="14sp" />-->
+        <TextView
+            android:id="@+id/tabFamous"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/bg_tab_unselected"
+            android:gravity="center"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:text="Nổi Tiếng"
+            android:textColor="@color/tab_unselected_text"
+            android:textSize="14sp" />
 
-<!--        <TextView-->
-<!--            android:id="@+id/tabComicCount"-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_weight="1"-->
-<!--            android:layout_marginStart="4dp"-->
-<!--            android:background="@drawable/bg_tab_unselected"-->
-<!--            android:gravity="center"-->
-<!--            android:paddingTop="8dp"-->
-<!--            android:paddingBottom="8dp"-->
-<!--            android:text="Số Truyện"-->
-<!--            android:textColor="@color/tab_unselected_text"-->
-<!--            android:textSize="14sp" />-->
-<!--    </LinearLayout>-->
+        <TextView
+            android:id="@+id/tabComicCount"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:background="@drawable/bg_tab_unselected"
+            android:gravity="center"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:text="Số Truyện"
+            android:textColor="@color/tab_unselected_text"
+            android:textSize="14sp" />
+    </LinearLayout>
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout_bookshelf"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_paddingVertical="10dp"
-        android:layout_paddingHorizontal="8dp"
+        android:paddingVertical="10dp"
+        android:paddingHorizontal="8dp"
         android:background="@android:color/transparent"
         app:tabBackground="@drawable/bg_tab_unselected"
         app:tabSelectedBackground="@drawable/bg_tab_selected"

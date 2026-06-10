@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -16,8 +15,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:gravity="center_vertical"
+            android:orientation="horizontal"
             android:padding="12dp">
 
             <!-- Icon Avatar người dùng -->
@@ -25,17 +24,17 @@
                 android:id="@+id/iv_avatar"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
-                android:src="@android:drawable/ic_menu_report_image" />
+                android:src="@drawable/ic_user_avatar" />
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="40dp"
+                android:layout_marginHorizontal="12dp"
                 android:layout_weight="1"
-                android:layout_mx="12dp"
                 android:background="@color/bg_input_light"
                 android:gravity="center_vertical"
-                android:paddingHorizontal="12dp"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:paddingHorizontal="12dp">
 
                 <ImageView
                     android:layout_width="18dp"
@@ -55,16 +54,38 @@
                 android:id="@+id/iv_notification"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:src="@android:drawable/ic_popup_reminder" />
+                android:src="@drawable/ic_notification" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="14dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="4dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Truyện nổi bật"
+                android:textColor="@color/text_primary_light"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_featured_comics"
             android:layout_width="match_parent"
-            android:layout_height="180dp"
+            android:layout_height="190dp"
             android:clipToPadding="false"
-            android:paddingHorizontal="12dp"
+            android:nestedScrollingEnabled="false"
             android:orientation="horizontal"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_comic_large" />
 
@@ -72,100 +93,158 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:weightSum="4"
-            android:paddingVertical="16dp"
-            android:paddingHorizontal="8dp">
+            android:paddingHorizontal="12dp"
+            android:paddingTop="18dp"
+            android:paddingBottom="14dp"
+            android:weightSum="4">
 
-            <!-- Danh mục 1: Thể Loại -->
+            <!-- Danh mục 1: Thể loại -->
             <LinearLayout
+                android:id="@+id/layout_cat_genres"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/iv_cat_genres"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:src="@drawable/ic_cat_genres"
-                    android:scaleType="centerCrop"
-                    app:shapeAppearanceOverlay="@style/CircleImageViewStyle"
-                    app:strokeColor="@color/green_category"
-                    app:strokeWidth="2dp"/>
+                <FrameLayout
+                    android:layout_width="58dp"
+                    android:layout_height="58dp"
+                    android:background="@drawable/bg_category_circle"
+                    android:padding="12dp">
 
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="@string/cat_genres" android:textSize="12sp" android:textColor="@color/text_primary_light"/>
+                    <ImageView
+                        android:id="@+id/iv_cat_genres"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_cat_genres" />
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="7dp"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="@string/cat_genres"
+                    android:textColor="@color/text_primary_light"
+                    android:textSize="12sp" />
             </LinearLayout>
 
             <!-- Danh mục 2: Top User -->
             <LinearLayout
+                android:id="@+id/layout_cat_top_user"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/iv_cat_top_user"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:src="@drawable/ic_cat_top_user"
-                    android:scaleType="centerCrop"
-                    app:shapeAppearanceOverlay="@style/CircleImageViewStyle"
-                    app:strokeColor="@color/green_category"
-                    app:strokeWidth="2dp"/>
+                <FrameLayout
+                    android:layout_width="58dp"
+                    android:layout_height="58dp"
+                    android:background="@drawable/bg_category_circle"
+                    android:padding="12dp">
 
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="@string/cat_top_user" android:textSize="12sp" android:textColor="@color/text_primary_light"/>
+                    <ImageView
+                        android:id="@+id/iv_cat_top_user"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_cat_top_user" />
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="7dp"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="@string/cat_top_user"
+                    android:textColor="@color/text_primary_light"
+                    android:textSize="12sp" />
             </LinearLayout>
 
-            <!-- Danh mục 3: Truyện Mới -->
+            <!-- Danh mục 3: Truyện mới -->
             <LinearLayout
+                android:id="@+id/layout_cat_new"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/iv_cat_new"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:src="@drawable/ic_cat_new"
-                    android:scaleType="centerCrop"
-                    app:shapeAppearanceOverlay="@style/CircleImageViewStyle"
-                    app:strokeColor="@color/green_category"
-                    app:strokeWidth="2dp"/>
+                <FrameLayout
+                    android:layout_width="58dp"
+                    android:layout_height="58dp"
+                    android:background="@drawable/bg_category_circle"
+                    android:padding="12dp">
 
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="@string/cat_new_comics" android:textSize="12sp" android:textColor="@color/text_primary_light"/>
+                    <ImageView
+                        android:id="@+id/iv_cat_new"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_cat_new" />
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="7dp"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="@string/cat_new_comics"
+                    android:textColor="@color/text_primary_light"
+                    android:textSize="12sp" />
             </LinearLayout>
 
             <!-- Danh mục 4: HOT -->
             <LinearLayout
+                android:id="@+id/layout_cat_hot"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/iv_cat_hot"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:src="@drawable/ic_cat_hot"
-                    android:scaleType="centerCrop"
-                    app:shapeAppearanceOverlay="@style/CircleImageViewStyle"
-                    app:strokeColor="@color/green_category"
-                    app:strokeWidth="2dp"/>
+                <FrameLayout
+                    android:layout_width="58dp"
+                    android:layout_height="58dp"
+                    android:background="@drawable/bg_category_circle"
+                    android:padding="12dp">
 
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="@string/cat_hot" android:textSize="12sp" android:textColor="@color/text_primary_light"/>
+                    <ImageView
+                        android:id="@+id/iv_cat_hot"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_cat_hot" />
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="7dp"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="@string/cat_hot"
+                    android:textColor="@color/text_primary_light"
+                    android:textSize="12sp" />
             </LinearLayout>
+
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:gravity="center_vertical"
+            android:orientation="horizontal"
             android:paddingHorizontal="14dp"
             android:paddingVertical="8dp">
 
@@ -181,24 +260,20 @@
             <ImageView
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:src="@android:drawable/ic_media_next"
                 android:contentDescription="Xem thêm"
-                android:rotation="180"/>
+                android:src="@drawable/ic_menu_forward" />
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_recently_updated"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:clipToPadding="false"
+            android:nestedScrollingEnabled="false"
             android:padding="8dp"
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:spanCount="3"
-            tools:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-            tools:layout_editor_absoluteX="0dp"
-            tools:layout_editor_absoluteY="0dp"
-            tools:listitem="@layout/item_comic"
-            tools:spanCount="3" />
+            tools:listitem="@layout/item_comic" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
