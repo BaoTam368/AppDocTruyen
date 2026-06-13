@@ -16,7 +16,7 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewGroup"
             android:layout_width="match_parent"
-            android:layout_height="481dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             tools:listitem="@layout/item_world_group" />
 
