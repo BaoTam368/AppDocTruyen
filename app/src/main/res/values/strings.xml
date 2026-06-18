@@ -94,4 +94,36 @@
     <string name="func_support">Hỗ trợ người dùng</string>
     <string name="func_terms">Điều khoản sử dụng</string>
     <string name="func_logout">Đăng xuất</string>
+    <string name="bookshelf_empty_following">Không có truyện theo dõi</string>
+    <string name="bookshelf_empty_history">Không có lịch sử đọc</string>
+    <string name="bookshelf_empty_downloaded">Không có truyện đã tải</string>
+    <string name="bookshelf_last_read_format">Vừa đọc: %1$s</string>
+    <string name="comic_title_placeholder">Tên truyện</string>
+    <string name="comic_cover_content_description">Ảnh bìa truyện</string>
+
+    <string name="group_title">Nhóm Dịch</string>
+    <string name="group_tab_all">Tất Cả</string>
+    <string name="group_tab_famous">Nổi Tiếng</string>
+    <string name="group_tab_comic_count">Số Truyện</string>
+    <string name="group_empty">Không có nhóm dịch</string>
+    <string name="group_detail_title">Chi Tiết Nhóm Dịch</string>
+    <string name="group_default_name">Nhóm dịch</string>
+    <string name="group_default_description">Nhóm dịch truyện tranh</string>
+    <string name="group_name_placeholder">Tên nhóm</string>
+    <string name="group_description_placeholder">Mô tả nhóm dịch</string>
+    <string name="group_avatar_content_description">Ảnh nhóm dịch</string>
+    <string name="group_rank_avatar_content_description">Ảnh nhóm</string>
+    <string name="group_trophy_content_description">Xếp hạng cao</string>
+    <string name="action_back">Quay lại</string>
+    <string name="label_comic_count">Số truyện</string>
+    <string name="label_comic_count_short">Truyện</string>
+    <string name="label_members">Thành viên</string>
+    <string name="label_followers">Người theo dõi</string>
+    <string name="label_followers_short">Theo dõi</string>
+    <string name="group_comic_count_format">%1$d truyện</string>
+    <string name="group_members_count_format">%1$d thành viên</string>
+    <string name="group_followers_count_format">%1$d người theo dõi</string>
+    <string name="group_members_zero">0 thành viên</string>
+    <string name="group_rank_number_placeholder">1</string>
+    <string name="zero_count">0</string>
 </resources>

@@ -37,6 +37,18 @@ public class TranslationGroup {
         this.rank = 0;
     }
 
+    public TranslationGroup(int id, String name, String description, int avatarResId,
+                            int comicCount, int memberCount, int followerCount) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.avatarResId = avatarResId;
+        this.comicCount = comicCount;
+        this.memberCount = memberCount;
+        this.followerCount = followerCount;
+        this.rank = 0;
+    }
+
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
