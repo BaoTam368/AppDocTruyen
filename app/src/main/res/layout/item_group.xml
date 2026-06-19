@@ -15,7 +15,7 @@
         android:src="@drawable/placeholder_group"
         android:background="@drawable/bg_card_comic"
         android:clipToOutline="true"
-        android:contentDescription="Ảnh nhóm dịch" />
+        android:contentDescription="@string/group_avatar_content_description" />
 
     <!-- Tên nhóm -->
     <TextView
@@ -26,7 +26,7 @@
         android:ellipsize="end"
         android:gravity="center"
         android:maxLines="1"
-        android:text="Tên nhóm"
+        android:text="@string/group_name_placeholder"
         android:textColor="?android:attr/textColorPrimary"
         android:textSize="13sp"
         android:textStyle="bold" />
@@ -44,7 +44,7 @@
             android:layout_width="14dp"
             android:layout_height="14dp"
             android:src="@drawable/ic_comic"
-            android:contentDescription="Truyện"
+            android:contentDescription="@string/label_comic_count_short"
             android:tint="@color/brand_blue" />
 
         <TextView
@@ -52,7 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="3dp"
-            android:text="0"
+            android:text="@string/zero_count"
             android:textColor="@color/text_secondary_light"
             android:textSize="11sp" />
 
@@ -65,7 +65,7 @@
             android:layout_width="14dp"
             android:layout_height="14dp"
             android:src="@drawable/ic_members"
-            android:contentDescription="Thành viên"
+            android:contentDescription="@string/label_members"
             android:tint="@color/brand_blue" />
 
         <TextView
@@ -73,7 +73,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="3dp"
-            android:text="0"
+            android:text="@string/zero_count"
             android:textColor="@color/text_secondary_light"
             android:textSize="11sp" />
     </LinearLayout>

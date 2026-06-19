@@ -18,7 +18,7 @@
             android:src="@drawable/placeholder_comic"
             android:background="@drawable/bg_card_comic"
             android:clipToOutline="true"
-            android:contentDescription="Ảnh bìa truyện"
+            android:contentDescription="@string/comic_cover_content_description"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -34,7 +34,7 @@
         android:layout_marginTop="6dp"
         android:ellipsize="end"
         android:maxLines="2"
-        android:text="Tên truyện"
+        android:text="@string/comic_title_placeholder"
         android:textColor="?android:attr/textColorPrimary"
         android:textSize="13sp"
         android:textStyle="bold" />

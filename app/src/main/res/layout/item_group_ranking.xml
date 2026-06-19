@@ -15,7 +15,7 @@
         android:layout_width="36dp"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="1"
+        android:text="@string/group_rank_number_placeholder"
         android:textColor="@color/brand_blue"
         android:textSize="18sp"
         android:textStyle="bold" />
@@ -30,7 +30,7 @@
         android:src="@drawable/placeholder_group"
         android:background="@drawable/bg_card_comic"
         android:clipToOutline="true"
-        android:contentDescription="Ảnh nhóm" />
+        android:contentDescription="@string/group_rank_avatar_content_description" />
 
     <!-- Thông tin nhóm -->
     <LinearLayout
@@ -44,7 +44,7 @@
             android:id="@+id/tvRankGroupName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tên nhóm"
+            android:text="@string/group_name_placeholder"
             android:textColor="?android:attr/textColorPrimary"
             android:textSize="15sp"
             android:textStyle="bold"
@@ -56,7 +56,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:text="0 thành viên"
+            android:text="@string/group_members_zero"
             android:textColor="@color/text_secondary_light"
             android:textSize="12sp" />
     </LinearLayout>
@@ -68,6 +68,6 @@
         android:layout_height="24dp"
         android:src="@drawable/ic_trophy"
         android:visibility="gone"
-        android:contentDescription="Trophy" />
+        android:contentDescription="@string/group_trophy_content_description" />
 
 </LinearLayout>
