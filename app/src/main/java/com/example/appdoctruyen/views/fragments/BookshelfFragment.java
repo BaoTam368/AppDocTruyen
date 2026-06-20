@@ -1,4 +1,4 @@
-package com.example.appdoctruyen;
+package com.example.appdoctruyen.views.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,9 +11,13 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.appdoctruyen.R;
 import com.example.appdoctruyen.data.api.MangaRepository;
 import com.example.appdoctruyen.data.database.BookshelfDatabaseHelper;
 import com.example.appdoctruyen.models.Comic;
+import com.example.appdoctruyen.views.adapters.BookshelfAdapter;
+import com.example.appdoctruyen.views.activities.ComicDetailActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +42,7 @@ public class BookshelfFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_bookshelf, container, false);
 
         tabFollowing = view.findViewById(R.id.tabFollowing);
-        tabRecentlyRead = view.findViewById(R.id.tabRecentlyRead);
+        tabRecentlyRead = view.findViewById( R.id.tabRecentlyRead);
         tabDownloaded = view.findViewById(R.id.tabDownloaded);
         recyclerView = view.findViewById(R.id.recyclerViewBookshelf);
         tvEmpty = view.findViewById(R.id.tvEmptyBookshelf);
