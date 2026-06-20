@@ -29,9 +29,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:paddingBottom="80dp"
         android:divider="@null"
         android:dividerHeight="0dp"
+        android:paddingBottom="80dp"
         tools:listitem="@layout/item_chapter" />
 
 </LinearLayout>

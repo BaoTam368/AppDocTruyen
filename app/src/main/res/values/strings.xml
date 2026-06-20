@@ -94,4 +94,5 @@
     <string name="func_support">Hỗ trợ người dùng</string>
     <string name="func_terms">Điều khoản sử dụng</string>
     <string name="func_logout">Đăng xuất</string>
+    <string name="title_activity_main2">MainActivity2</string>
 </resources>
