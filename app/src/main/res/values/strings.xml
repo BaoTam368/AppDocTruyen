@@ -98,6 +98,10 @@
     <string name="bookshelf_empty_history">Không có lịch sử đọc</string>
     <string name="bookshelf_empty_downloaded">Không có truyện đã tải</string>
     <string name="bookshelf_last_read_format">Vừa đọc: %1$s</string>
+    <string name="bookshelf_last_read_with_time_format">Vừa đọc: %1$s - %2$s</string>
+    <string name="bookshelf_local_comment_title">Bình luận local</string>
+    <string name="bookshelf_no_local_comment">Chưa có bình luận</string>
+    <string name="chapter_placeholder">Chapter 1</string>
     <string name="comic_title_placeholder">Tên truyện</string>
     <string name="comic_cover_content_description">Ảnh bìa truyện</string>
 

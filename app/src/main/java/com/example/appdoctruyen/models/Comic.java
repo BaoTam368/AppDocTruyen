@@ -12,6 +12,11 @@ public class Comic {
     private String description;
     private boolean isFollowed;       // Đang theo dõi
     private boolean isDownloaded;     // Đã tải về
+    private String mangaId;           // ID MangaDex dạng chuỗi để lưu local
+    private String chapterId;
+    private String chapterName;
+    private String localPath;
+    private long lastReadTime;
 
     public Comic(int id, String title, int coverImageResId, String coverUrl,
                  String latestChapter, String lastReadChapter, String author,
@@ -26,6 +31,7 @@ public class Comic {
         this.description = description;
         this.isFollowed = isFollowed;
         this.isDownloaded = isDownloaded;
+        this.mangaId = String.valueOf(id);
     }
 
     public Comic(int id, String title, int coverImageResId, String latestChapter) {
@@ -35,6 +41,7 @@ public class Comic {
         this.latestChapter = latestChapter;
         this.isFollowed = false;
         this.isDownloaded = false;
+        this.mangaId = String.valueOf(id);
     }
 
     public int getId() { return id; }
@@ -66,4 +73,19 @@ public class Comic {
 
     public boolean isDownloaded() { return isDownloaded; }
     public void setDownloaded(boolean downloaded) { isDownloaded = downloaded; }
+
+    public String getMangaId() { return mangaId; }
+    public void setMangaId(String mangaId) { this.mangaId = mangaId; }
+
+    public String getChapterId() { return chapterId; }
+    public void setChapterId(String chapterId) { this.chapterId = chapterId; }
+
+    public String getChapterName() { return chapterName; }
+    public void setChapterName(String chapterName) { this.chapterName = chapterName; }
+
+    public String getLocalPath() { return localPath; }
+    public void setLocalPath(String localPath) { this.localPath = localPath; }
+
+    public long getLastReadTime() { return lastReadTime; }
+    public void setLastReadTime(long lastReadTime) { this.lastReadTime = lastReadTime; }
 }

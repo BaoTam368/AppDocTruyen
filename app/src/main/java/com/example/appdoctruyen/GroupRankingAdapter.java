@@ -43,7 +43,8 @@ public class GroupRankingAdapter extends RecyclerView.Adapter<GroupRankingAdapte
     public void onBindViewHolder(@NonNull RankingViewHolder holder, int position) {
         TranslationGroup group = groupList.get(position);
 
-        holder.tvRankNumber.setText(String.valueOf(position + 1));
+        int displayRank = group.getRank() > 0 ? group.getRank() : position + 1;
+        holder.tvRankNumber.setText(String.valueOf(displayRank));
         holder.tvRankGroupName.setText(group.getName());
         holder.tvRankMemberCount.setText(context.getString(
                 R.string.group_followers_count_format,
