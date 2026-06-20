@@ -13,6 +13,23 @@
         android:paddingBottom="24dp">
 
         <LinearLayout
+            android:id="@+id/headerComic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/brand_blue"
+            android:gravity="center"
+            android:padding="14dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Truyện"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
@@ -29,6 +46,7 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="40dp"
+                android:id="@+id/iv_search_bar"
                 android:layout_marginHorizontal="12dp"
                 android:layout_weight="1"
                 android:background="@color/bg_input_light"
@@ -96,157 +114,157 @@
             android:paddingHorizontal="12dp"
             android:paddingTop="18dp"
             android:paddingBottom="14dp"
-            android:weightSum="4">
+            android:weightSum="3">
 
-            <!-- Danh mục 1: Thể loại -->
-            <LinearLayout
-                android:id="@+id/layout_cat_genres"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
+<!--&lt;!&ndash;            &lt;!&ndash; Danh mục 1: Thể loại &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;            <LinearLayout&ndash;&gt;-->
+<!--&lt;!&ndash;                android:id="@+id/layout_cat_genres"&ndash;&gt;-->
+<!--&lt;!&ndash;                android:layout_width="0dp"&ndash;&gt;-->
+<!--&lt;!&ndash;                android:layout_height="wrap_content"&ndash;&gt;-->
+<!--&lt;!&ndash;                android:layout_weight="1"&ndash;&gt;-->
+<!--&lt;!&ndash;                android:gravity="center"&ndash;&gt;-->
+<!--&lt;!&ndash;                android:orientation="vertical">&ndash;&gt;-->
 
-                <FrameLayout
-                    android:layout_width="58dp"
-                    android:layout_height="58dp"
-                    android:background="@drawable/bg_category_circle"
-                    android:padding="12dp">
+<!--&lt;!&ndash;                <FrameLayout&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:layout_width="58dp"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:layout_height="58dp"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:background="@drawable/bg_category_circle"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:padding="12dp">&ndash;&gt;-->
 
-                    <ImageView
-                        android:id="@+id/iv_cat_genres"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:scaleType="centerInside"
-                        android:src="@drawable/ic_cat_genres" />
-                </FrameLayout>
+<!--&lt;!&ndash;                    <ImageView&ndash;&gt;-->
+<!--&lt;!&ndash;                        android:id="@+id/iv_cat_genres"&ndash;&gt;-->
+<!--&lt;!&ndash;                        android:layout_width="match_parent"&ndash;&gt;-->
+<!--&lt;!&ndash;                        android:layout_height="match_parent"&ndash;&gt;-->
+<!--&lt;!&ndash;                        android:scaleType="centerInside"&ndash;&gt;-->
+<!--&lt;!&ndash;                        android:src="@drawable/ic_cat_genres" />&ndash;&gt;-->
+<!--&lt;!&ndash;                </FrameLayout>&ndash;&gt;-->
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="7dp"
-                    android:ellipsize="end"
-                    android:gravity="center"
-                    android:maxLines="1"
-                    android:text="@string/cat_genres"
-                    android:textColor="@color/text_primary_light"
-                    android:textSize="12sp" />
-            </LinearLayout>
+<!--&lt;!&ndash;                <TextView&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:layout_width="match_parent"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:layout_height="wrap_content"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:layout_marginTop="7dp"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:ellipsize="end"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:gravity="center"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:maxLines="1"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:text="@string/cat_genres"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:textColor="@color/text_primary_light"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:textSize="12sp" />&ndash;&gt;-->
+<!--&lt;!&ndash;            </LinearLayout>&ndash;&gt;-->
 
-            <!-- Danh mục 2: Top User -->
-            <LinearLayout
-                android:id="@+id/layout_cat_top_user"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
+<!--            &lt;!&ndash; Danh mục 2: Top User &ndash;&gt;-->
+<!--            <LinearLayout-->
+<!--                android:id="@+id/layout_cat_top_user"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:gravity="center"-->
+<!--                android:orientation="vertical">-->
 
-                <FrameLayout
-                    android:layout_width="58dp"
-                    android:layout_height="58dp"
-                    android:background="@drawable/bg_category_circle"
-                    android:padding="12dp">
+<!--                <FrameLayout-->
+<!--                    android:layout_width="58dp"-->
+<!--                    android:layout_height="58dp"-->
+<!--                    android:background="@drawable/bg_category_circle"-->
+<!--                    android:padding="12dp">-->
 
-                    <ImageView
-                        android:id="@+id/iv_cat_top_user"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:scaleType="centerInside"
-                        android:src="@drawable/ic_cat_top_user" />
-                </FrameLayout>
+<!--                    <ImageView-->
+<!--                        android:id="@+id/iv_cat_top_user"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        android:scaleType="centerInside"-->
+<!--                        android:src="@drawable/ic_cat_top_user" />-->
+<!--                </FrameLayout>-->
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="7dp"
-                    android:ellipsize="end"
-                    android:gravity="center"
-                    android:maxLines="1"
-                    android:text="@string/cat_top_user"
-                    android:textColor="@color/text_primary_light"
-                    android:textSize="12sp" />
-            </LinearLayout>
+<!--                <TextView-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="7dp"-->
+<!--                    android:ellipsize="end"-->
+<!--                    android:gravity="center"-->
+<!--                    android:maxLines="1"-->
+<!--                    android:text="@string/cat_top_user"-->
+<!--                    android:textColor="@color/text_primary_light"-->
+<!--                    android:textSize="12sp" />-->
+<!--            </LinearLayout>-->
 
-            <!-- Danh mục 3: Truyện mới -->
-            <LinearLayout
-                android:id="@+id/layout_cat_new"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
+<!--            &lt;!&ndash; Danh mục 3: Truyện mới &ndash;&gt;-->
+<!--            <LinearLayout-->
+<!--                android:id="@+id/layout_cat_new"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:gravity="center"-->
+<!--                android:orientation="vertical">-->
 
-                <FrameLayout
-                    android:layout_width="58dp"
-                    android:layout_height="58dp"
-                    android:background="@drawable/bg_category_circle"
-                    android:padding="12dp">
+<!--                <FrameLayout-->
+<!--                    android:layout_width="58dp"-->
+<!--                    android:layout_height="58dp"-->
+<!--                    android:background="@drawable/bg_category_circle"-->
+<!--                    android:padding="12dp">-->
 
-                    <ImageView
-                        android:id="@+id/iv_cat_new"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:scaleType="centerInside"
-                        android:src="@drawable/ic_cat_new" />
-                </FrameLayout>
+<!--                    <ImageView-->
+<!--                        android:id="@+id/iv_cat_new"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        android:scaleType="centerInside"-->
+<!--                        android:src="@drawable/ic_cat_new" />-->
+<!--                </FrameLayout>-->
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="7dp"
-                    android:ellipsize="end"
-                    android:gravity="center"
-                    android:maxLines="1"
-                    android:text="@string/cat_new_comics"
-                    android:textColor="@color/text_primary_light"
-                    android:textSize="12sp" />
-            </LinearLayout>
+<!--                <TextView-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="7dp"-->
+<!--                    android:ellipsize="end"-->
+<!--                    android:gravity="center"-->
+<!--                    android:maxLines="1"-->
+<!--                    android:text="@string/cat_new_comics"-->
+<!--                    android:textColor="@color/text_primary_light"-->
+<!--                    android:textSize="12sp" />-->
+<!--            </LinearLayout>-->
 
-            <!-- Danh mục 4: HOT -->
-            <LinearLayout
-                android:id="@+id/layout_cat_hot"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
+<!--            &lt;!&ndash; Danh mục 4: HOT &ndash;&gt;-->
+<!--            <LinearLayout-->
+<!--                android:id="@+id/layout_cat_hot"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:gravity="center"-->
+<!--                android:orientation="vertical">-->
 
-                <FrameLayout
-                    android:layout_width="58dp"
-                    android:layout_height="58dp"
-                    android:background="@drawable/bg_category_circle"
-                    android:padding="12dp">
+<!--                <FrameLayout-->
+<!--                    android:layout_width="58dp"-->
+<!--                    android:layout_height="58dp"-->
+<!--                    android:background="@drawable/bg_category_circle"-->
+<!--                    android:padding="12dp">-->
 
-                    <ImageView
-                        android:id="@+id/iv_cat_hot"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:scaleType="centerInside"
-                        android:src="@drawable/ic_cat_hot" />
-                </FrameLayout>
+<!--                    <ImageView-->
+<!--                        android:id="@+id/iv_cat_hot"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        android:scaleType="centerInside"-->
+<!--                        android:src="@drawable/ic_cat_hot" />-->
+<!--                </FrameLayout>-->
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="7dp"
-                    android:ellipsize="end"
-                    android:gravity="center"
-                    android:maxLines="1"
-                    android:text="@string/cat_hot"
-                    android:textColor="@color/text_primary_light"
-                    android:textSize="12sp" />
-            </LinearLayout>
+<!--                <TextView-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="7dp"-->
+<!--                    android:ellipsize="end"-->
+<!--                    android:gravity="center"-->
+<!--                    android:maxLines="1"-->
+<!--                    android:text="@string/cat_hot"-->
+<!--                    android:textColor="@color/text_primary_light"-->
+<!--                    android:textSize="12sp" />-->
+<!--            </LinearLayout>-->
 
-        </LinearLayout>
+<!--        </LinearLayout>-->
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingHorizontal="14dp"
-            android:paddingVertical="8dp">
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:gravity="center_vertical"-->
+<!--            android:orientation="horizontal"-->
+<!--            android:paddingHorizontal="14dp"-->
+<!--            android:paddingVertical="8dp">-->
 
             <TextView
                 android:layout_width="0dp"
@@ -261,7 +279,9 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:contentDescription="Xem thêm"
+                android:id="@+id/iv_new_comic"
                 android:src="@drawable/ic_menu_forward" />
+
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView

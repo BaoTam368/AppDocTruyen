@@ -123,37 +123,37 @@
                 android:layout_height="24dp"
                 android:src="@android:drawable/ic_menu_save"
                 android:layout_marginEnd="16dp"/>
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@android:drawable/ic_menu_share"
-                android:layout_marginEnd="16dp"/>
+<!--            <ImageView-->
+<!--                android:layout_width="24dp"-->
+<!--                android:layout_height="24dp"-->
+<!--                android:src="@android:drawable/ic_menu_share"-->
+<!--                android:layout_marginEnd="16dp"/>-->
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@android:drawable/stat_sys_download"/>
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/btnGift"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@color/badge_red"
-            android:orientation="horizontal"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="6dp"
-            android:gravity="center"
-            app:layout_constraintBottom_toBottomOf="@id/layoutActions"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/layoutActions">
+<!--        <LinearLayout-->
+<!--            android:id="@+id/btnGift"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:background="@color/badge_red"-->
+<!--            android:orientation="horizontal"-->
+<!--            android:paddingHorizontal="12dp"-->
+<!--            android:paddingVertical="6dp"-->
+<!--            android:gravity="center"-->
+<!--            app:layout_constraintBottom_toBottomOf="@id/layoutActions"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="@id/layoutActions">-->
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="+"
-                android:textColor="@android:color/white"
-                android:textStyle="bold"/>
-        </LinearLayout>
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="+"-->
+<!--                android:textColor="@android:color/white"-->
+<!--                android:textStyle="bold"/>-->
+<!--        </LinearLayout>-->
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/imgAuthorAvatar"
@@ -241,6 +241,7 @@
             android:layout_marginTop="8dp"
             android:background="@color/gray_bg"
             android:padding="16dp"
+            android:id="@+id/tvRating"
             app:layout_constraintTop_toBottomOf="@id/tvLabelRating">
 
             <TextView

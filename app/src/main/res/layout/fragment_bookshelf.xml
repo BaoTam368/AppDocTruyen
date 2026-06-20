@@ -81,46 +81,46 @@
                 android:textSize="14sp" />
         </LinearLayout>
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tab_layout_bookshelf"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="8dp"
-        android:layout_marginVertical="10dp"
-        android:background="@android:color/transparent"
-        app:tabBackground="@drawable/bg_tab_unselected"
-        app:tabSelectedBackground="@drawable/bg_tab_selected"
-        app:tabIndicatorHeight="0dp"
-        app:tabTextColor="@color/text_secondary_light"
-        app:tabSelectedTextColor="@color/white"
-        app:tabMode="fixed"
-        app:tabGravity="fill"
-        app:tabPaddingStart="0dp"
-        app:tabPaddingEnd="0dp">
+<!--    <com.google.android.material.tabs.TabLayout-->
+<!--        android:id="@+id/tab_layout_bookshelf"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginHorizontal="8dp"-->
+<!--        android:layout_marginVertical="10dp"-->
+<!--        android:background="@android:color/transparent"-->
+<!--        app:tabBackground="@drawable/bg_tab_unselected"-->
+<!--        app:tabSelectedBackground="@drawable/bg_tab_selected"-->
+<!--        app:tabIndicatorHeight="0dp"-->
+<!--        app:tabTextColor="@color/text_secondary_light"-->
+<!--        app:tabSelectedTextColor="@color/white"-->
+<!--        app:tabMode="fixed"-->
+<!--        app:tabGravity="fill"-->
+<!--        app:tabPaddingStart="0dp"-->
+<!--        app:tabPaddingEnd="0dp">-->
 
-        <!-- Các thẻ con để vẽ nháp hiển thị ngay lúc thiết kế -->
-        <com.google.android.material.tabs.TabItem
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Theo Dõi" />
+<!--        &lt;!&ndash; Các thẻ con để vẽ nháp hiển thị ngay lúc thiết kế &ndash;&gt;-->
+<!--        <com.google.android.material.tabs.TabItem-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Theo Dõi" />-->
 
-        <com.google.android.material.tabs.TabItem
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Vừa Xem" />
+<!--        <com.google.android.material.tabs.TabItem-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Vừa Xem" />-->
 
-        <com.google.android.material.tabs.TabItem
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Đã Tải" />
+<!--        <com.google.android.material.tabs.TabItem-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Đã Tải" />-->
 
-    </com.google.android.material.tabs.TabLayout>
+<!--    </com.google.android.material.tabs.TabLayout>-->
 
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/view_pager_bookshelf"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+<!--    <androidx.viewpager2.widget.ViewPager2-->
+<!--        android:id="@+id/view_pager_bookshelf"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="0dp"-->
+<!--        android:layout_weight="1" />-->
 
         <!-- RecyclerView danh sách truyện dạng grid 3 cột -->
         <androidx.recyclerview.widget.RecyclerView

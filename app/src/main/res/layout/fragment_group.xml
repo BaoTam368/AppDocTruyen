@@ -67,57 +67,57 @@
             android:textColor="@color/tab_unselected_text"
             android:textSize="14sp" />
 
-        <TextView
-            android:id="@+id/tabComicCount"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="4dp"
-            android:background="@drawable/bg_tab_unselected"
-            android:gravity="center"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:text="Số Truyện"
-            android:textColor="@color/tab_unselected_text"
-            android:textSize="14sp" />
+<!--        <TextView-->
+<!--            android:id="@+id/tabComicCount"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_weight="1"-->
+<!--            android:layout_marginStart="4dp"-->
+<!--            android:background="@drawable/bg_tab_unselected"-->
+<!--            android:gravity="center"-->
+<!--            android:paddingTop="8dp"-->
+<!--            android:paddingBottom="8dp"-->
+<!--            android:text="Số Truyện"-->
+<!--            android:textColor="@color/tab_unselected_text"-->
+<!--            android:textSize="14sp" />-->
     </LinearLayout>
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tab_layout_bookshelf"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingVertical="10dp"
-        android:paddingHorizontal="8dp"
-        android:background="@android:color/transparent"
-        app:tabBackground="@drawable/bg_tab_unselected"
-        app:tabSelectedBackground="@drawable/bg_tab_selected"
-        app:tabIndicatorHeight="0dp"
-        app:tabTextColor="@color/tab_unselected_text"
-        app:tabSelectedTextColor="@color/white"
-        app:tabMode="fixed"
-        app:tabGravity="fill"
-        app:tabPaddingStart="0dp"
-        app:tabPaddingEnd="0dp">
+<!--    <com.google.android.material.tabs.TabLayout-->
+<!--        android:id="@+id/tab_layout_bookshelf"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:paddingVertical="10dp"-->
+<!--        android:paddingHorizontal="8dp"-->
+<!--        android:background="@android:color/transparent"-->
+<!--        app:tabBackground="@drawable/bg_tab_unselected"-->
+<!--        app:tabSelectedBackground="@drawable/bg_tab_selected"-->
+<!--        app:tabIndicatorHeight="0dp"-->
+<!--        app:tabTextColor="@color/tab_unselected_text"-->
+<!--        app:tabSelectedTextColor="@color/white"-->
+<!--        app:tabMode="fixed"-->
+<!--        app:tabGravity="fill"-->
+<!--        app:tabPaddingStart="0dp"-->
+<!--        app:tabPaddingEnd="0dp">-->
 
-        <!-- Tab 1: Thay thế cho tabAll -->
-        <com.google.android.material.tabs.TabItem
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tất Cả" />
+<!--        &lt;!&ndash; Tab 1: Thay thế cho tabAll &ndash;&gt;-->
+<!--        <com.google.android.material.tabs.TabItem-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Tất Cả" />-->
 
-        <!-- Tab 2: Thay thế cho tabFamous -->
-        <com.google.android.material.tabs.TabItem
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Nổi Tiếng" />
+<!--        &lt;!&ndash; Tab 2: Thay thế cho tabFamous &ndash;&gt;-->
+<!--        <com.google.android.material.tabs.TabItem-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Nổi Tiếng" />-->
 
-        <!-- Tab 3: Thay thế cho tabComicCount -->
-        <com.google.android.material.tabs.TabItem
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Số Truyện" />
+<!--        &lt;!&ndash; Tab 3: Thay thế cho tabComicCount &ndash;&gt;-->
+<!--        <com.google.android.material.tabs.TabItem-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Số Truyện" />-->
 
-    </com.google.android.material.tabs.TabLayout>
+<!--    </com.google.android.material.tabs.TabLayout>-->
 
     <!-- RecyclerView danh sách nhóm dạng grid (Tất Cả & Số Truyện) -->
     <androidx.recyclerview.widget.RecyclerView
