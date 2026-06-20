@@ -1,0 +1,24 @@
+{
+  "name": "appdoctruyen",
+  "version": "1.0.0",
+  "description": "link figma: https://www.figma.com/design/iQwa0EWvV8KwUv3VbN2U1j/DOANGiaoTiepNguoi-May--Copy-?node-id=0-1&p=f&t=GOrT1cSCXTGfL6br-0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BaoTam368/AppDocTruyen.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/BaoTam368/AppDocTruyen/issues"
+  },
+  "homepage": "https://github.com/BaoTam368/AppDocTruyen#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
