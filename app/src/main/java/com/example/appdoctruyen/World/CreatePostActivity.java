@@ -68,7 +68,6 @@ public class CreatePostActivity extends AppCompatActivity {
                     Toast.makeText(CreatePostActivity.this, "Vui lòng nhập nội dung hoặc chọn ảnh!", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                // TODO: Chỗ này sau này sẽ là code gửi dữ liệu (caption và selectedImageUri) về lại trang FeedFragment
                 Toast.makeText(CreatePostActivity.this, "Đăng bài thành công!\nNội dung: " + caption, Toast.LENGTH_LONG).show();
                 finish();
             }
