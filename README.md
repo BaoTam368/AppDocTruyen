@@ -137,3 +137,45 @@ ví dụ: là hình này
 <img width="302" height="553" alt="image" src="https://github.com/user-attachments/assets/17ed42e6-1cae-4b52-be3c-64d8464a8bb3" />
 
 
+
+## Phần Nguyễn Thắng phụ trách
+
+### 1. Tủ sách
+
+File chính:
+- `BookshelfFragment.java`
+- `BookshelfAdapter.java`
+- `BookshelfDatabaseHelper.java`
+- `fragment_bookshelf.xml`
+- `item_comic.xml`
+
+Chức năng:
+- Hiển thị truyện theo dõi.
+- Hiển thị truyện vừa xem.
+- Hiển thị truyện đã tải.
+- Sử dụng RecyclerView dạng grid.
+- Có empty state khi danh sách rỗng.
+- Có SQLite local để lưu bookmark, lịch sử đọc, truyện đã tải và comment local.
+- SQLite lưu theo `user_id` + `manga_id`, không lưu nguyên toàn bộ truyện như backend.
+- Nếu SQLite chưa có dữ liệu thì dùng dữ liệu mẫu để demo.
+
+### 2. Nhóm dịch
+
+File chính:
+- `BookshelfGroupFragment.java`
+- `BookshelfGroupAdapter.java`
+- `GroupRankingAdapter.java`
+- `GroupDetailActivity.java`
+- `TranslationGroup.java`
+- `fragment_group.xml`
+- `item_group.xml`
+- `item_group_ranking.xml`
+- `activity_group_detail.xml`
+
+Chức năng:
+- Hiển thị danh sách nhóm dịch.
+- Có tab Tất Cả, Nổi Tiếng, Số Truyện.
+- Có danh sách nhóm dạng grid.
+- Có danh sách ranking nhóm dịch.
+- Click vào nhóm để xem chi tiết.
+- Dữ liệu nhóm dịch hiện là dữ liệu local/demo để phục vụ bảo vệ.
