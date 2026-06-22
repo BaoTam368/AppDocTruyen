@@ -23,6 +23,17 @@ public class CreatePostActivity extends AppCompatActivity {
     private EditText editCaption;
     private LinearLayout btnPickImage;
     private Uri selectedImageUri = null;
+    private ActivityResultLauncher<Intent> pickImageLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    selectedImageUri = result.getData().getData();
+                    imagePreview.setImageURI(selectedImageUri);
+                    btnPickImage.setVisibility(View.GONE);
+                    imagePreview.setVisibility(View.VISIBLE);
+                }
+            }
+    );
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,15 +74,4 @@ public class CreatePostActivity extends AppCompatActivity {
             }
         });
     }
-    private ActivityResultLauncher<Intent> pickImageLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                    selectedImageUri = result.getData().getData();
-                    imagePreview.setImageURI(selectedImageUri);
-                    btnPickImage.setVisibility(View.GONE);
-                    imagePreview.setVisibility(View.VISIBLE);
-                }
-            }
-    );
 }

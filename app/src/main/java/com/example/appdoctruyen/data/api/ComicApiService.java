@@ -1,4 +1,5 @@
 package com.example.appdoctruyen.data.api;
 
-public class ComicApiService {
+@Deprecated
+public interface ComicApiService extends MangaApiService {
 }

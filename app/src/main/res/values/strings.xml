@@ -76,7 +76,7 @@
 
     <string name="lbl_notice_title">Chú Ý</string>
     <string name="note_rate_highlight">10 Xu = 1000đ</string>
-    <string name="note_rate_rest"> nạp 10k tương ứng với 100 xu.</string>
+    <string name="note_rate_rest">nạp 10k tương ứng với 100 xu.</string>
     <string name="note_vip_info">Xu dùng để mở chap VIP trên app, cần dùng 2 Xu để mở khóa 1 chap VIP.</string>
     <string name="note_ads_info">Bạn có thể xem quảng cáo sẽ nhận 5-10 xu tùy vào độ dài quảng cáo.</string>
 

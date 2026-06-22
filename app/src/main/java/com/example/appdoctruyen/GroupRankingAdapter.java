@@ -16,10 +16,6 @@ public class GroupRankingAdapter extends RecyclerView.Adapter<GroupRankingAdapte
     private List<TranslationGroup> groupList;
     private OnRankingClickListener listener;
 
-    public interface OnRankingClickListener {
-        void onRankingClick(TranslationGroup group, int position);
-    }
-
     public GroupRankingAdapter(Context context, List<TranslationGroup> groupList,
                                OnRankingClickListener listener) {
         this.context = context;
@@ -82,6 +78,10 @@ public class GroupRankingAdapter extends RecyclerView.Adapter<GroupRankingAdapte
     @Override
     public int getItemCount() {
         return groupList != null ? groupList.size() : 0;
+    }
+
+    public interface OnRankingClickListener {
+        void onRankingClick(TranslationGroup group, int position);
     }
 
     public static class RankingViewHolder extends RecyclerView.ViewHolder {

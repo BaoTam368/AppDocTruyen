@@ -44,48 +44,123 @@ public class Comic {
         this.mangaId = String.valueOf(id);
     }
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public int getId() {
+        return id;
+    }
 
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-    public int getCoverImageResId() { return coverImageResId; }
-    public void setCoverImageResId(int coverImageResId) { this.coverImageResId = coverImageResId; }
+    public String getTitle() {
+        return title;
+    }
 
-    public String getCoverUrl() { return coverUrl; }
-    public void setCoverUrl(String coverUrl) { this.coverUrl = coverUrl; }
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-    public String getLatestChapter() { return latestChapter; }
-    public void setLatestChapter(String latestChapter) { this.latestChapter = latestChapter; }
+    public int getCoverImageResId() {
+        return coverImageResId;
+    }
 
-    public String getLastReadChapter() { return lastReadChapter; }
-    public void setLastReadChapter(String lastReadChapter) { this.lastReadChapter = lastReadChapter; }
+    public void setCoverImageResId(int coverImageResId) {
+        this.coverImageResId = coverImageResId;
+    }
 
-    public String getAuthor() { return author; }
-    public void setAuthor(String author) { this.author = author; }
+    public String getCoverUrl() {
+        return coverUrl;
+    }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public void setCoverUrl(String coverUrl) {
+        this.coverUrl = coverUrl;
+    }
 
-    public boolean isFollowed() { return isFollowed; }
-    public void setFollowed(boolean followed) { isFollowed = followed; }
+    public String getLatestChapter() {
+        return latestChapter;
+    }
 
-    public boolean isDownloaded() { return isDownloaded; }
-    public void setDownloaded(boolean downloaded) { isDownloaded = downloaded; }
+    public void setLatestChapter(String latestChapter) {
+        this.latestChapter = latestChapter;
+    }
 
-    public String getMangaId() { return mangaId; }
-    public void setMangaId(String mangaId) { this.mangaId = mangaId; }
+    public String getLastReadChapter() {
+        return lastReadChapter;
+    }
 
-    public String getChapterId() { return chapterId; }
-    public void setChapterId(String chapterId) { this.chapterId = chapterId; }
+    public void setLastReadChapter(String lastReadChapter) {
+        this.lastReadChapter = lastReadChapter;
+    }
 
-    public String getChapterName() { return chapterName; }
-    public void setChapterName(String chapterName) { this.chapterName = chapterName; }
+    public String getAuthor() {
+        return author;
+    }
 
-    public String getLocalPath() { return localPath; }
-    public void setLocalPath(String localPath) { this.localPath = localPath; }
+    public void setAuthor(String author) {
+        this.author = author;
+    }
 
-    public long getLastReadTime() { return lastReadTime; }
-    public void setLastReadTime(long lastReadTime) { this.lastReadTime = lastReadTime; }
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public boolean isFollowed() {
+        return isFollowed;
+    }
+
+    public void setFollowed(boolean followed) {
+        isFollowed = followed;
+    }
+
+    public boolean isDownloaded() {
+        return isDownloaded;
+    }
+
+    public void setDownloaded(boolean downloaded) {
+        isDownloaded = downloaded;
+    }
+
+    public String getMangaId() {
+        return mangaId;
+    }
+
+    public void setMangaId(String mangaId) {
+        this.mangaId = mangaId;
+    }
+
+    public String getChapterId() {
+        return chapterId;
+    }
+
+    public void setChapterId(String chapterId) {
+        this.chapterId = chapterId;
+    }
+
+    public String getChapterName() {
+        return chapterName;
+    }
+
+    public void setChapterName(String chapterName) {
+        this.chapterName = chapterName;
+    }
+
+    public String getLocalPath() {
+        return localPath;
+    }
+
+    public void setLocalPath(String localPath) {
+        this.localPath = localPath;
+    }
+
+    public long getLastReadTime() {
+        return lastReadTime;
+    }
+
+    public void setLastReadTime(long lastReadTime) {
+        this.lastReadTime = lastReadTime;
+    }
 }

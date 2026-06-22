@@ -1,7 +1,7 @@
 package com.example.appdoctruyen.models;
 
 public class Group {
-    private String groupName, time, caption,  avatarUrl;
+    private String groupName, time, caption, avatarUrl;
     private int numLikes, numComments;
 
     public Group(String groupName, String time, String caption, String avatarUrl, int numLikes, int numComments) {
