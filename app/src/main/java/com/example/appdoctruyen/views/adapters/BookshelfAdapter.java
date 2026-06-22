@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.appdoctruyen.R;
 import com.example.appdoctruyen.models.Comic;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class BookshelfAdapter extends RecyclerView.Adapter<BookshelfAdapter.ComicViewHolder> {
@@ -17,10 +19,6 @@ public class BookshelfAdapter extends RecyclerView.Adapter<BookshelfAdapter.Comi
     private Context context;
     private List<Comic> comicList;
     private OnItemClickListener listener;
-
-    public interface OnItemClickListener {
-        void onItemClick(Comic comic, int position);
-    }
 
     public BookshelfAdapter(Context context, List<Comic> comicList, OnItemClickListener listener) {
         this.context = context;
@@ -44,17 +42,31 @@ public class BookshelfAdapter extends RecyclerView.Adapter<BookshelfAdapter.Comi
     public void onBindViewHolder(@NonNull ComicViewHolder holder, int position) {
         Comic comic = comicList.get(position);
 
-        // Hiển thị tên truyện
+        // Bind thông tin truyện lên từng item trong danh sách tủ sách
         holder.tvComicTitle.setText(comic.getTitle());
 
-        // Hiển thị thông tin chapter
-        if (comic.getLastReadChapter() != null && !comic.getLastReadChapter().isEmpty()) {
-            holder.tvComicChapter.setText("Vừa đọc: " + comic.getLastReadChapter());
-        } else if (comic.getLatestChapter() != null) {
+        String lastReadChapter = !isBlank(comic.getLastReadChapter())
+                ? comic.getLastReadChapter()
+                : comic.getChapterName();
+
+        if (!isBlank(lastReadChapter) && comic.getLastReadTime() > 0) {
+            holder.tvComicChapter.setText(context.getString(
+                    R.string.bookshelf_last_read_with_time_format,
+                    lastReadChapter,
+                    formatTime(comic.getLastReadTime())
+            ));
+        } else if (!isBlank(lastReadChapter)) {
+            holder.tvComicChapter.setText(context.getString(
+                    R.string.bookshelf_last_read_format,
+                    lastReadChapter
+            ));
+        } else if (comic.getLatestChapter() != null && !comic.getLatestChapter().isEmpty()) {
             holder.tvComicChapter.setText(comic.getLatestChapter());
+        } else {
+            holder.tvComicChapter.setText("");
         }
 
-        // Hiển thị ảnh bìa: ưu tiên URL, nếu không có dùng resource ID
+        // Ưu tiên tải ảnh bìa từ URL, nếu không có thì dùng ảnh placeholder local
         if (comic.getCoverUrl() != null && !comic.getCoverUrl().isEmpty()) {
             Glide.with(context)
                     .load(comic.getCoverUrl())
@@ -67,7 +79,6 @@ public class BookshelfAdapter extends RecyclerView.Adapter<BookshelfAdapter.Comi
             holder.imgComicCover.setImageResource(R.drawable.placeholder_comic);
         }
 
-        // Xử lý click vào item
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onItemClick(comic, position);
@@ -78,6 +89,19 @@ public class BookshelfAdapter extends RecyclerView.Adapter<BookshelfAdapter.Comi
     @Override
     public int getItemCount() {
         return comicList != null ? comicList.size() : 0;
+    }
+
+    private String formatTime(long timeMillis) {
+        return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT)
+                .format(new Date(timeMillis));
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(Comic comic, int position);
     }
 
     public static class ComicViewHolder extends RecyclerView.ViewHolder {

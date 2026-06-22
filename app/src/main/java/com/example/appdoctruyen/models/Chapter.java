@@ -11,7 +11,15 @@ public class Chapter {
         this.isFree = isFree;
     }
 
-    public String getName() { return name; }
-    public String getDate() { return date; }
-    public boolean isFree() { return isFree; }
+    public String getName() {
+        return name;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public boolean isFree() {
+        return isFree;
+    }
 }

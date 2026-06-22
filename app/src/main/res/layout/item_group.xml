@@ -8,74 +8,74 @@
 
     <!-- Ảnh đại diện nhóm -->
     <ImageView
-        android:id="@+id/imgGroupAvatar"
-        android:layout_width="90dp"
-        android:layout_height="90dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/placeholder_group"
-        android:background="@drawable/bg_card_comic"
-        android:clipToOutline="true"
-        android:contentDescription="Ảnh nhóm dịch" />
+            android:id="@+id/imgGroupAvatar"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/placeholder_group"
+            android:background="@drawable/bg_card_comic"
+            android:clipToOutline="true"
+            android:contentDescription="@string/group_avatar_content_description"/>
 
     <!-- Tên nhóm -->
     <TextView
-        android:id="@+id/tvGroupName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:ellipsize="end"
-        android:gravity="center"
-        android:maxLines="1"
-        android:text="Tên nhóm"
-        android:textColor="?android:attr/textColorPrimary"
-        android:textSize="13sp"
-        android:textStyle="bold" />
+            android:id="@+id/tvGroupName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:text="@string/group_name_placeholder"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textSize="13sp"
+            android:textStyle="bold"/>
 
     <!-- Hàng thông tin: số truyện + số thành viên -->
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:gravity="center"
-        android:orientation="horizontal">
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:gravity="center"
+            android:orientation="horizontal">
 
         <!-- Số truyện -->
         <ImageView
-            android:layout_width="14dp"
-            android:layout_height="14dp"
-            android:src="@drawable/ic_comic"
-            android:contentDescription="Truyện"
-            android:tint="@color/brand_blue" />
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:src="@drawable/ic_comic"
+                android:contentDescription="@string/label_comic_count_short"
+                android:tint="@color/brand_blue"/>
 
         <TextView
-            android:id="@+id/tvGroupComicCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="3dp"
-            android:text="0"
-            android:textColor="@color/text_secondary_light"
-            android:textSize="11sp" />
+                android:id="@+id/tvGroupComicCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="3dp"
+                android:text="@string/zero_count"
+                android:textColor="@color/text_secondary_light"
+                android:textSize="11sp"/>
 
         <View
-            android:layout_width="8dp"
-            android:layout_height="1dp" />
+                android:layout_width="8dp"
+                android:layout_height="1dp"/>
 
         <!-- Số thành viên -->
         <ImageView
-            android:layout_width="14dp"
-            android:layout_height="14dp"
-            android:src="@drawable/ic_members"
-            android:contentDescription="Thành viên"
-            android:tint="@color/brand_blue" />
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:src="@drawable/ic_members"
+                android:contentDescription="@string/label_members"
+                android:tint="@color/brand_blue"/>
 
         <TextView
-            android:id="@+id/tvGroupMemberCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="3dp"
-            android:text="0"
-            android:textColor="@color/text_secondary_light"
-            android:textSize="11sp" />
+                android:id="@+id/tvGroupMemberCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="3dp"
+                android:text="@string/zero_count"
+                android:textColor="@color/text_secondary_light"
+                android:textSize="11sp"/>
     </LinearLayout>
 
 </LinearLayout>

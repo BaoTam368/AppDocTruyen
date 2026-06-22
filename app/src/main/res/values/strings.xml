@@ -7,7 +7,7 @@
     <string name="tv_forgot_password">Bạn quên mật khẩu ư?</string>
     <string name="text_or">OR</string>
     <string name="btn_register">Tạo tài khoản mới</string>
-    <string name="hint_username">Nhập tài khoản:...</string>
+    <string name="hint_username">Nhập email:...</string>
     <string name="hint_password">Nhập mật khẩu:...</string>
 
     <string name="title_register">Đăng Ký</string>
@@ -41,6 +41,9 @@
 
     <string name="title_search_activity">Tìm Kiếm Truyện Tranh</string>
     <string name="title_top_search">Top tìm kiếm:</string>
+    <string name="title_search_result">Kết quả tìm kiếm</string>
+    <string name="title_filter_by_genre">Lọc theo thể loại</string>
+    <string name="btn_apply_filter">Áp dụng</string>
 
 
     <string name="title_chapter_list">Danh sách chương</string>
@@ -76,7 +79,7 @@
 
     <string name="lbl_notice_title">Chú Ý</string>
     <string name="note_rate_highlight">10 Xu = 1000đ</string>
-    <string name="note_rate_rest"> nạp 10k tương ứng với 100 xu.</string>
+    <string name="note_rate_rest">nạp 10k tương ứng với 100 xu.</string>
     <string name="note_vip_info">Xu dùng để mở chap VIP trên app, cần dùng 2 Xu để mở khóa 1 chap VIP.</string>
     <string name="note_ads_info">Bạn có thể xem quảng cáo sẽ nhận 5-10 xu tùy vào độ dài quảng cáo.</string>
 
@@ -94,5 +97,40 @@
     <string name="func_support">Hỗ trợ người dùng</string>
     <string name="func_terms">Điều khoản sử dụng</string>
     <string name="func_logout">Đăng xuất</string>
-    <string name="title_activity_main2">MainActivity2</string>
+    <string name="bookshelf_empty_following">Không có truyện theo dõi</string>
+    <string name="bookshelf_empty_history">Không có lịch sử đọc</string>
+    <string name="bookshelf_empty_downloaded">Không có truyện đã tải</string>
+    <string name="bookshelf_last_read_format">Vừa đọc: %1$s</string>
+    <string name="bookshelf_last_read_with_time_format">Vừa đọc: %1$s - %2$s</string>
+    <string name="bookshelf_local_comment_title">Bình luận local</string>
+    <string name="bookshelf_no_local_comment">Chưa có bình luận</string>
+    <string name="chapter_placeholder">Chapter 1</string>
+    <string name="comic_title_placeholder">Tên truyện</string>
+    <string name="comic_cover_content_description">Ảnh bìa truyện</string>
+
+    <string name="group_title">Nhóm Dịch</string>
+    <string name="group_tab_all">Tất Cả</string>
+    <string name="group_tab_famous">Nổi Tiếng</string>
+    <string name="group_tab_comic_count">Số Truyện</string>
+    <string name="group_empty">Không có nhóm dịch</string>
+    <string name="group_detail_title">Chi Tiết Nhóm Dịch</string>
+    <string name="group_default_name">Nhóm dịch</string>
+    <string name="group_default_description">Nhóm dịch truyện tranh</string>
+    <string name="group_name_placeholder">Tên nhóm</string>
+    <string name="group_description_placeholder">Mô tả nhóm dịch</string>
+    <string name="group_avatar_content_description">Ảnh nhóm dịch</string>
+    <string name="group_rank_avatar_content_description">Ảnh nhóm</string>
+    <string name="group_trophy_content_description">Xếp hạng cao</string>
+    <string name="action_back">Quay lại</string>
+    <string name="label_comic_count">Số truyện</string>
+    <string name="label_comic_count_short">Truyện</string>
+    <string name="label_members">Thành viên</string>
+    <string name="label_followers">Người theo dõi</string>
+    <string name="label_followers_short">Theo dõi</string>
+    <string name="group_comic_count_format">%1$d truyện</string>
+    <string name="group_members_count_format">%1$d thành viên</string>
+    <string name="group_followers_count_format">%1$d người theo dõi</string>
+    <string name="group_members_zero">0 thành viên</string>
+    <string name="group_rank_number_placeholder">1</string>
+    <string name="zero_count">0</string>
 </resources>

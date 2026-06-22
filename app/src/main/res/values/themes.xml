@@ -13,5 +13,5 @@
         <item name="cornerSize">50%</item>
     </style>
 
-    <style name="Theme.AppDocTruyen" parent="Base.Theme.AppDocTruyen" />
+    <style name="Theme.AppDocTruyen" parent="Base.Theme.AppDocTruyen"/>
 </resources>
