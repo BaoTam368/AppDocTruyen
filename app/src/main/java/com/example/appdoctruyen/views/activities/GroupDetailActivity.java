@@ -21,6 +21,7 @@ public class GroupDetailActivity extends AppCompatActivity {
         TextView tvMemberCount = findViewById(R.id.tvGroupDetailMemberCount);
         TextView tvFollowerCount = findViewById(R.id.tvGroupDetailFollowerCount);
 
+        // Nhận dữ liệu nhóm dịch từ màn danh sách và hiển thị lên giao diện chi tiết
         String name = getIntent().getStringExtra("group_name");
         String description = getIntent().getStringExtra("group_description");
         int comicCount = getIntent().getIntExtra("group_comic_count", 0);
@@ -28,8 +29,8 @@ public class GroupDetailActivity extends AppCompatActivity {
         int followerCount = getIntent().getIntExtra("group_follower_count", 0);
         int avatarResId = getIntent().getIntExtra("group_avatar_res_id", 0);
 
-        tvName.setText(name != null ? name : "Nhóm dịch");
-        tvDescription.setText(description != null ? description : "Nhóm dịch truyện tranh");
+        tvName.setText(name != null ? name : getString(R.string.group_default_name));
+        tvDescription.setText(description != null ? description : getString(R.string.group_default_description));
         tvComicCount.setText(String.valueOf(comicCount));
         tvMemberCount.setText(String.valueOf(memberCount));
         tvFollowerCount.setText(String.valueOf(followerCount));

@@ -21,10 +21,6 @@ public class FeaturedComicAdapter extends RecyclerView.Adapter<FeaturedComicAdap
     private List<Comic> comicList;
     private OnFeaturedComicClickListener listener;
 
-    public interface OnFeaturedComicClickListener {
-        void onFeaturedComicClick(Comic comic, int position);
-    }
-
     public FeaturedComicAdapter(Context context,
                                 List<Comic> comicList,
                                 OnFeaturedComicClickListener listener) {
@@ -62,6 +58,10 @@ public class FeaturedComicAdapter extends RecyclerView.Adapter<FeaturedComicAdap
     @Override
     public int getItemCount() {
         return comicList != null ? comicList.size() : 0;
+    }
+
+    public interface OnFeaturedComicClickListener {
+        void onFeaturedComicClick(Comic comic, int position);
     }
 
     public static class FeaturedComicViewHolder extends RecyclerView.ViewHolder {

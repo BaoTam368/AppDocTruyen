@@ -1,7 +1,9 @@
 package com.example.appdoctruyen.models;
+
 public class TranslationGroup {
 
     private int id;
+    private String groupId;
     private String name;
     private String description;
     private int avatarResId;
@@ -16,6 +18,7 @@ public class TranslationGroup {
                             String avatarUrl, int comicCount, int memberCount,
                             int followerCount, int rank, String createdDate) {
         this.id = id;
+        this.groupId = String.valueOf(id);
         this.name = name;
         this.description = description;
         this.avatarResId = avatarResId;
@@ -30,6 +33,7 @@ public class TranslationGroup {
     public TranslationGroup(int id, String name, int avatarResId,
                             int comicCount, int memberCount) {
         this.id = id;
+        this.groupId = String.valueOf(id);
         this.name = name;
         this.avatarResId = avatarResId;
         this.comicCount = comicCount;
@@ -37,33 +41,104 @@ public class TranslationGroup {
         this.rank = 0;
     }
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public TranslationGroup(int id, String name, String description, int avatarResId,
+                            int comicCount, int memberCount, int followerCount) {
+        this.id = id;
+        this.groupId = String.valueOf(id);
+        this.name = name;
+        this.description = description;
+        this.avatarResId = avatarResId;
+        this.comicCount = comicCount;
+        this.memberCount = memberCount;
+        this.followerCount = followerCount;
+        this.rank = 0;
+    }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public int getId() {
+        return id;
+    }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-    public int getAvatarResId() { return avatarResId; }
-    public void setAvatarResId(int avatarResId) { this.avatarResId = avatarResId; }
+    public String getGroupId() {
+        return groupId;
+    }
 
-    public String getAvatarUrl() { return avatarUrl; }
-    public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
 
-    public int getComicCount() { return comicCount; }
-    public void setComicCount(int comicCount) { this.comicCount = comicCount; }
+    public String getName() {
+        return name;
+    }
 
-    public int getMemberCount() { return memberCount; }
-    public void setMemberCount(int memberCount) { this.memberCount = memberCount; }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public int getFollowerCount() { return followerCount; }
-    public void setFollowerCount(int followerCount) { this.followerCount = followerCount; }
+    public String getDescription() {
+        return description;
+    }
 
-    public int getRank() { return rank; }
-    public void setRank(int rank) { this.rank = rank; }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-    public String getCreatedDate() { return createdDate; }
-    public void setCreatedDate(String createdDate) { this.createdDate = createdDate; }
+    public int getAvatarResId() {
+        return avatarResId;
+    }
+
+    public void setAvatarResId(int avatarResId) {
+        this.avatarResId = avatarResId;
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
+    }
+
+    public int getComicCount() {
+        return comicCount;
+    }
+
+    public void setComicCount(int comicCount) {
+        this.comicCount = comicCount;
+    }
+
+    public int getMemberCount() {
+        return memberCount;
+    }
+
+    public void setMemberCount(int memberCount) {
+        this.memberCount = memberCount;
+    }
+
+    public int getFollowerCount() {
+        return followerCount;
+    }
+
+    public void setFollowerCount(int followerCount) {
+        this.followerCount = followerCount;
+    }
+
+    public int getRank() {
+        return rank;
+    }
+
+    public void setRank(int rank) {
+        this.rank = rank;
+    }
+
+    public String getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(String createdDate) {
+        this.createdDate = createdDate;
+    }
 }

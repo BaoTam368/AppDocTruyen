@@ -38,11 +38,6 @@ public class ChapterAdapter extends BaseAdapter {
         return position;
     }
 
-    private class ViewHolder {
-        TextView tvChapterName, tvChapterDate, tvFree;
-        ImageView imgLock;
-    }
-
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
@@ -80,5 +75,10 @@ public class ChapterAdapter extends BaseAdapter {
         }
 
         return convertView;
+    }
+
+    private class ViewHolder {
+        TextView tvChapterName, tvChapterDate, tvFree;
+        ImageView imgLock;
     }
 }

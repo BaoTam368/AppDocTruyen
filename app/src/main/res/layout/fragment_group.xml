@@ -1,154 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://android.com"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="?android:attr/windowBackground">
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="?android:attr/windowBackground"
+              android:orientation="vertical">
 
-    <!-- Header xanh ngọc -->
     <LinearLayout
-        android:id="@+id/headerGroup"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/brand_blue"
-        android:gravity="center"
-        android:padding="14dp">
+            android:id="@+id/headerGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/brand_blue"
+            android:gravity="center"
+            android:padding="14dp">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Nhóm Dịch"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/group_title"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
     </LinearLayout>
 
-    <!-- 3 Tab: Tất Cả / Nổi Tiếng / Số Truyện -->
     <LinearLayout
-        android:id="@+id/tabContainerGroup"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp">
+            android:id="@+id/tabContainerGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingStart="8dp"
+            android:paddingTop="10dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="10dp">
 
         <TextView
-            android:id="@+id/tabAll"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginEnd="4dp"
-            android:background="@drawable/bg_tab_selected"
-            android:gravity="center"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:text="Tất Cả"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+                android:id="@+id/tabAll"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_tab_selected"
+                android:gravity="center"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:text="@string/group_tab_all"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
 
         <TextView
-            android:id="@+id/tabFamous"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="4dp"
-            android:background="@drawable/bg_tab_unselected"
-            android:gravity="center"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:text="Nổi Tiếng"
-            android:textColor="@color/tab_unselected_text"
-            android:textSize="14sp" />
+                android:id="@+id/tabFamous"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_tab_unselected"
+                android:gravity="center"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:text="@string/group_tab_famous"
+                android:textColor="@color/tab_unselected_text"
+                android:textSize="14sp"/>
 
-<!--        <TextView-->
-<!--            android:id="@+id/tabComicCount"-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_weight="1"-->
-<!--            android:layout_marginStart="4dp"-->
-<!--            android:background="@drawable/bg_tab_unselected"-->
-<!--            android:gravity="center"-->
-<!--            android:paddingTop="8dp"-->
-<!--            android:paddingBottom="8dp"-->
-<!--            android:text="Số Truyện"-->
-<!--            android:textColor="@color/tab_unselected_text"-->
-<!--            android:textSize="14sp" />-->
+        <TextView
+                android:id="@+id/tabComicCount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_tab_unselected"
+                android:gravity="center"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:text="@string/group_tab_comic_count"
+                android:textColor="@color/tab_unselected_text"
+                android:textSize="14sp"/>
     </LinearLayout>
 
-<!--    <com.google.android.material.tabs.TabLayout-->
-<!--        android:id="@+id/tab_layout_bookshelf"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:paddingVertical="10dp"-->
-<!--        android:paddingHorizontal="8dp"-->
-<!--        android:background="@android:color/transparent"-->
-<!--        app:tabBackground="@drawable/bg_tab_unselected"-->
-<!--        app:tabSelectedBackground="@drawable/bg_tab_selected"-->
-<!--        app:tabIndicatorHeight="0dp"-->
-<!--        app:tabTextColor="@color/tab_unselected_text"-->
-<!--        app:tabSelectedTextColor="@color/white"-->
-<!--        app:tabMode="fixed"-->
-<!--        app:tabGravity="fill"-->
-<!--        app:tabPaddingStart="0dp"-->
-<!--        app:tabPaddingEnd="0dp">-->
-
-<!--        &lt;!&ndash; Tab 1: Thay thế cho tabAll &ndash;&gt;-->
-<!--        <com.google.android.material.tabs.TabItem-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="Tất Cả" />-->
-
-<!--        &lt;!&ndash; Tab 2: Thay thế cho tabFamous &ndash;&gt;-->
-<!--        <com.google.android.material.tabs.TabItem-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="Nổi Tiếng" />-->
-
-<!--        &lt;!&ndash; Tab 3: Thay thế cho tabComicCount &ndash;&gt;-->
-<!--        <com.google.android.material.tabs.TabItem-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="Số Truyện" />-->
-
-<!--    </com.google.android.material.tabs.TabLayout>-->
-
-    <!-- RecyclerView danh sách nhóm dạng grid (Tất Cả & Số Truyện) -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewGroup2"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:padding="8dp"
-        tools:listitem="@layout/item_group" />
+            android:id="@+id/recyclerViewGroup2"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:padding="8dp"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="3"
+            tools:listitem="@layout/item_group"/>
 
-    <!-- RecyclerView bảng xếp hạng (Nổi Tiếng) -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewRanking"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:padding="8dp"
-        android:visibility="gone" />
+            android:id="@+id/recyclerViewRanking"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:padding="8dp"
+            android:visibility="gone"
+            tools:listitem="@layout/item_group_ranking"/>
 
-    <!-- Empty State -->
     <TextView
-        android:id="@+id/tvEmptyGroup"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:text="Chưa có nhóm dịch nào"
-        android:textColor="@color/text_secondary_light"
-        android:textSize="16sp"
-        android:visibility="gone" />
+            android:id="@+id/tvEmptyGroup"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/group_empty"
+            android:textColor="@color/text_secondary_light"
+            android:textSize="16sp"
+            android:visibility="gone"/>
 
 </LinearLayout>

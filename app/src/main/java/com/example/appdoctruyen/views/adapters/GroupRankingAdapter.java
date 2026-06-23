@@ -18,10 +18,6 @@ public class GroupRankingAdapter extends RecyclerView.Adapter<GroupRankingAdapte
     private List<TranslationGroup> groupList;
     private OnRankingClickListener listener;
 
-    public interface OnRankingClickListener {
-        void onRankingClick(TranslationGroup group, int position);
-    }
-
     public GroupRankingAdapter(Context context, List<TranslationGroup> groupList,
                                OnRankingClickListener listener) {
         this.context = context;
@@ -45,30 +41,27 @@ public class GroupRankingAdapter extends RecyclerView.Adapter<GroupRankingAdapte
     public void onBindViewHolder(@NonNull RankingViewHolder holder, int position) {
         TranslationGroup group = groupList.get(position);
 
-        // Số thứ hạng (bắt đầu từ 1)
-        holder.tvRankNumber.setText(String.valueOf(position + 1));
-
-        // Tên nhóm
+        int displayRank = group.getRank() > 0 ? group.getRank() : position + 1;
+        holder.tvRankNumber.setText(String.valueOf(displayRank));
         holder.tvRankGroupName.setText(group.getName());
+        holder.tvRankMemberCount.setText(context.getString(
+                R.string.group_followers_count_format,
+                group.getFollowerCount()
+        ));
 
-        // Số thành viên
-        holder.tvRankMemberCount.setText(group.getMemberCount() + " thành viên");
-
-        // Ảnh avatar
         if (group.getAvatarResId() != 0) {
             holder.imgRankAvatar.setImageResource(group.getAvatarResId());
         } else {
             holder.imgRankAvatar.setImageResource(R.drawable.placeholder_group);
         }
 
-        // Hiện trophy cho top 3
+        // Hiển thị biểu tượng trophy cho ba nhóm có thứ hạng cao nhất
         if (position < 3) {
             holder.imgRankTrophy.setVisibility(View.VISIBLE);
         } else {
             holder.imgRankTrophy.setVisibility(View.GONE);
         }
 
-        // Đổi màu ranking number cho top 3
         if (position == 0) {
             holder.tvRankNumber.setTextColor(context.getResources().getColor(R.color.badge_red, null));
         } else if (position < 3) {
@@ -77,7 +70,6 @@ public class GroupRankingAdapter extends RecyclerView.Adapter<GroupRankingAdapte
             holder.tvRankNumber.setTextColor(context.getResources().getColor(R.color.text_secondary_light, null));
         }
 
-        // Xử lý click
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onRankingClick(group, position);
@@ -88,6 +80,10 @@ public class GroupRankingAdapter extends RecyclerView.Adapter<GroupRankingAdapte
     @Override
     public int getItemCount() {
         return groupList != null ? groupList.size() : 0;
+    }
+
+    public interface OnRankingClickListener {
+        void onRankingClick(TranslationGroup group, int position);
     }
 
     public static class RankingViewHolder extends RecyclerView.ViewHolder {

@@ -46,7 +46,9 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
     }
 
     @Override
-    public int getItemCount() { return groupList != null ? groupList.size() : 0; }
+    public int getItemCount() {
+        return groupList != null ? groupList.size() : 0;
+    }
 
     public static class GroupViewHolder extends RecyclerView.ViewHolder {
         ImageView imgGroupAvatar, iconFavourite, iconComment;

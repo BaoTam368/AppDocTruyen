@@ -2,28 +2,28 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/nav_bookshelf"
-        android:icon="@drawable/ic_book"
-        android:title="@string/menu_bookshelf" />
+            android:id="@+id/nav_bookshelf"
+            android:icon="@drawable/ic_book"
+            android:title="@string/menu_bookshelf"/>
 
     <item
-        android:id="@+id/nav_stories"
-        android:icon="@drawable/ic_comic"
-        android:title="@string/menu_stories" />
+            android:id="@+id/nav_stories"
+            android:icon="@drawable/ic_comic"
+            android:title="@string/menu_stories"/>
 
     <item
-        android:id="@+id/nav_world"
-        android:icon="@drawable/ic_world"
-        android:title="@string/menu_world" />
+            android:id="@+id/nav_world"
+            android:icon="@drawable/ic_world"
+            android:title="@string/menu_world"/>
 
     <item
-        android:id="@+id/nav_translation_team"
-        android:icon="@drawable/ic_group"
-        android:title="@string/menu_translation_team" />
+            android:id="@+id/nav_translation_team"
+            android:icon="@drawable/ic_group"
+            android:title="@string/menu_translation_team"/>
 
     <item
-        android:id="@+id/nav_profile"
-        android:icon="@drawable/ic_person"
-        android:title="@string/menu_profile" />
+            android:id="@+id/nav_profile"
+            android:icon="@drawable/ic_person"
+            android:title="@string/menu_profile"/>
 
 </menu>

@@ -46,6 +46,9 @@ Thumbs.db
 # Kotlin / Java generated
 out/
 
+# Android / Gradle
+app/build/
+
 # Node.js
 node_modules/
 npm-debug.log*
@@ -54,27 +57,14 @@ yarn-error.log*
 pnpm-debug.log*
 .npm/
 .cache/
-coverage/
 dist/
+coverage/
 
-# Environment files
+# Environment / secrets
 .env
 .env.local
 .env.*.local
 
-# Android / Gradle
-.gradle/
-build/
-app/build/
-local.properties
-*.iml
-.externalNativeBuild/
-.cxx/
-
-# IDE
-.idea/
-
 # OS
 .DS_Store
-Thumbs.db
 desktop.ini

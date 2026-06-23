@@ -15,16 +15,11 @@ import com.example.appdoctruyen.models.TranslationGroup;
 
 import java.util.List;
 
-
 public class BookshelfGroupAdapter extends RecyclerView.Adapter<BookshelfGroupAdapter.GroupViewHolder> {
 
     private Context context;
     private List<TranslationGroup> groupList;
     private OnGroupClickListener listener;
-
-    public interface OnGroupClickListener {
-        void onGroupClick(TranslationGroup group, int position);
-    }
 
     public BookshelfGroupAdapter(Context context, List<TranslationGroup> groupList,
                                  OnGroupClickListener listener) {
@@ -49,9 +44,16 @@ public class BookshelfGroupAdapter extends RecyclerView.Adapter<BookshelfGroupAd
     public void onBindViewHolder(@NonNull GroupViewHolder holder, int position) {
         TranslationGroup group = groupList.get(position);
 
+        // Hiển thị thông tin nhóm dịch trong dạng lưới
         holder.tvGroupName.setText(group.getName());
-        holder.tvGroupComicCount.setText(group.getComicCount() + " truyện");
-        holder.tvGroupMemberCount.setText(String.valueOf(group.getMemberCount()));
+        holder.tvGroupComicCount.setText(context.getString(
+                R.string.group_comic_count_format,
+                group.getComicCount()
+        ));
+        holder.tvGroupMemberCount.setText(context.getString(
+                R.string.group_members_count_format,
+                group.getMemberCount()
+        ));
 
         if (group.getAvatarResId() != 0) {
             holder.imgGroupAvatar.setImageResource(group.getAvatarResId());
@@ -69,6 +71,10 @@ public class BookshelfGroupAdapter extends RecyclerView.Adapter<BookshelfGroupAd
     @Override
     public int getItemCount() {
         return groupList != null ? groupList.size() : 0;
+    }
+
+    public interface OnGroupClickListener {
+        void onGroupClick(TranslationGroup group, int position);
     }
 
     public static class GroupViewHolder extends RecyclerView.ViewHolder {
