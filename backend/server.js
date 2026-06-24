@@ -4,8 +4,7 @@ const cors = require('cors');
 const express = require('express');
 
 const mangaRoutes = require('./src/routes/mangaRoutes');
-const chapterRoutes = require('./src/routes/chapterRoutes');
-const groupRoutes = require('./src/routes/groupRoutes');
+const localMangaRoutes = require('./src/routes/localMangaRoutes');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -21,8 +20,7 @@ app.get('/api/health', (req, res) => {
 });
 
 app.use('/api/manga', mangaRoutes);
-app.use('/api/chapter', chapterRoutes);
-app.use('/api/groups', groupRoutes);
+app.use('/api/local-manga', localMangaRoutes);
 
 app.use((req, res) => {
     res.status(404).json({
