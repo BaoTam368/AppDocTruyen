@@ -19,7 +19,7 @@ import com.example.appdoctruyen.views.activities.UserDetailsActivity;
 import com.google.android.material.imageview.ShapeableImageView;
 
 public class ProfileFragment extends Fragment {
-    LinearLayout btn_logout, btn_terms, btn_topup;
+    LinearLayout btn_logout, btn_topup;
     ShapeableImageView iv_user_avatar;
 
     @Nullable
@@ -28,8 +28,7 @@ public class ProfileFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
         btn_logout = view.findViewById(R.id.btn_logout);
-        btn_terms = view.findViewById(R.id.btn_terms);
-        btn_topup = view.findViewById(R.id.btn_topup);
+        btn_topup = view.findViewById(R.id.btn_func_top_up);
         iv_user_avatar = view.findViewById(R.id.iv_user_avatar);
 
         btn_logout.setOnClickListener(v -> {

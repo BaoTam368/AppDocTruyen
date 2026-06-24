@@ -1,4 +1,4 @@
-package com.example.appdoctruyen.views.fragments;
+package com.example.appdoctruyen;
 
 import android.content.Intent;
 import android.os.Bundle;
