@@ -35,6 +35,36 @@
         <activity
                 android:name="com.example.appdoctruyen.views.activities.GroupDetailActivity"
                 android:exported="false"/>
+        <activity
+                android:name="com.example.appdoctruyen.views.activities.SearchActivity"
+                android:exported="false"/>
+        <activity
+                android:name="com.example.appdoctruyen.views.activities.FilterActivity"
+                android:exported="false"/>
+        <activity
+                android:name="com.example.appdoctruyen.views.activities.NotificationActivity"
+                android:exported="false"/>
+        <activity
+                android:name="com.example.appdoctruyen.views.activities.NewBookshelfActivity"
+                android:exported="false"/>
+        <activity
+                android:name="com.example.appdoctruyen.views.activities.RankingActivity"
+                android:exported="false"/>
+        <activity
+                android:name="com.example.appdoctruyen.views.activities.LoginActivity"
+                android:exported="false"/>
+        <activity
+                android:name="com.example.appdoctruyen.views.activities.RegisterActivity"
+                android:exported="false"/>
+        <activity
+                android:name="com.example.appdoctruyen.views.activities.PostDetailActivity"
+                android:exported="false"/>
+        <activity
+                android:name="com.example.appdoctruyen.views.activities.RechargeActivity"
+                android:exported="false"/>
+        <activity
+                android:name="com.example.appdoctruyen.views.activities.UserDetailsActivity"
+                android:exported="false"/>
     </application>
 
 </manifest>

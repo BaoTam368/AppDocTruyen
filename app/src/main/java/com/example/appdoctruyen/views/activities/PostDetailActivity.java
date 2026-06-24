@@ -1,4 +1,6 @@
 package com.example.appdoctruyen.views.activities;
 
-public class PostDetailActivity {
+import androidx.appcompat.app.AppCompatActivity;
+
+public class PostDetailActivity extends AppCompatActivity {
 }

@@ -156,6 +156,64 @@ public class MangaRepository {
         });
     }
 
+    // Local SQLite API methods
+    public void getLocalMangaList(int limit, int offset, RepositoryCallback<List<Comic>> callback) {
+        apiService.getLocalMangaList(limit, offset).enqueue(new Callback<MangaListResponse>() {
+            @Override
+            public void onResponse(Call<MangaListResponse> call, Response<MangaListResponse> response) {
+                MangaListResponse body = response.body();
+                if (response.isSuccessful() && body != null && body.success) {
+                    callback.onSuccess(mapMangaList(body.data));
+                } else {
+                    callback.onError(readErrorMessage(body, "Không lấy được danh sách truyện từ SQLite"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MangaListResponse> call, Throwable throwable) {
+                callback.onError("Không kết nối được Node.js backend");
+            }
+        });
+    }
+
+    public void searchLocalMangas(String query, int limit, int offset, RepositoryCallback<List<Comic>> callback) {
+        apiService.searchLocalMangas(query, limit, offset).enqueue(new Callback<MangaListResponse>() {
+            @Override
+            public void onResponse(Call<MangaListResponse> call, Response<MangaListResponse> response) {
+                MangaListResponse body = response.body();
+                if (response.isSuccessful() && body != null && body.success) {
+                    callback.onSuccess(mapMangaList(body.data));
+                } else {
+                    callback.onError(readErrorMessage(body, "Không tìm thấy truyện"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MangaListResponse> call, Throwable throwable) {
+                callback.onError("Không kết nối được Node.js backend");
+            }
+        });
+    }
+
+    public void syncPopularMangas(int count, RepositoryCallback<List<Comic>> callback) {
+        apiService.syncPopularMangas(count).enqueue(new Callback<MangaListResponse>() {
+            @Override
+            public void onResponse(Call<MangaListResponse> call, Response<MangaListResponse> response) {
+                MangaListResponse body = response.body();
+                if (response.isSuccessful() && body != null && body.success) {
+                    callback.onSuccess(mapMangaList(body.data));
+                } else {
+                    callback.onError(readErrorMessage(body, "Không đồng bộ được truyện phổ biến"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MangaListResponse> call, Throwable throwable) {
+                callback.onError("Không kết nối được Node.js backend");
+            }
+        });
+    }
+
     private List<Comic> mapMangaList(List<MangaDto> dtoList) {
         List<Comic> comics = new ArrayList<>();
         if (dtoList == null) return comics;

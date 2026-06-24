@@ -4,6 +4,7 @@ import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -30,6 +31,26 @@ public interface MangaApiService {
 
     @GET("groups/{groupId}")
     Call<GroupDetailResponse> getGroupDetail(@Path("groupId") String groupId);
+
+    // Local SQLite API endpoints
+    @GET("local-manga")
+    Call<MangaListResponse> getLocalMangaList(
+            @Query("limit") int limit,
+            @Query("offset") int offset
+    );
+
+    @GET("local-manga/search")
+    Call<MangaListResponse> searchLocalMangas(
+            @Query("q") String query,
+            @Query("limit") int limit,
+            @Query("offset") int offset
+    );
+
+    @POST("local-manga/{mangaId}/sync")
+    Call<MangaDetailResponse> syncMangaFromMangaDex(@Path("mangaId") String mangaId);
+
+    @POST("local-manga/sync/popular")
+    Call<MangaListResponse> syncPopularMangas(@Query("count") int count);
 }
 
 class MangaListResponse extends ApiResponse<List<MangaDto>> {

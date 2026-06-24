@@ -28,6 +28,7 @@ import com.example.appdoctruyen.R;
 import com.example.appdoctruyen.models.Comic;
 import com.example.appdoctruyen.views.activities.ComicDetailActivity;
 import com.example.appdoctruyen.views.adapters.BookshelfAdapter;
+import com.example.appdoctruyen.data.api.MangaRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +43,7 @@ public class ComicHomeFragment extends Fragment {
     private BookshelfAdapter recentAdapter;
     private ImageView ivAvatar, ivNotification;
     private LinearLayout layoutSearchBar, layoutCatNew;
+    private MangaRepository mangaRepository;
 //    private LinearLayout layoutCatGenres, layoutCatTopUser, layoutCatNew, layoutCatHot;
 
     @SuppressLint("MissingInflatedId")
@@ -60,6 +62,8 @@ public class ComicHomeFragment extends Fragment {
         layoutSearchBar = view.findViewById(R.id.layout_search_bar);
         ivNotification = view.findViewById(R.id.iv_notification);
         layoutCatNew = view.findViewById(R.id.layout_cat_new);
+
+        mangaRepository = new MangaRepository();
 
 //        layoutCatGenres = view.findViewById(R.id.layout_cat_genres);
 //        layoutCatTopUser = view.findViewById(R.id.layout_cat_top_user);
@@ -103,6 +107,12 @@ public class ComicHomeFragment extends Fragment {
             startActivity(intent);
         });
 
+        // Long press vào Truyện Mới để đồng bộ dữ liệu
+        layoutCatNew.setOnLongClickListener(v -> {
+            syncPopularMangas();
+            return true;
+        });
+
 //        // Click danh mục HOT
 //        layoutCatHot.setOnClickListener(v -> {
 //            Toast.makeText(requireContext(), "Xem danh sách Truyện HOT", Toast.LENGTH_SHORT).show();
@@ -117,36 +127,47 @@ public class ComicHomeFragment extends Fragment {
     private void setupFeaturedComics() {
         featuredList = new ArrayList<>();
 
-        featuredList.add(new Comic(1, "One Piece", R.drawable.placeholder_comic, "Chapter 1100"));
-        featuredList.add(new Comic(2, "Doraemon", R.drawable.placeholder_comic, "Chapter 200"));
-        featuredList.add(new Comic(3, "Conan", R.drawable.placeholder_comic, "Chapter 1050"));
+        mangaRepository.getLocalMangaList(10, 0, new MangaRepository.RepositoryCallback<List<Comic>>() {
+            @Override
+            public void onSuccess(List<Comic> data) {
+                featuredList.clear();
+                featuredList.addAll(data);
+                featuredAdapter = new FeaturedComicAdapter(requireContext(), featuredList,
+                        (comic, position) -> openComicDetail(comic));
+                rvFeaturedComics.setLayoutManager(
+                        new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+                );
+                rvFeaturedComics.setNestedScrollingEnabled(false);
+                rvFeaturedComics.setAdapter(featuredAdapter);
+            }
 
-        featuredAdapter = new FeaturedComicAdapter(requireContext(), featuredList,
-                (comic, position) -> openComicDetail(comic));
-
-        rvFeaturedComics.setLayoutManager(
-                new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        );
-        rvFeaturedComics.setNestedScrollingEnabled(false);
-        rvFeaturedComics.setAdapter(featuredAdapter);
+            @Override
+            public void onError(String message) {
+                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void setupRecentlyUpdatedComics() {
         recentList = new ArrayList<>();
 
-        recentList.add(new Comic(4, "Naruto", R.drawable.placeholder_comic, "Chapter 700"));
-        recentList.add(new Comic(5, "Bleach", R.drawable.placeholder_comic, "Chapter 686"));
-        recentList.add(new Comic(6, "Dragon Ball", R.drawable.placeholder_comic, "Chapter 519"));
-        recentList.add(new Comic(7, "Jujutsu Kaisen", R.drawable.placeholder_comic, "Chapter 260"));
-        recentList.add(new Comic(8, "Solo Leveling", R.drawable.placeholder_comic, "Chapter 179"));
-        recentList.add(new Comic(9, "Kimetsu no Yaiba", R.drawable.placeholder_comic, "Chapter 205"));
+        mangaRepository.getLocalMangaList(20, 0, new MangaRepository.RepositoryCallback<List<Comic>>() {
+            @Override
+            public void onSuccess(List<Comic> data) {
+                recentList.clear();
+                recentList.addAll(data);
+                recentAdapter = new BookshelfAdapter(requireContext(), recentList,
+                        (comic, position) -> openComicDetail(comic));
+                rvRecentlyUpdated.setLayoutManager(new GridLayoutManager(requireContext(), 3));
+                rvRecentlyUpdated.setNestedScrollingEnabled(false);
+                rvRecentlyUpdated.setAdapter(recentAdapter);
+            }
 
-        recentAdapter = new BookshelfAdapter(requireContext(), recentList,
-                (comic, position) -> openComicDetail(comic));
-
-        rvRecentlyUpdated.setLayoutManager(new GridLayoutManager(requireContext(), 3));
-        rvRecentlyUpdated.setNestedScrollingEnabled(false);
-        rvRecentlyUpdated.setAdapter(recentAdapter);
+            @Override
+            public void onError(String message) {
+                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void openComicDetail(Comic comic) {
@@ -154,5 +175,22 @@ public class ComicHomeFragment extends Fragment {
         intent.putExtra("comic_id", comic.getId());
         intent.putExtra("comic_title", comic.getTitle());
         startActivity(intent);
+    }
+
+    private void syncPopularMangas() {
+        Toast.makeText(requireContext(), "Đang đồng bộ truyện từ MangaDex...", Toast.LENGTH_SHORT).show();
+        mangaRepository.syncPopularMangas(20, new MangaRepository.RepositoryCallback<List<Comic>>() {
+            @Override
+            public void onSuccess(List<Comic> data) {
+                Toast.makeText(requireContext(), "Đã đồng bộ " + data.size() + " truyện!", Toast.LENGTH_SHORT).show();
+                setupFeaturedComics();
+                setupRecentlyUpdatedComics();
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(requireContext(), "Lỗi: " + message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
