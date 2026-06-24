@@ -40,8 +40,8 @@ public class ComicHomeFragment extends Fragment {
     private List<Comic> recentList;
     private FeaturedComicAdapter featuredAdapter;
     private BookshelfAdapter recentAdapter;
-    private ImageView ivAvatar, ivNotification, ivNewComic;
-    private LinearLayout layoutSearchBar;
+    private ImageView ivAvatar, ivNotification;
+    private LinearLayout layoutSearchBar, layoutCatNew;
 //    private LinearLayout layoutCatGenres, layoutCatTopUser, layoutCatNew, layoutCatHot;
 
     @SuppressLint("MissingInflatedId")
@@ -57,9 +57,9 @@ public class ComicHomeFragment extends Fragment {
         rvRecentlyUpdated = view.findViewById(R.id.rv_recently_updated);
 
         ivAvatar = view.findViewById(R.id.iv_avatar);
-        layoutSearchBar = view.findViewById(R.id.iv_search_bar);
+        layoutSearchBar = view.findViewById(R.id.layout_search_bar);
         ivNotification = view.findViewById(R.id.iv_notification);
-        ivNewComic = view.findViewById(R.id.iv_new_comic);
+        layoutCatNew = view.findViewById(R.id.layout_cat_new);
 
 //        layoutCatGenres = view.findViewById(R.id.layout_cat_genres);
 //        layoutCatTopUser = view.findViewById(R.id.layout_cat_top_user);
@@ -98,7 +98,7 @@ public class ComicHomeFragment extends Fragment {
 //        });
 //
         // Click danh mục Truyện Mới
-        ivNewComic.setOnClickListener(v -> {
+        layoutCatNew.setOnClickListener(v -> {
             Intent intent = new Intent(requireContext(), NewBookshelfActivity.class);
             startActivity(intent);
         });

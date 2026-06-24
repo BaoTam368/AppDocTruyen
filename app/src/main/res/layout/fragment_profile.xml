@@ -204,6 +204,17 @@
                         android:layout_width="match_parent"
                         android:layout_height="44dp">
                 </LinearLayout>
+
+                <LinearLayout
+                        android:id="@+id/btn_logout"
+                        style="@style/SettingsRowStyle"
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp">
+                    <ImageView android:layout_width="20dp" android:layout_height="20dp"
+                               android:src="@android:drawable/ic_menu_close_clear_cancel" app:tint="@color/black"/>
+                    <TextView style="@style/SettingsTextStyle" android:layout_width="match_parent"
+                              android:layout_height="wrap_content" android:text="@string/func_logout"/>
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
