@@ -17,7 +17,7 @@ async function getLocalMangaList(req, res, next) {
 
 async function searchLocalMangas(req, res, next) {
     try {
-        const { q } = req.query;
+        const q = req.query.q || req.query.title;
         const { limit, offset } = req.query;
         
         if (!q) {

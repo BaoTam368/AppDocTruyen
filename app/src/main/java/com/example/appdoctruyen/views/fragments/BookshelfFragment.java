@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.appdoctruyen.R;
+import com.example.appdoctruyen.data.database.BookshelfDatabaseHelper;
 import com.example.appdoctruyen.models.Comic;
 import com.example.appdoctruyen.views.activities.ComicDetailActivity;
 import com.example.appdoctruyen.views.adapters.BookshelfAdapter;
@@ -22,12 +23,15 @@ import java.util.List;
 
 public class BookshelfFragment extends Fragment {
 
+    private static final String DEMO_USER_ID = "local_user";
+
     private TextView tabFollowing, tabRecentlyRead, tabDownloaded;
 
     private RecyclerView recyclerView;
     private TextView tvEmpty;
 
     private BookshelfAdapter adapter;
+    private BookshelfDatabaseHelper bookshelfDatabaseHelper;
 
     // Tab hiện tại (0 = Theo Dõi, 1 = Vừa Xem, 2 = Đã Tải)
     private int currentTab = 0;
@@ -43,16 +47,12 @@ public class BookshelfFragment extends Fragment {
         tabDownloaded = view.findViewById(R.id.tabDownloaded);
         recyclerView = view.findViewById(R.id.recyclerViewBookshelf);
         tvEmpty = view.findViewById(R.id.tvEmptyBookshelf);
+        bookshelfDatabaseHelper = new BookshelfDatabaseHelper(requireContext().getApplicationContext());
 
         recyclerView.setLayoutManager(new GridLayoutManager(requireContext(), 3));
 
-        adapter = new BookshelfAdapter(requireContext(), createSampleFollowedComics(),
-                (comic, position) -> {
-                    Intent intent = new Intent(requireContext(), ComicDetailActivity.class);
-                    intent.putExtra("comic_id", comic.getId());
-                    intent.putExtra("comic_title", comic.getTitle());
-                    startActivity(intent);
-                });
+        adapter = new BookshelfAdapter(requireContext(), new ArrayList<>(),
+                (comic, position) -> openComicDetail(comic));
         recyclerView.setAdapter(adapter);
 
         setupTabListeners();
@@ -61,6 +61,25 @@ public class BookshelfFragment extends Fragment {
         selectTab(0);
 
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (bookshelfDatabaseHelper != null) {
+            bookshelfDatabaseHelper.close();
+            bookshelfDatabaseHelper = null;
+        }
+    }
+
+    private void openComicDetail(Comic comic) {
+        if (comic == null) return;
+
+        Intent intent = new Intent(requireContext(), ComicDetailActivity.class);
+        intent.putExtra("mangaId", resolveMangaId(comic));
+        intent.putExtra("comic_id", comic.getId());
+        intent.putExtra("comic_title", comic.getTitle());
+        startActivity(intent);
     }
 
 
@@ -82,19 +101,19 @@ public class BookshelfFragment extends Fragment {
                 tabFollowing.setBackgroundResource(R.drawable.bg_tab_selected);
                 tabFollowing.setTextColor(getResources().getColor(R.color.white, null));
                 tabFollowing.setTypeface(null, android.graphics.Typeface.BOLD);
-                data = createSampleFollowedComics();
+                data = loadFollowedComics();
                 break;
             case 1:
                 tabRecentlyRead.setBackgroundResource(R.drawable.bg_tab_selected);
                 tabRecentlyRead.setTextColor(getResources().getColor(R.color.white, null));
                 tabRecentlyRead.setTypeface(null, android.graphics.Typeface.BOLD);
-                data = createSampleRecentComics();
+                data = loadRecentComics();
                 break;
             case 2:
                 tabDownloaded.setBackgroundResource(R.drawable.bg_tab_selected);
                 tabDownloaded.setTextColor(getResources().getColor(R.color.white, null));
                 tabDownloaded.setTypeface(null, android.graphics.Typeface.BOLD);
-                data = createSampleDownloadedComics();
+                data = loadDownloadedComics();
                 break;
             default:
                 data = new ArrayList<>();
@@ -105,11 +124,11 @@ public class BookshelfFragment extends Fragment {
             recyclerView.setVisibility(View.GONE);
             tvEmpty.setVisibility(View.VISIBLE);
             if (tabIndex == 2) {
-                tvEmpty.setText("Không có truyện đã tải");
+                tvEmpty.setText(R.string.bookshelf_empty_downloaded);
             } else if (tabIndex == 1) {
-                tvEmpty.setText("Chưa đọc truyện nào");
+                tvEmpty.setText(R.string.bookshelf_empty_history);
             } else {
-                tvEmpty.setText("Chưa theo dõi truyện nào");
+                tvEmpty.setText(R.string.bookshelf_empty_following);
             }
         } else {
             recyclerView.setVisibility(View.VISIBLE);
@@ -129,6 +148,58 @@ public class BookshelfFragment extends Fragment {
         tabDownloaded.setBackgroundResource(R.drawable.bg_tab_unselected);
         tabDownloaded.setTextColor(getResources().getColor(R.color.tab_unselected_text, null));
         tabDownloaded.setTypeface(null, android.graphics.Typeface.NORMAL);
+    }
+
+    // SQLite loading with sample fallback
+
+    private List<Comic> loadFollowedComics() {
+        List<Comic> comics = getBookmarksFromDatabase();
+        return comics.isEmpty() ? createSampleFollowedComics() : comics;
+    }
+
+    private List<Comic> loadRecentComics() {
+        List<Comic> comics = getReadingHistoryFromDatabase();
+        return comics.isEmpty() ? createSampleRecentComics() : comics;
+    }
+
+    private List<Comic> loadDownloadedComics() {
+        List<Comic> comics = getDownloadedComicsFromDatabase();
+        return comics.isEmpty() ? createSampleDownloadedComics() : comics;
+    }
+
+    private List<Comic> getBookmarksFromDatabase() {
+        if (bookshelfDatabaseHelper == null) return new ArrayList<>();
+        try {
+            return bookshelfDatabaseHelper.getBookmarks(DEMO_USER_ID);
+        } catch (RuntimeException ignored) {
+            return new ArrayList<>();
+        }
+    }
+
+    private List<Comic> getReadingHistoryFromDatabase() {
+        if (bookshelfDatabaseHelper == null) return new ArrayList<>();
+        try {
+            return bookshelfDatabaseHelper.getReadingHistory(DEMO_USER_ID);
+        } catch (RuntimeException ignored) {
+            return new ArrayList<>();
+        }
+    }
+
+    private List<Comic> getDownloadedComicsFromDatabase() {
+        if (bookshelfDatabaseHelper == null) return new ArrayList<>();
+        try {
+            return bookshelfDatabaseHelper.getDownloadedComics(DEMO_USER_ID);
+        } catch (RuntimeException ignored) {
+            return new ArrayList<>();
+        }
+    }
+
+    private String resolveMangaId(Comic comic) {
+        return isBlank(comic.getMangaId()) ? String.valueOf(comic.getId()) : comic.getMangaId();
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
     }
 
     // DỮ LIỆU MẪU

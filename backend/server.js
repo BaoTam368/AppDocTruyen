@@ -3,8 +3,12 @@ require('dotenv').config();
 const cors = require('cors');
 const express = require('express');
 
+const chapterRoutes = require('./src/routes/chapterRoutes');
+const commentRoutes = require('./src/routes/commentRoutes');
 const mangaRoutes = require('./src/routes/mangaRoutes');
 const localMangaRoutes = require('./src/routes/localMangaRoutes');
+const postRoutes = require('./src/routes/postRoutes');
+const userRoutes = require('./src/routes/userRoutes');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -20,7 +24,11 @@ app.get('/api/health', (req, res) => {
 });
 
 app.use('/api/manga', mangaRoutes);
+app.use('/api/chapter', chapterRoutes);
 app.use('/api/local-manga', localMangaRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/comments', commentRoutes);
+app.use('/api/posts', postRoutes);
 
 app.use((req, res) => {
     res.status(404).json({
