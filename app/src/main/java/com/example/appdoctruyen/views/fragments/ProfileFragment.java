@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.appdoctruyen.R;
+import com.example.appdoctruyen.data.firebase.AuthManager;
 import com.example.appdoctruyen.views.activities.LoginActivity;
 import com.example.appdoctruyen.views.activities.RechargeActivity;
 import com.example.appdoctruyen.views.activities.SearchActivity;
@@ -21,6 +22,7 @@ import com.google.android.material.imageview.ShapeableImageView;
 public class ProfileFragment extends Fragment {
     LinearLayout btn_logout, btn_topup;
     ShapeableImageView iv_user_avatar;
+    private AuthManager authManager;
 
     @Nullable
     @Override
@@ -30,11 +32,13 @@ public class ProfileFragment extends Fragment {
         btn_logout = view.findViewById(R.id.btn_logout);
         btn_topup = view.findViewById(R.id.btn_func_top_up);
         iv_user_avatar = view.findViewById(R.id.iv_user_avatar);
+        authManager = new AuthManager();
 
         btn_logout.setOnClickListener(v -> {
-            Intent intent = new Intent(requireContext(), LoginActivity.class);
+            authManager.logout();
+            Intent intent = new Intent(getActivity(), LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-            requireActivity().finish();
         });
 
         btn_topup.setOnClickListener(v -> {
