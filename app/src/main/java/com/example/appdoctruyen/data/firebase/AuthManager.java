@@ -1,7 +1,10 @@
 package com.example.appdoctruyen.data.firebase;
 
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
+
 public class AuthManager {
     private FirebaseAuth mAuth;
     public AuthManager() {
@@ -36,5 +39,16 @@ public class AuthManager {
 
     public void logout() {
         mAuth.signOut();
+    }
+
+    public void loginWithGoogle(String idToken, AuthCallback callback) {
+        AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
+        mAuth.signInWithCredential(credential).addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        callback.onSuccess(mAuth.getCurrentUser());
+                    } else {
+                        callback.onFailure(task.getException() != null ? task.getException().getLocalizedMessage() : "Đăng nhập Google thất bại");
+                    }
+                });
     }
 }
