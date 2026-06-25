@@ -9,9 +9,13 @@ import com.example.appdoctruyen.views.fragments.ComicInfoFragment;
 import com.example.appdoctruyen.views.fragments.ComicChaptersFragment;
 
 public class ComicDetailAdapter extends FragmentStateAdapter {
+    private String mangaId;
+    private String mangaTitle;
 
-    public ComicDetailAdapter(@NonNull FragmentActivity fragmentActivity) {
+    public ComicDetailAdapter(@NonNull FragmentActivity fragmentActivity, String mangaId, String mangaTitle) {
         super(fragmentActivity);
+        this.mangaId = mangaId;
+        this.mangaTitle = mangaTitle;
     }
 
     @NonNull
@@ -19,9 +23,9 @@ public class ComicDetailAdapter extends FragmentStateAdapter {
     public Fragment createFragment(int position) {
         // Position 0 là Tab đầu tiên, Position 1 là Tab thứ hai
         if (position == 0) {
-            return new ComicInfoFragment(); // Trả về Fragment Giới thiệu
+            return ComicInfoFragment.newInstance(mangaId, mangaTitle); // Trả về Fragment Giới thiệu
         } else {
-            return new ComicChaptersFragment(); // Trả về Fragment Danh sách chương
+            return ComicChaptersFragment.newInstance(mangaId, mangaTitle); // Trả về Fragment Danh sách chương
         }
     }
 

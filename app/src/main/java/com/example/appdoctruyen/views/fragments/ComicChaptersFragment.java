@@ -17,16 +17,42 @@ import com.example.appdoctruyen.views.activities.ComicReadingActivity;
 import com.example.appdoctruyen.R;
 import com.example.appdoctruyen.models.Chapter;
 import com.example.appdoctruyen.views.adapters.ChapterAdapter;
+import com.example.appdoctruyen.data.api.MangaRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ComicChaptersFragment extends Fragment {
 
+    private static final String ARG_MANGA_ID = "mangaId";
+    private static final String ARG_MANGA_TITLE = "mangaTitle";
+
     private ListView lvChapters;
     private TextView tvTotalChapters;
     private ChapterAdapter chapterAdapter;
     private List<Chapter> chapterList;
+    private String mangaId;
+    private String mangaTitle;
+    private MangaRepository mangaRepository;
+
+    public static ComicChaptersFragment newInstance(String mangaId, String mangaTitle) {
+        ComicChaptersFragment fragment = new ComicChaptersFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_MANGA_ID, mangaId);
+        args.putString(ARG_MANGA_TITLE, mangaTitle);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            mangaId = getArguments().getString(ARG_MANGA_ID);
+            mangaTitle = getArguments().getString(ARG_MANGA_TITLE);
+        }
+        mangaRepository = new MangaRepository();
+    }
 
     @Nullable
     @Override
@@ -36,39 +62,53 @@ public class ComicChaptersFragment extends Fragment {
         lvChapters = view.findViewById(R.id.lvChapters);
         tvTotalChapters = view.findViewById(R.id.tvTotalChapters);
 
-        // 1. Tạo dữ liệu giả
+        // 1. Khởi tạo danh sách và adapter
         chapterList = new ArrayList<>();
-        for (int i = 1; i <= 30; i++) {
-            boolean isFree = (i <= 5); // 5 chương đầu free, còn lại khóa
-            chapterList.add(new Chapter("Chapter " + i, "16:38 30/05/2026", isFree));
-        }
-
-        tvTotalChapters.setText("Tổng số " + chapterList.size() + " chương");
-
-        // 2. Gắn Adapter
         chapterAdapter = new ChapterAdapter(getContext(), chapterList);
         lvChapters.setAdapter(chapterAdapter);
+
+        // 2. Tải chapters từ API
+        loadChaptersFromApi();
 
         // 3. XỬ LÝ SỰ KIỆN CLICK CHỌN CHƯƠNG
         lvChapters.setOnItemClickListener((parent, view1, position, id) -> {
             // Lấy ra chương mà người dùng vừa bấm vào
             Chapter clickedChapter = chapterList.get(position);
 
-            // Kiểm tra trạng thái: Nếu Free (hoặc Unlock) thì mới cho vào đọc
-            if (clickedChapter.isFree()) {
-                // Tạo Intent để chuyển sang màn hình Đọc truyện
-                Intent intent = new Intent(getActivity(), ComicReadingActivity.class);
+            // Tạo Intent để chuyển sang màn hình Đọc truyện
+            Intent intent = new Intent(getActivity(), ComicReadingActivity.class);
 
-                // Gửi kèm số thứ tự của chương sang màn hình kia (position bắt đầu từ 0 nên phải + 1)
-                intent.putExtra("CHAPTER_NUM", position + 1);
+            // Gửi kèm mangaId, mangaTitle và chapterId
+            intent.putExtra("mangaId", mangaId);
+            intent.putExtra("mangaTitle", mangaTitle);
+            intent.putExtra("chapterId", clickedChapter.getChapterId());
+            intent.putExtra("chapterName", clickedChapter.getName());
 
-                startActivity(intent);
-            } else {
-                // Nếu bị khóa thì hiện thông báo
-                Toast.makeText(getContext(), "Chương này đang bị khóa! Vui lòng mở khoá để đọc.", Toast.LENGTH_SHORT).show();
-            }
+            startActivity(intent);
         });
 
         return view;
+    }
+
+    private void loadChaptersFromApi() {
+        if (mangaId == null || mangaId.isEmpty()) {
+            Toast.makeText(getContext(), "Thiếu mangaId", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        mangaRepository.getMangaChapters(mangaId, new MangaRepository.RepositoryCallback<List<Chapter>>() {
+            @Override
+            public void onSuccess(List<Chapter> data) {
+                chapterList.clear();
+                chapterList.addAll(data);
+                tvTotalChapters.setText("Tổng số " + chapterList.size() + " chương");
+                chapterAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(getContext(), "Lỗi: " + message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
