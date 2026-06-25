@@ -232,7 +232,7 @@ public class MangaRepository {
             String chapterName = isBlank(dto.chapterName)
                     ? "Chapter " + (isBlank(dto.chapterNumber) ? "" : dto.chapterNumber)
                     : dto.chapterName;
-            chapters.add(new Chapter(chapterName.trim(), dto.createdAt, true));
+            chapters.add(new Chapter(dto.chapterId, chapterName.trim(), dto.createdAt, true));
         }
         return chapters;
     }
@@ -264,6 +264,7 @@ public class MangaRepository {
                 false
         );
         comic.setMangaId(mangaId);
+        comic.setTags(dto.tags);
         return comic;
     }
 

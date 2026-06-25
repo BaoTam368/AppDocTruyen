@@ -1,5 +1,7 @@
 package com.example.appdoctruyen.models;
 
+import java.util.List;
+
 public class Comic {
 
     private int id;
@@ -17,6 +19,7 @@ public class Comic {
     private String chapterName;
     private String localPath;
     private long lastReadTime;
+    private List<String> tags;
 
     public Comic(int id, String title, int coverImageResId, String coverUrl,
                  String latestChapter, String lastReadChapter, String author,
@@ -162,5 +165,13 @@ public class Comic {
 
     public void setLastReadTime(long lastReadTime) {
         this.lastReadTime = lastReadTime;
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
     }
 }

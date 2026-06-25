@@ -41,7 +41,7 @@ public class ComicHomeFragment extends Fragment {
     private List<Comic> recentList;
     private FeaturedComicAdapter featuredAdapter;
     private BookshelfAdapter recentAdapter;
-    private ImageView ivAvatar, ivNotification;
+    private ImageView ivAvatar, ivNotification, ivRefresh;
     private LinearLayout layoutSearchBar, layoutCatNew;
     private MangaRepository mangaRepository;
 //    private LinearLayout layoutCatGenres, layoutCatTopUser, layoutCatNew, layoutCatHot;
@@ -61,9 +61,13 @@ public class ComicHomeFragment extends Fragment {
         ivAvatar = view.findViewById(R.id.iv_avatar);
         layoutSearchBar = view.findViewById(R.id.layout_search_bar);
         ivNotification = view.findViewById(R.id.iv_notification);
+        ivRefresh = view.findViewById(R.id.iv_refresh);
         layoutCatNew = view.findViewById(R.id.layout_cat_new);
 
         mangaRepository = new MangaRepository();
+
+        // Auto-sync khi mở fragment
+        syncPopularMangas();
 
 //        layoutCatGenres = view.findViewById(R.id.layout_cat_genres);
 //        layoutCatTopUser = view.findViewById(R.id.layout_cat_top_user);
@@ -89,6 +93,11 @@ public class ComicHomeFragment extends Fragment {
             startActivity(intent);
         });
 
+        // Click nút Refresh để đồng bộ dữ liệu
+        ivRefresh.setOnClickListener(v -> {
+            syncPopularMangas();
+        });
+
 //        // Click danh mục Thể Loại
 //        layoutCatGenres.setOnClickListener(v -> {
 //            Intent intent = new Intent(requireContext(), FilterActivity.class);
@@ -105,12 +114,6 @@ public class ComicHomeFragment extends Fragment {
         layoutCatNew.setOnClickListener(v -> {
             Intent intent = new Intent(requireContext(), NewBookshelfActivity.class);
             startActivity(intent);
-        });
-
-        // Long press vào Truyện Mới để đồng bộ dữ liệu
-        layoutCatNew.setOnLongClickListener(v -> {
-            syncPopularMangas();
-            return true;
         });
 
 //        // Click danh mục HOT
@@ -174,6 +177,7 @@ public class ComicHomeFragment extends Fragment {
         Intent intent = new Intent(requireContext(), ComicDetailActivity.class);
         intent.putExtra("comic_id", comic.getId());
         intent.putExtra("comic_title", comic.getTitle());
+        intent.putExtra("mangaId", comic.getMangaId());
         startActivity(intent);
     }
 

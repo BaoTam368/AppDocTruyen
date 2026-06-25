@@ -18,6 +18,7 @@ import com.example.appdoctruyen.models.ComicPage;
 import com.example.appdoctruyen.views.adapters.ComicPageAdapter;
 import com.example.appdoctruyen.models.Chapter;
 import com.example.appdoctruyen.views.adapters.ChapterAdapter;
+import com.example.appdoctruyen.data.api.MangaRepository;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.util.ArrayList;
@@ -26,24 +27,42 @@ import java.util.List;
 public class ComicReadingActivity extends AppCompatActivity {
 
     private ImageView btnBack, btnChapterList, btnReport, btnReload, btnNextChapter;
-    private LinearLayout layoutLike;
-    private TextView tvLikeCount, tvChapterTitle;
+    private TextView tvChapterTitle;
     private RecyclerView lvPages;
 
     private List<ComicPage> pageList;
     private ComicPageAdapter adapter;
-    private boolean isLiked = false;
-    private int likeCount = 128;
 
     // Quản lý số thứ tự chương hiện tại đang đọc (mặc định vào là Chapter 1)
     private int currentChapter = 1;
+    private String mangaId;
+    private String mangaTitle;
+    private String chapterId;
+    private String chapterName;
+    private MangaRepository mangaRepository;
+    
+    private List<Chapter> chapterList;
+    private int currentChapterIndex = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comic_reading);
 
+        // Nhận extras từ intent
+        mangaId = getIntent().getStringExtra("mangaId");
+        mangaTitle = getIntent().getStringExtra("mangaTitle");
+        chapterId = getIntent().getStringExtra("chapterId");
+        chapterName = getIntent().getStringExtra("chapterName");
         currentChapter = getIntent().getIntExtra("CHAPTER_NUM", 1);
+
+        mangaRepository = new MangaRepository();
+        chapterList = new ArrayList<>();
+
+        // Tải danh sách chapters của manga
+        if (mangaId != null && !mangaId.isEmpty()) {
+            loadChapterList();
+        }
 
         // 1. Ánh xạ View từ XML
         btnBack = findViewById(R.id.btnBack);
@@ -51,8 +70,6 @@ public class ComicReadingActivity extends AppCompatActivity {
 //        btnReport = findViewById(R.id.btnReport);
         btnReload = findViewById(R.id.btnReload);
         btnNextChapter = findViewById(R.id.btnNextChapter);
-        layoutLike = findViewById(R.id.layoutLike);
-        tvLikeCount = findViewById(R.id.tvLikeCount);
         tvChapterTitle = findViewById(R.id.tvChapterTitle);
         lvPages = findViewById(R.id.lvPages);
         lvPages.setLayoutManager(new LinearLayoutManager(this));
@@ -80,39 +97,77 @@ public class ComicReadingActivity extends AppCompatActivity {
             loadChapterData(currentChapter); // Gọi lại hàm nạp dữ liệu để cập nhật lại UI
         });
 
-        // Nút Thích truyện
-        layoutLike.setOnClickListener(v -> {
-            if (!isLiked) {
-                likeCount++;
-                isLiked = true;
-                Toast.makeText(this, "Đã thích chương này!", Toast.LENGTH_SHORT).show();
-            } else {
-                likeCount--;
-                isLiked = false;
-                Toast.makeText(this, "Đã bỏ thích chương này!", Toast.LENGTH_SHORT).show();
-            }
-            tvLikeCount.setText(String.valueOf(likeCount));
-        });
-
         // Nút chuyển sang chương tiếp theo
         btnNextChapter.setOnClickListener(v -> {
-            currentChapter++; // Tăng số chương lên 1
-            loadChapterData(currentChapter); // Nạp data của chương mới
+            if (chapterList == null || chapterList.isEmpty()) {
+                Toast.makeText(this, "Không có danh sách chapter", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            
+            if (currentChapterIndex < chapterList.size() - 1) {
+                currentChapterIndex++;
+                Chapter nextChapter = chapterList.get(currentChapterIndex);
+                chapterId = nextChapter.getChapterId();
+                chapterName = nextChapter.getName();
+                loadChapterData(currentChapterIndex + 1);
+            } else {
+                Toast.makeText(this, "Đã đến chapter cuối cùng", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 
     /**
-     * Hàm giả lập tải dữ liệu hình ảnh tương ứng theo từng chương truyện.
-     * Khi có WebService RESTful API (MangaDex) thay thế phần add link giả này bằng hàm gọi Retrofit.
+     * Hàm tải dữ liệu hình ảnh từ API
      */
     private void loadChapterData(int chapterNum) {
-        // Cập nhật lại số tiêu đề trên thanh Top Bar
-        tvChapterTitle.setText("Chapter " + chapterNum);
+        // Cập nhật lại tiêu đề trên thanh Top Bar
+        if (chapterName != null && !chapterName.isEmpty()) {
+            tvChapterTitle.setText(chapterName);
+        } else {
+            tvChapterTitle.setText("Chapter " + chapterNum);
+        }
 
         // Xóa sạch các trang truyện cũ đang hiển thị
         pageList.clear();
 
-        // Giả lập thay đổi ảnh dựa trên số chương chẵn/lẻ để thấy sự khác biệt khi chuyển chương
+        // Nếu có chapterId, gọi API lấy pages
+        if (chapterId != null && !chapterId.isEmpty()) {
+            loadChapterPagesFromApi(chapterId);
+        } else {
+            Toast.makeText(this, "Không có chapterId, hiển thị ảnh mẫu", Toast.LENGTH_SHORT).show();
+            loadMockPages(chapterNum);
+        }
+    }
+
+    private void loadChapterPagesFromApi(String chapterId) {
+        Toast.makeText(this, "Đang tải trang...", Toast.LENGTH_SHORT).show();
+        
+        mangaRepository.getChapterPages(chapterId, new MangaRepository.RepositoryCallback<List<ComicPage>>() {
+            @Override
+            public void onSuccess(List<ComicPage> data) {
+                if (data == null || data.isEmpty()) {
+                    Toast.makeText(ComicReadingActivity.this, "Không có trang nào cho chapter này", Toast.LENGTH_SHORT).show();
+                    loadMockPages(currentChapter);
+                    return;
+                }
+                
+                pageList.clear();
+                pageList.addAll(data);
+                adapter.notifyDataSetChanged();
+                lvPages.scrollToPosition(0);
+                Toast.makeText(ComicReadingActivity.this, "Đã tải " + data.size() + " trang", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(ComicReadingActivity.this, "Lỗi tải trang: " + message, Toast.LENGTH_SHORT).show();
+                loadMockPages(currentChapter);
+            }
+        });
+    }
+
+    private void loadMockPages(int chapterNum) {
+        // Giả lập thay đổi ảnh dựa trên số chương chẵn/lẻ
         if (chapterNum % 2 == 0) {
             pageList.add(new ComicPage("https://loremflickr.com/600/800/manga"));
             pageList.add(new ComicPage("https://loremflickr.com/600/800/comic"));
@@ -121,12 +176,33 @@ public class ComicReadingActivity extends AppCompatActivity {
             pageList.add(new ComicPage("https://loremflickr.com/600/800/manga"));
             pageList.add(new ComicPage("https://loremflickr.com/600/900/action"));
         }
-
-        // Báo cho Adapter biết dữ liệu đã thay đổi để vẽ lại danh sách hình ảnh truyện
         adapter.notifyDataSetChanged();
-
-        // Lệnh cuộn trang của RecyclerView
         lvPages.scrollToPosition(0);
+    }
+
+    private void loadChapterList() {
+        mangaRepository.getMangaChapters(mangaId, new MangaRepository.RepositoryCallback<List<Chapter>>() {
+            @Override
+            public void onSuccess(List<Chapter> data) {
+                chapterList.clear();
+                chapterList.addAll(data);
+                
+                // Tìm vị trí của chapter hiện tại
+                if (chapterId != null && !chapterId.isEmpty()) {
+                    for (int i = 0; i < chapterList.size(); i++) {
+                        if (chapterId.equals(chapterList.get(i).getChapterId())) {
+                            currentChapterIndex = i;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(ComicReadingActivity.this, "Lỗi tải danh sách chapter: " + message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     /**
@@ -140,20 +216,28 @@ public class ComicReadingActivity extends AppCompatActivity {
 
         ListView lvBottomSheetChapters = bottomSheetView.findViewById(R.id.lvBottomSheetChapters);
 
-        // Tạo dữ liệu giả cho danh sách chương trong BottomSheet
-        List<Chapter> mockChapters = new ArrayList<>();
-        for (int i = 1; i <= 20; i++) {
-            mockChapters.add(new Chapter("Chapter " + i, "12:15 12/1/2021", i <= 5));
+        // Sử dụng danh sách chapter thực tế nếu có,否则 dùng dữ liệu giả
+        List<Chapter> displayChapters = chapterList != null && !chapterList.isEmpty() 
+                ? chapterList 
+                : new ArrayList<>();
+        
+        if (displayChapters.isEmpty()) {
+            for (int i = 1; i <= 20; i++) {
+                displayChapters.add(new Chapter("Chapter " + i, "12:15 12/1/2021", i <= 5));
+            }
         }
 
         // Sử dụng ChapterAdapter để đổ dữ liệu vào ListView của BottomSheet
-        ChapterAdapter chapterAdapter = new ChapterAdapter(this, mockChapters);
+        ChapterAdapter chapterAdapter = new ChapterAdapter(this, displayChapters);
         lvBottomSheetChapters.setAdapter(chapterAdapter);
 
         // Bắt sự kiện khi click chọn nhanh một chương bất kỳ trong BottomSheet
         lvBottomSheetChapters.setOnItemClickListener((parent, view, position, id) -> {
-            currentChapter = position + 1; // Cập nhật số chương hiện hành dựa trên vị trí click (index chạy từ 0)
-            loadChapterData(currentChapter); // Gọi hàm nạp truyện để thay đổi nội dung trang đọc
+            Chapter selectedChapter = displayChapters.get(position);
+            chapterId = selectedChapter.getChapterId();
+            chapterName = selectedChapter.getName();
+            currentChapterIndex = position;
+            loadChapterData(position + 1); // Gọi hàm nạp truyện để thay đổi nội dung trang đọc
             bottomSheetDialog.dismiss(); // Đóng bảng trượt sau khi chọn xong chương
         });
 
