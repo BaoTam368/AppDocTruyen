@@ -2,6 +2,7 @@ package com.example.appdoctruyen.views.fragments;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,12 +23,41 @@ import com.example.appdoctruyen.views.activities.ComicReadingActivity;
 import com.example.appdoctruyen.views.activities.GroupDetailActivity;
 import com.example.appdoctruyen.views.activities.MainActivity;
 import com.example.appdoctruyen.views.activities.NotificationActivity;
+import com.example.appdoctruyen.data.api.MangaRepository;
+import com.example.appdoctruyen.models.Comic;
 
 public class ComicInfoFragment extends Fragment {
-    private TextView tvAuthorName;
-    private ImageView imgAuthorAvatar ;
+    private static final String ARG_MANGA_ID = "mangaId";
+    private static final String ARG_MANGA_TITLE = "mangaTitle";
+    
+    private ImageView imgCover, imgAuthorAvatar;
+    private TextView tvMangaName, tvAuthorName, tvDescription, tvViews, tvLikes;
+    private LinearLayout layoutTags;
     private ConstraintLayout layoutRating;
+    private String mangaId;
+    private String mangaTitle;
+    private MangaRepository mangaRepository;
+    private Comic mangaInfo;
 
+    public static ComicInfoFragment newInstance(String mangaId, String mangaTitle) {
+        ComicInfoFragment fragment = new ComicInfoFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_MANGA_ID, mangaId);
+        args.putString(ARG_MANGA_TITLE, mangaTitle);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            mangaId = getArguments().getString(ARG_MANGA_ID);
+            mangaTitle = getArguments().getString(ARG_MANGA_TITLE);
+        }
+        mangaRepository = new MangaRepository();
+    }
 
     @SuppressLint({"WrongViewCast", "MissingInflatedId"})
     @Nullable
@@ -35,16 +65,20 @@ public class ComicInfoFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_comic_info, container, false);
 
-        tvAuthorName = view.findViewById(R.id.tvAuthorName);
+        imgCover = view.findViewById(R.id.imgCover);
         imgAuthorAvatar = view.findViewById(R.id.imgAuthorAvatar);
+        tvMangaName = view.findViewById(R.id.tvMangaName);
+        tvAuthorName = view.findViewById(R.id.tvAuthorName);
+        tvDescription = view.findViewById(R.id.tvDescription);
+        tvViews = view.findViewById(R.id.tvViews);
+        tvLikes = view.findViewById(R.id.tvLikes);
+        layoutTags = view.findViewById(R.id.layoutTags);
         layoutRating = view.findViewById(R.id.layoutRating);
 
-        layoutRating.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), MainActivity.class);
-            intent.putExtra("open_tab", "world");
-            intent.putExtra("world_page", "comment");
-            startActivity(intent);
-        });
+        // Load manga info từ API
+        if (mangaId != null && !mangaId.isEmpty()) {
+            loadMangaInfo();
+        }
 
         tvAuthorName.setOnClickListener(v -> {
             openGroupDetail();
@@ -55,6 +89,58 @@ public class ComicInfoFragment extends Fragment {
         });
 
         return view;
+    }
+
+    private void loadMangaInfo() {
+        mangaRepository.getMangaDetail(mangaId, new MangaRepository.RepositoryCallback<Comic>() {
+            @Override
+            public void onSuccess(Comic data) {
+                mangaInfo = data;
+                
+                // Cập nhật UI với thông tin manga
+                if (tvMangaName != null) {
+                    tvMangaName.setText(data.getTitle());
+                }
+                
+                if (tvDescription != null) {
+                    tvDescription.setText(data.getDescription());
+                }
+                
+                if (tvAuthorName != null) {
+                    tvAuthorName.setText("MangaDex");
+                }
+                
+                // Load ảnh bìa (sử dụng placeholder nếu không có library)
+                if (imgCover != null && data.getCoverUrl() != null && !data.getCoverUrl().isEmpty()) {
+                    // Nếu có Picasso hoặc Glide, load ảnh ở đây
+                    // Hiện tại giữ placeholder
+                }
+                
+                // Hiển thị tags nếu có
+                if (layoutTags != null && data.getTags() != null && !data.getTags().isEmpty()) {
+                    layoutTags.removeAllViews();
+                    for (String tag : data.getTags()) {
+                        TextView tagView = new TextView(getContext());
+                        tagView.setText("#" + tag);
+                        tagView.setBackgroundColor(getResources().getColor(R.color.brand_blue));
+                        tagView.setTextColor(Color.BLACK);
+                        tagView.setTextSize(12);
+                        tagView.setPadding(24, 16, 24, 16);
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.WRAP_CONTENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT
+                        );
+                        params.setMargins(0, 0, 32, 0);
+                        layoutTags.addView(tagView, params);
+                    }
+                }
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(getContext(), "Lỗi tải thông tin: " + message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void openGroupDetail() {

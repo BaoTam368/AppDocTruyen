@@ -203,12 +203,14 @@
 
         <TextView
                 android:id="@+id/tvDescription"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="Nội dung giới thiệu"
                 android:textColor="@color/black"
                 android:textSize="14sp"
+                app:layout_constraintEnd_toStartOf="@id/tvReadMore"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvLabelIntro"/>
 
         <TextView
@@ -219,9 +221,7 @@
                 android:textColor="@color/brand_blue"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="1.0"
-                app:layout_constraintStart_toEndOf="@id/tvDescription"
-                app:layout_constraintTop_toBottomOf="@id/tvDescription"/>
+                app:layout_constraintTop_toTopOf="@id/tvDescription"/>
 
         <TextView
                 android:id="@+id/tvLabelRating"

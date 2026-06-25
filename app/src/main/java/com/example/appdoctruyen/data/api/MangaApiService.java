@@ -23,7 +23,7 @@ public interface MangaApiService {
     @GET("manga/{mangaId}/chapters")
     Call<ChapterListResponse> getMangaChapters(@Path("mangaId") String mangaId);
 
-    @GET("chapter/{chapterId}/pages")
+    @GET("manga/chapter/{chapterId}/pages")
     Call<ChapterPagesResponse> getChapterPages(@Path("chapterId") String chapterId);
 
     @GET("groups")
