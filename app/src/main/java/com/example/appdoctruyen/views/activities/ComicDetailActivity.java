@@ -16,11 +16,17 @@ public class ComicDetailActivity extends AppCompatActivity {
     private TabLayout tabLayout;
     private ViewPager2 viewPager;
     private ImageView btnBack;
+    private String mangaId;
+    private String mangaTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comic_detail);
+
+        // Nhận mangaId và mangaTitle từ intent
+        mangaId = getIntent().getStringExtra("mangaId");
+        mangaTitle = getIntent().getStringExtra("comic_title");
 
         // 1. Ánh xạ các View từ XML
         tabLayout = findViewById(R.id.tabLayout);
@@ -28,7 +34,7 @@ public class ComicDetailActivity extends AppCompatActivity {
         btnBack = findViewById(R.id.btnBack);
 
         // 2. Khởi tạo Adapter và gắn vào ViewPager2
-        ComicDetailAdapter adapter = new ComicDetailAdapter(this);
+        ComicDetailAdapter adapter = new ComicDetailAdapter(this, mangaId, mangaTitle);
         viewPager.setAdapter(adapter);
 
         // 3. Liên kết TabLayout với ViewPager2

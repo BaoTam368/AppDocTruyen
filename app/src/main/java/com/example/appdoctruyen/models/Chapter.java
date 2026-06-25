@@ -1,6 +1,7 @@
 package com.example.appdoctruyen.models;
 
 public class Chapter {
+    private String chapterId;
     private String name;
     private String date;
     private boolean isFree; // true là miễn phí, false là khóa
@@ -9,6 +10,21 @@ public class Chapter {
         this.name = name;
         this.date = date;
         this.isFree = isFree;
+    }
+
+    public Chapter(String chapterId, String name, String date, boolean isFree) {
+        this.chapterId = chapterId;
+        this.name = name;
+        this.date = date;
+        this.isFree = isFree;
+    }
+
+    public String getChapterId() {
+        return chapterId;
+    }
+
+    public void setChapterId(String chapterId) {
+        this.chapterId = chapterId;
     }
 
     public String getName() {
