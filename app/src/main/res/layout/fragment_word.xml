@@ -10,19 +10,40 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-        <com.google.android.material.tabs.TabLayout
-                android:id="@+id/tabLayout_world"
+        <LinearLayout
+                android:id="@+id/tabContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:tabIndicatorColor="#FFFFFF"
-                app:tabSelectedTextColor="#333333"
-                app:tabTextColor="#333333"
-                app:tabMode="fixed"
+                android:orientation="horizontal"
                 android:background="@color/brand_blue"
-                app:tabGravity="fill"/>
+                android:padding="8dp">
 
-        <androidx.viewpager2.widget.ViewPager2
-                android:id="@+id/viewPager_world"
+            <TextView
+                    android:id="@+id/tabPost"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Bài viết"
+                    android:textAlignment="center"
+                    android:padding="12dp"
+                    android:textColor="@color/tab_unselected_text"
+                    android:background="@drawable/bg_tab_unselected"/>
+
+            <TextView
+                    android:id="@+id/tabComment"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Bình luận"
+                    android:textAlignment="center"
+                    android:padding="12dp"
+                    android:textColor="@color/tab_unselected_text"
+                    android:background="@drawable/bg_tab_unselected"/>
+
+        </LinearLayout>
+
+        <FrameLayout
+                android:id="@+id/worldFragmentContainer"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
 

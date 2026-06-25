@@ -26,7 +26,7 @@ import com.example.appdoctruyen.views.activities.NotificationActivity;
 public class ComicInfoFragment extends Fragment {
     private TextView tvAuthorName;
     private ImageView imgAuthorAvatar ;
-    private ConstraintLayout tvRating;
+    private ConstraintLayout layoutRating;
 
 
     @SuppressLint({"WrongViewCast", "MissingInflatedId"})
@@ -37,9 +37,9 @@ public class ComicInfoFragment extends Fragment {
 
         tvAuthorName = view.findViewById(R.id.tvAuthorName);
         imgAuthorAvatar = view.findViewById(R.id.imgAuthorAvatar);
-        tvRating = view.findViewById(R.id.tvRating);
+        layoutRating = view.findViewById(R.id.layoutRating);
 
-        tvRating.setOnClickListener(v -> {
+        layoutRating.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), MainActivity.class);
             intent.putExtra("open_tab", "world");
             intent.putExtra("world_page", "comment");

@@ -26,9 +26,6 @@ public class PostFragment extends Fragment {
     private RecyclerView rvPosts;
     private PostAdapter postAdapter;
     private List<Post> postList;
-    private EditText edtPostCaption;
-    private EditText edtImageUrl;
-    private Button btnAddPost;
 
     @SuppressLint("MissingInflatedId")
     @Nullable
@@ -37,26 +34,6 @@ public class PostFragment extends Fragment {
         View view = inflater.inflate(R.layout.list_world_feed, container, false);
 
         rvPosts = view.findViewById(R.id.recyclerViewPost);
-        edtPostCaption = view.findViewById(R.id.edt_post_caption);
-        edtImageUrl = view.findViewById(R.id.edt_image_url);
-        btnAddPost = view.findViewById(R.id.btn_add_post);
-        btnAddPost.setOnClickListener(v -> {
-
-            String caption = edtPostCaption.getText().toString().trim();
-            String imageUrl = edtImageUrl.getText().toString().trim();
-
-            if (caption.isEmpty()) {
-                edtPostCaption.setError("Nhập nội dung bài viết");
-                return;
-            }
-
-            Post newPost = new Post("Nguyễn Văn A", "Vừa xong", caption, "https://i.pinimg.com/736x/87/9b/a9/879ba9d3f1cc4821a37c92b0c369fc48.jpg", imageUrl.isEmpty() ? "https://picsum.photos/400/600" : imageUrl, 0, 0);
-
-            addPost(newPost);
-
-            edtPostCaption.setText("");
-            edtImageUrl.setText("");
-        });
         setupPostList();
 
 //        recyclerView = view.findViewById(R.id.recyclerViewPost);
@@ -91,6 +68,7 @@ public class PostFragment extends Fragment {
 
         rvPosts.setAdapter(postAdapter);
     }
+
     public void addPost(Post post) {
         postList.add(0, post);
         postAdapter.notifyItemInserted(0);

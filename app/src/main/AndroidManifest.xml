@@ -15,12 +15,11 @@
             android:theme="@style/Theme.AppDocTruyen"
             android:usesCleartextTraffic="true">
         <activity
-                android:name=".World.CreatePostActivity"
+                android:name="com.example.appdoctruyen.World.CreatePostActivity"
                 android:exported="false"/>
         <activity
-                android:name=".MainActivity"
-                android:exported="true"
-                android:screenOrientation="portrait">
+                android:name="com.example.appdoctruyen.views.activities.MainActivity"
+                android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -28,17 +27,44 @@
             </intent-filter>
         </activity>
         <activity
-                android:name=".ComicDetailActivity"
-                android:exported="false"
-                android:screenOrientation="portrait"/>
+                android:name="com.example.appdoctruyen.views.activities.ComicDetailActivity"
+                android:exported="false"/>
         <activity
-                android:name=".ComicReadingActivity"
-                android:exported="false"
-                android:screenOrientation="portrait"/>
+                android:name="com.example.appdoctruyen.views.activities.ComicReadingActivity"
+                android:exported="false"/>
         <activity
-                android:name=".GroupDetailActivity"
-                android:exported="false"
-                android:screenOrientation="portrait"/>
+                android:name="com.example.appdoctruyen.views.activities.GroupDetailActivity"
+                android:exported="false"/>
+        <activity
+                android:name="com.example.appdoctruyen.views.activities.SearchActivity"
+                android:exported="false"/>
+        <activity
+                android:name="com.example.appdoctruyen.views.activities.FilterActivity"
+                android:exported="false"/>
+        <activity
+                android:name="com.example.appdoctruyen.views.activities.NotificationActivity"
+                android:exported="false"/>
+        <activity
+                android:name="com.example.appdoctruyen.views.activities.NewBookshelfActivity"
+                android:exported="false"/>
+        <activity
+                android:name="com.example.appdoctruyen.views.activities.RankingActivity"
+                android:exported="false"/>
+        <activity
+                android:name="com.example.appdoctruyen.views.activities.LoginActivity"
+                android:exported="false"/>
+        <activity
+                android:name="com.example.appdoctruyen.views.activities.RegisterActivity"
+                android:exported="false"/>
+        <activity
+                android:name="com.example.appdoctruyen.views.activities.PostDetailActivity"
+                android:exported="false"/>
+        <activity
+                android:name="com.example.appdoctruyen.views.activities.RechargeActivity"
+                android:exported="false"/>
+        <activity
+                android:name="com.example.appdoctruyen.views.activities.UserDetailsActivity"
+                android:exported="false"/>
     </application>
 
 </manifest>
