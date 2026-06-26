@@ -31,13 +31,14 @@ public class ComicInfoFragment extends Fragment {
     private static final String ARG_MANGA_TITLE = "mangaTitle";
 
     private ImageView imgCover, imgAuthorAvatar;
-    private TextView tvMangaName, tvAuthorName, tvDescription, tvViews, tvLikes;
+    private TextView tvMangaName, tvAuthorName, tvDescription, tvViews, tvLikes, tvReadMore;
     private LinearLayout layoutTags;
     private ConstraintLayout layoutRating;
     private String mangaId;
     private String mangaTitle;
     private MangaRepository mangaRepository;
     private Comic mangaInfo;
+    private boolean isDescriptionExpanded = false;
 
     public static ComicInfoFragment newInstance(String mangaId, String mangaTitle) {
         ComicInfoFragment fragment = new ComicInfoFragment();
@@ -65,28 +66,53 @@ public class ComicInfoFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_comic_info, container, false);
 
-        imgCover = view.findViewById(R.id.imgCover);
-        imgAuthorAvatar = view.findViewById(R.id.imgAuthorAvatar);
-        tvMangaName = view.findViewById(R.id.tvMangaName);
-        tvAuthorName = view.findViewById(R.id.tvAuthorName);
-        tvDescription = view.findViewById(R.id.tvDescription);
-        tvViews = view.findViewById(R.id.tvViews);
-        tvLikes = view.findViewById(R.id.tvLikes);
-        layoutTags = view.findViewById(R.id.layoutTags);
-//        layoutRating = view.findViewById(R.id.layoutRating);
+        try {
+            imgCover = view.findViewById(R.id.imgCover);
+            imgAuthorAvatar = view.findViewById(R.id.imgAuthorAvatar);
+            tvMangaName = view.findViewById(R.id.tvMangaName);
+            tvAuthorName = view.findViewById(R.id.tvAuthorName);
+            tvDescription = view.findViewById(R.id.tvDescription);
+            tvViews = view.findViewById(R.id.tvViews);
+            tvLikes = view.findViewById(R.id.tvLikes);
+            tvReadMore = view.findViewById(R.id.tvReadMore);
+            layoutTags = view.findViewById(R.id.layoutTags);
+    //        layoutRating = view.findViewById(R.id.layoutRating);
 
-        // Load manga info từ API
-        if (mangaId != null && !mangaId.isEmpty()) {
-            loadMangaInfo();
+            // Load manga info từ API
+            if (mangaId != null && !mangaId.isEmpty()) {
+                loadMangaInfo();
+            } else {
+                Toast.makeText(getContext(), "Không tìm thấy ID truyện", Toast.LENGTH_SHORT).show();
+            }
+
+            if (tvAuthorName != null) {
+                tvAuthorName.setOnClickListener(v -> {
+                    openGroupDetail();
+                });
+            }
+
+            if (imgAuthorAvatar != null) {
+                imgAuthorAvatar.setOnClickListener(v -> {
+                    openGroupDetail();
+                });
+            }
+
+            if (tvReadMore != null) {
+                tvReadMore.setOnClickListener(v -> {
+                    isDescriptionExpanded = !isDescriptionExpanded;
+                    if (isDescriptionExpanded) {
+                        tvDescription.setMaxLines(Integer.MAX_VALUE);
+                        tvReadMore.setText("Thu gọn");
+                    } else {
+                        tvDescription.setMaxLines(3);
+                        tvReadMore.setText("Đọc thêm");
+                    }
+                });
+            }
+        } catch (Exception e) {
+            android.util.Log.e("ComicInfoFragment", "Error initializing views: " + e.getMessage());
+            Toast.makeText(getContext(), "Lỗi khởi tạo giao diện", Toast.LENGTH_SHORT).show();
         }
-
-        tvAuthorName.setOnClickListener(v -> {
-            openGroupDetail();
-        });
-
-        imgAuthorAvatar.setOnClickListener(v -> {
-            openGroupDetail();
-        });
 
         return view;
     }
@@ -114,7 +140,7 @@ public class ComicInfoFragment extends Fragment {
                 }
 
                 if (tvAuthorName != null) {
-                    tvAuthorName.setText("MangaDex");
+                    tvAuthorName.setText(data.getAuthor() != null ? data.getAuthor() : "Không có thông tin");
                 }
 
                 // Load ảnh bìa (sử dụng placeholder nếu không có library)
