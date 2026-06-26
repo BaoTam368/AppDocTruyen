@@ -283,6 +283,33 @@ public class BookshelfDatabaseHelper extends SQLiteOpenHelper {
         return comics;
     }
 
+    public boolean isDownloaded(String userId, String mangaId) {
+        if (isBlank(userId) || isBlank(mangaId)) return false;
+        Cursor cursor = getReadableDatabase().query(
+                TABLE_DOWNLOADED,
+                new String[]{COL_ID},
+                COL_USER_ID + " = ? AND " + COL_MANGA_ID + " = ?",
+                new String[]{userId, mangaId},
+                null,
+                null,
+                null
+        );
+        try {
+            return cursor.moveToFirst();
+        } finally {
+            cursor.close();
+        }
+    }
+
+    public int removeDownloadedComic(String userId, String mangaId) {
+        if (isBlank(userId) || isBlank(mangaId)) return 0;
+        return getWritableDatabase().delete(
+                TABLE_DOWNLOADED,
+                COL_USER_ID + " = ? AND " + COL_MANGA_ID + " = ?",
+                new String[]{userId, mangaId}
+        );
+    }
+
     // Comment chỉ được lưu local trên máy, không gửi lên server
     public long addLocalComment(String userId, String mangaId, String content) {
         if (isBlank(userId) || isBlank(mangaId) || isBlank(content)) return -1;

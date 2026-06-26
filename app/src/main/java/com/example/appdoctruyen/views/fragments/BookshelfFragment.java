@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.appdoctruyen.R;
 import com.example.appdoctruyen.data.database.BookshelfDatabaseHelper;
+import com.example.appdoctruyen.data.firebase.AuthManager;
+import com.example.appdoctruyen.data.firebase.BookshelfFirebaseHelper;
 import com.example.appdoctruyen.models.Comic;
 import com.example.appdoctruyen.views.activities.ComicDetailActivity;
 import com.example.appdoctruyen.views.adapters.BookshelfAdapter;
@@ -61,6 +63,13 @@ public class BookshelfFragment extends Fragment {
         selectTab(0);
 
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        selectTab(currentTab);
+        syncWithFirebase();
     }
 
     @Override
@@ -170,7 +179,7 @@ public class BookshelfFragment extends Fragment {
     private List<Comic> getBookmarksFromDatabase() {
         if (bookshelfDatabaseHelper == null) return new ArrayList<>();
         try {
-            return bookshelfDatabaseHelper.getBookmarks(DEMO_USER_ID);
+            return bookshelfDatabaseHelper.getBookmarks(getCurrentUserId());
         } catch (RuntimeException ignored) {
             return new ArrayList<>();
         }
@@ -179,7 +188,7 @@ public class BookshelfFragment extends Fragment {
     private List<Comic> getReadingHistoryFromDatabase() {
         if (bookshelfDatabaseHelper == null) return new ArrayList<>();
         try {
-            return bookshelfDatabaseHelper.getReadingHistory(DEMO_USER_ID);
+            return bookshelfDatabaseHelper.getReadingHistory(getCurrentUserId());
         } catch (RuntimeException ignored) {
             return new ArrayList<>();
         }
@@ -188,10 +197,87 @@ public class BookshelfFragment extends Fragment {
     private List<Comic> getDownloadedComicsFromDatabase() {
         if (bookshelfDatabaseHelper == null) return new ArrayList<>();
         try {
-            return bookshelfDatabaseHelper.getDownloadedComics(DEMO_USER_ID);
+            return bookshelfDatabaseHelper.getDownloadedComics(getCurrentUserId());
         } catch (RuntimeException ignored) {
             return new ArrayList<>();
         }
+    }
+
+    private String getCurrentUserId() {
+        AuthManager authManager = new AuthManager();
+        String userId = authManager.getCurrentUserId();
+        return userId != null ? userId : "local_user";
+    }
+
+    private void syncWithFirebase() {
+        String userId = getCurrentUserId();
+        if (userId.equals("local_user")) return;
+
+        BookshelfFirebaseHelper fbHelper = new BookshelfFirebaseHelper(userId);
+        
+        fbHelper.getBookmarks(new BookshelfFirebaseHelper.BookshelfCallback() {
+            @Override
+            public void onSuccess(List<Comic> comics) {
+                if (comics != null && bookshelfDatabaseHelper != null) {
+                    boolean hasNew = false;
+                    for (Comic comic : comics) {
+                        if (!bookshelfDatabaseHelper.isBookmarked(userId, comic.getMangaId())) {
+                            bookshelfDatabaseHelper.addBookmark(userId, comic.getMangaId(), comic.getTitle(), comic.getCoverUrl());
+                            hasNew = true;
+                        }
+                    }
+                    if (hasNew && currentTab == 0 && getActivity() != null) {
+                        getActivity().runOnUiThread(() -> selectTab(0));
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(String errorMessage) {}
+        });
+
+        fbHelper.getReadingHistory(new BookshelfFirebaseHelper.BookshelfCallback() {
+            @Override
+            public void onSuccess(List<Comic> comics) {
+                if (comics != null && bookshelfDatabaseHelper != null) {
+                    boolean hasNew = false;
+                    for (Comic comic : comics) {
+                        Comic localHist = bookshelfDatabaseHelper.getReadingHistoryForManga(userId, comic.getMangaId());
+                        if (localHist == null || localHist.getLastReadTime() < comic.getLastReadTime()) {
+                            bookshelfDatabaseHelper.saveReadingHistory(userId, comic.getMangaId(), comic.getChapterId(), comic.getChapterName(), comic.getTitle(), comic.getCoverUrl());
+                            hasNew = true;
+                        }
+                    }
+                    if (hasNew && currentTab == 1 && getActivity() != null) {
+                        getActivity().runOnUiThread(() -> selectTab(1));
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(String errorMessage) {}
+        });
+
+        fbHelper.getDownloadedComics(new BookshelfFirebaseHelper.BookshelfCallback() {
+            @Override
+            public void onSuccess(List<Comic> comics) {
+                if (comics != null && bookshelfDatabaseHelper != null) {
+                    boolean hasNew = false;
+                    for (Comic comic : comics) {
+                        if (!bookshelfDatabaseHelper.isDownloaded(userId, comic.getMangaId())) {
+                            bookshelfDatabaseHelper.addDownloadedComic(userId, comic.getMangaId(), comic.getChapterId(), comic.getChapterName(), comic.getLocalPath(), comic.getTitle(), comic.getCoverUrl());
+                            hasNew = true;
+                        }
+                    }
+                    if (hasNew && currentTab == 2 && getActivity() != null) {
+                        getActivity().runOnUiThread(() -> selectTab(2));
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(String errorMessage) {}
+        });
     }
 
     private String resolveMangaId(Comic comic) {

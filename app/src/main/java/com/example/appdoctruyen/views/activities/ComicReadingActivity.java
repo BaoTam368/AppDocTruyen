@@ -19,6 +19,7 @@ import com.example.appdoctruyen.views.adapters.ComicPageAdapter;
 import com.example.appdoctruyen.models.Chapter;
 import com.example.appdoctruyen.views.adapters.ChapterAdapter;
 import com.example.appdoctruyen.data.api.MangaRepository;
+import com.example.appdoctruyen.models.Comic;
 import com.example.appdoctruyen.data.database.BookshelfDatabaseHelper;
 import com.example.appdoctruyen.data.firebase.AuthManager;
 import com.example.appdoctruyen.data.firebase.BookshelfFirebaseHelper;
@@ -79,6 +80,10 @@ public class ComicReadingActivity extends AppCompatActivity {
         // Tải danh sách chapters của manga
         if (mangaId != null && !mangaId.isEmpty()) {
             loadChapterList();
+            // Nếu không có cover URL từ intent, tự động lấy từ API
+            if (coverUrl == null || coverUrl.isEmpty()) {
+                loadMangaDetailForCover();
+            }
         }
 
         // 1. Ánh xạ View từ XML
@@ -162,11 +167,39 @@ public class ComicReadingActivity extends AppCompatActivity {
         String userId = getCurrentUserId();
         String title = mangaTitle != null ? mangaTitle : ("Manga " + mangaId);
         String chName = chapterName != null ? chapterName : ("Chapter " + currentChapter);
+        // Dùng coverUrl nếu có, hoặc chuỗi rỗng để tránh null
+        String cover = (coverUrl != null && !coverUrl.isEmpty()) ? coverUrl : "";
         
-        bookshelfDatabaseHelper.saveReadingHistory(userId, mangaId, chapterId, chName, title, coverUrl);
+        bookshelfDatabaseHelper.saveReadingHistory(userId, mangaId, chapterId, chName, title, cover);
         if (firebaseHelper != null) {
-            firebaseHelper.saveReadingHistory(mangaId, chapterId, chName, title, coverUrl);
+            firebaseHelper.saveReadingHistory(mangaId, chapterId, chName, title, cover);
         }
+    }
+
+    /**
+     * Tự động lấy cover URL từ API khi không được truyền qua Intent.
+     * Sau khi lấy được, cập nhật lại lịch sử đọc với cover URL mới.
+     */
+    private void loadMangaDetailForCover() {
+        mangaRepository.getMangaDetail(mangaId, new MangaRepository.RepositoryCallback<Comic>() {
+            @Override
+            public void onSuccess(Comic data) {
+                if (data != null && data.getCoverUrl() != null && !data.getCoverUrl().isEmpty()) {
+                    coverUrl = data.getCoverUrl();
+                    // Cập nhật tiêu đề nếu chưa có
+                    if ((mangaTitle == null || mangaTitle.isEmpty()) && data.getTitle() != null) {
+                        mangaTitle = data.getTitle();
+                    }
+                    // Lưu lại lịch sử với cover URL đã có
+                    saveHistory();
+                }
+            }
+
+            @Override
+            public void onError(String message) {
+                // Bỏ qua lỗi - chỉ là không có ảnh bìa, không ảnh hưởng đến việc đọc truyện
+            }
+        });
     }
 
     private String getCurrentUserId() {
