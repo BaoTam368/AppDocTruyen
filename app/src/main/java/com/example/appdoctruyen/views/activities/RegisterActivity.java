@@ -15,7 +15,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class RegisterActivity extends AppCompatActivity {
     private AuthManager authManager;
-    private EditText edtEmailPhone, edtPassword, edtConfirmPassword;
+    private EditText edtEmailPhone, edtUsername, edtPassword, edtConfirmPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,29 +24,76 @@ public class RegisterActivity extends AppCompatActivity {
 
         authManager = new AuthManager();
         edtEmailPhone = findViewById(R.id.edt_email_phone);
+        edtUsername = findViewById(R.id.edt_username);
         edtPassword = findViewById(R.id.edt_password);
         edtConfirmPassword = findViewById(R.id.edt_confirm_password);
         Button btnRegister = findViewById(R.id.btn_register);
 
         btnRegister.setOnClickListener(v -> {
             String email = edtEmailPhone.getText().toString().trim();
+            String username = edtUsername.getText().toString().trim();
             String password = edtPassword.getText().toString().trim();
             String confirmPassword = edtConfirmPassword.getText().toString().trim();
 
-            if (email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-                Toast.makeText(this, "Vui lòng điền đủ thông tin!", Toast.LENGTH_SHORT).show();
+            // Validate email/phone field
+            if (email.isEmpty()) {
+                edtEmailPhone.setError("Vui lòng nhập email");
+                edtEmailPhone.requestFocus();
+                return;
+            }
+
+            // Validate email format
+            if (!isValidEmail(email)) {
+                edtEmailPhone.setError("Email không hợp lệ");
+                edtEmailPhone.requestFocus();
+                return;
+            }
+
+            // Validate username
+            if (username.isEmpty()) {
+                edtUsername.setError("Vui lòng nhập tên đăng nhập");
+                edtUsername.requestFocus();
+                return;
+            }
+
+            if (username.length() < 3) {
+                edtUsername.setError("Tên đăng nhập phải từ 3 ký tự trở lên");
+                edtUsername.requestFocus();
+                return;
+            }
+
+            if (!username.matches("^[a-zA-Z0-9_]+$")) {
+                edtUsername.setError("Tên đăng nhập chỉ được chứa chữ cái, số và dấu gạch dưới");
+                edtUsername.requestFocus();
+                return;
+            }
+
+            // Validate password
+            if (password.isEmpty()) {
+                edtPassword.setError("Vui lòng nhập mật khẩu");
+                edtPassword.requestFocus();
                 return;
             }
 
             if (password.length() < 6) {
-                Toast.makeText(this, "Mật khẩu phải từ 6 ký tự trở lên!", Toast.LENGTH_SHORT).show();
+                edtPassword.setError("Mật khẩu phải từ 6 ký tự trở lên");
+                edtPassword.requestFocus();
+                return;
+            }
+
+            // Validate confirm password
+            if (confirmPassword.isEmpty()) {
+                edtConfirmPassword.setError("Vui lòng xác nhận mật khẩu");
+                edtConfirmPassword.requestFocus();
                 return;
             }
 
             if (!password.equals(confirmPassword)) {
-                Toast.makeText(this, "Mật khẩu không khớp!", Toast.LENGTH_SHORT).show();
+                edtConfirmPassword.setError("Mật khẩu không khớp");
+                edtConfirmPassword.requestFocus();
                 return;
             }
+
             authManager.register(email, password, new AuthCallback() {
                 @Override
                 public void onSuccess(FirebaseUser user) {
@@ -69,5 +116,10 @@ public class RegisterActivity extends AppCompatActivity {
         btnLogin.setOnClickListener(v -> {
             finish();
         });
+    }
+
+    private boolean isValidEmail(String email) {
+        String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
+        return email.matches(emailPattern);
     }
 }

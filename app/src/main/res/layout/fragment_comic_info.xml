@@ -31,6 +31,8 @@
                 android:textColor="@android:color/black"
                 android:textSize="20sp"
                 android:textStyle="bold"
+                android:maxLines="2"
+                android:ellipsize="end"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/imgCover"
                 app:layout_constraintTop_toTopOf="parent"/>
@@ -42,6 +44,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 android:orientation="horizontal"
+                android:maxLines="2"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/imgCover"
                 app:layout_constraintTop_toBottomOf="@id/tvMangaName">
@@ -113,7 +116,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:orientation="horizontal"
                 app:layout_constraintStart_toEndOf="@id/imgCover"
                 app:layout_constraintTop_toBottomOf="@id/layoutStats">
@@ -132,27 +135,6 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@android:drawable/stat_sys_download"/>
-        </LinearLayout>
-
-        <LinearLayout
-                android:id="@+id/btnGift"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@color/badge_red"
-                android:orientation="horizontal"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="6dp"
-                android:gravity="center"
-                app:layout_constraintBottom_toBottomOf="@id/layoutActions"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/layoutActions">
-
-            <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="+"
-                    android:textColor="@android:color/white"
-                    android:textStyle="bold"/>
         </LinearLayout>
 
         <com.google.android.material.imageview.ShapeableImageView
@@ -206,6 +188,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:maxLines="3"
+                android:ellipsize="end"
                 android:text="Nội dung giới thiệu"
                 android:textColor="@color/black"
                 android:textSize="14sp"
@@ -222,140 +206,6 @@
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/tvDescription"/>
-
-        <TextView
-                android:id="@+id/tvLabelRating"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="Đánh giá"
-                android:textColor="@android:color/black"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvReadMore"/>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/layoutRating"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:background="@color/gray_bg"
-                android:padding="16dp"
-                app:layout_constraintTop_toBottomOf="@id/tvLabelRating">
-
-            <TextView
-                    android:id="@+id/tvRatingTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Xem toàn bộ đánh giá"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"/>
-
-            <TextView
-                    android:id="@+id/tvAvgStars"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="0"
-                    android:textColor="@color/brand_blue"
-                    android:textSize="36sp"
-                    android:textStyle="bold"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tvRatingTitle"/>
-
-            <TextView
-                    android:id="@+id/tvLabelStars"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=" Sao"
-                    android:textColor="@color/brand_blue"
-                    android:textSize="16sp"
-                    android:layout_marginBottom="6dp"
-                    app:layout_constraintBottom_toBottomOf="@id/tvAvgStars"
-                    app:layout_constraintStart_toEndOf="@id/tvAvgStars"/>
-
-            <TextView
-                    android:id="@+id/tvTotalRatings"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="0 đánh giá"
-                    android:textSize="12sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tvAvgStars"/>
-
-            <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="24dp"
-                    android:orientation="vertical"
-                    app:layout_constraintBottom_toBottomOf="@id/tvTotalRatings"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/tvLabelStars"
-                    app:layout_constraintTop_toTopOf="@id/tvAvgStars">
-
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                              android:gravity="center_vertical" android:orientation="horizontal">
-                    <TextView android:layout_width="12dp" android:layout_height="wrap_content" android:text="5"
-                              android:textSize="10sp"/>
-                    <ProgressBar android:layout_width="match_parent" android:layout_height="8dp"
-                                 style="@android:style/Widget.ProgressBar.Horizontal" android:progress="0"
-                                 android:progressTint="@android:color/darker_gray" android:layout_marginStart="4dp"/>
-                </LinearLayout>
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                              android:gravity="center_vertical" android:orientation="horizontal"
-                              android:layout_marginTop="2dp">
-                    <TextView android:layout_width="12dp" android:layout_height="wrap_content" android:text="4"
-                              android:textSize="10sp"/>
-                    <ProgressBar android:layout_width="match_parent" android:layout_height="8dp"
-                                 style="@android:style/Widget.ProgressBar.Horizontal" android:progress="0"
-                                 android:progressTint="@android:color/darker_gray" android:layout_marginStart="4dp"/>
-                </LinearLayout>
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                              android:gravity="center_vertical" android:orientation="horizontal"
-                              android:layout_marginTop="2dp">
-                    <TextView android:layout_width="12dp" android:layout_height="wrap_content" android:text="3"
-                              android:textSize="10sp"/>
-                    <ProgressBar android:layout_width="match_parent" android:layout_height="8dp"
-                                 style="@android:style/Widget.ProgressBar.Horizontal" android:progress="0"
-                                 android:progressTint="@android:color/darker_gray" android:layout_marginStart="4dp"/>
-                </LinearLayout>
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                              android:gravity="center_vertical" android:orientation="horizontal"
-                              android:layout_marginTop="2dp">
-                    <TextView android:layout_width="12dp" android:layout_height="wrap_content" android:text="2"
-                              android:textSize="10sp"/>
-                    <ProgressBar android:layout_width="match_parent" android:layout_height="8dp"
-                                 style="@android:style/Widget.ProgressBar.Horizontal" android:progress="0"
-                                 android:progressTint="@android:color/darker_gray" android:layout_marginStart="4dp"/>
-                </LinearLayout>
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                              android:gravity="center_vertical" android:orientation="horizontal"
-                              android:layout_marginTop="2dp">
-                    <TextView android:layout_width="12dp" android:layout_height="wrap_content" android:text="1"
-                              android:textSize="10sp"/>
-                    <ProgressBar android:layout_width="match_parent" android:layout_height="8dp"
-                                 style="@android:style/Widget.ProgressBar.Horizontal" android:progress="0"
-                                 android:progressTint="@android:color/darker_gray" android:layout_marginStart="4dp"/>
-                </LinearLayout>
-            </LinearLayout>
-
-            <TextView
-                    android:id="@+id/btnWriteReview"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:background="@color/gray_btn"
-                    android:gravity="center"
-                    android:paddingVertical="8dp"
-                    android:text="Viết đánh giá ~"
-                    android:textColor="@android:color/black"
-                    android:textSize="14sp"
-                    app:layout_constraintTop_toBottomOf="@id/tvTotalRatings"/>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

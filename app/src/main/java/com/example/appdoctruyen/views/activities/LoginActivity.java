@@ -51,8 +51,24 @@ public class LoginActivity extends AppCompatActivity {
             String email = edtUsername.getText().toString().trim();
             String password = edtPassword.getText().toString().trim();
 
-            if (email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Vui lòng nhập tài khoản và mật khẩu", android.widget.Toast.LENGTH_SHORT).show();
+            // Validate email field
+            if (email.isEmpty()) {
+                edtUsername.setError("Vui lòng nhập email");
+                edtUsername.requestFocus();
+                return;
+            }
+
+            // Validate email format
+            if (!isValidEmail(email)) {
+                edtUsername.setError("Email không hợp lệ");
+                edtUsername.requestFocus();
+                return;
+            }
+
+            // Validate password field
+            if (password.isEmpty()) {
+                edtPassword.setError("Vui lòng nhập mật khẩu");
+                edtPassword.requestFocus();
                 return;
             }
 
@@ -122,5 +138,10 @@ public class LoginActivity extends AppCompatActivity {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+    }
+
+    private boolean isValidEmail(String email) {
+        String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
+        return email.matches(emailPattern);
     }
 }

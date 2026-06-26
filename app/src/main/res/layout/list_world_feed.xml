@@ -19,6 +19,11 @@
                 android:layout_marginTop="10dp"
                 tools:listitem="@layout/item_world_feed"/>
 
+        <include
+            layout="@layout/item_add_post"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

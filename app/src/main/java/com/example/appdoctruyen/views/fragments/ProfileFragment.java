@@ -1,5 +1,6 @@
 package com.example.appdoctruyen.views.fragments;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -24,13 +25,14 @@ public class ProfileFragment extends Fragment {
     ShapeableImageView iv_user_avatar;
     private AuthManager authManager;
 
+    @SuppressLint("MissingInflatedId")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
         btn_logout = view.findViewById(R.id.btn_logout);
-        btn_topup = view.findViewById(R.id.btn_func_top_up);
+        btn_topup = view.findViewById(R.id.btn_topup);
         iv_user_avatar = view.findViewById(R.id.iv_user_avatar);
         authManager = new AuthManager();
 

@@ -62,7 +62,7 @@ public class ComicHomeFragment extends Fragment {
         layoutSearchBar = view.findViewById(R.id.layout_search_bar);
         ivNotification = view.findViewById(R.id.iv_notification);
         ivRefresh = view.findViewById(R.id.iv_refresh);
-        layoutCatNew = view.findViewById(R.id.layout_cat_new);
+//        layoutCatNew = view.findViewById(R.id.layout_cat_new);
 
         mangaRepository = new MangaRepository();
 
@@ -110,11 +110,11 @@ public class ComicHomeFragment extends Fragment {
 //            startActivity(intent);
 //        });
 //
-        // Click danh mục Truyện Mới
-        layoutCatNew.setOnClickListener(v -> {
-            Intent intent = new Intent(requireContext(), NewBookshelfActivity.class);
-            startActivity(intent);
-        });
+//        // Click danh mục Truyện Mới
+//        layoutCatNew.setOnClickListener(v -> {
+//            Intent intent = new Intent(requireContext(), NewBookshelfActivity.class);
+//            startActivity(intent);
+//        });
 
 //        // Click danh mục HOT
 //        layoutCatHot.setOnClickListener(v -> {
@@ -175,7 +175,7 @@ public class ComicHomeFragment extends Fragment {
 
     private void openComicDetail(Comic comic) {
         Intent intent = new Intent(requireContext(), ComicDetailActivity.class);
-        intent.putExtra("comic_id", comic.getId());
+        intent.putExtra("comic_id", comic.getMangaId());
         intent.putExtra("comic_title", comic.getTitle());
         intent.putExtra("mangaId", comic.getMangaId());
         startActivity(intent);

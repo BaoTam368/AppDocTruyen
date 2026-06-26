@@ -1,70 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools">
     <!-- Mở quyền truy cập Internet -->
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
-            android:allowBackup="true"
-            android:dataExtractionRules="@xml/data_extraction_rules"
-            android:fullBackupContent="@xml/backup_rules"
-            android:icon="@mipmap/ic_launcher"
-            android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_round"
-            android:supportsRtl="true"
-            android:theme="@style/Theme.AppDocTruyen"
-            android:usesCleartextTraffic="true">
-        <activity
-                android:name="com.example.appdoctruyen.World.CreatePostActivity"
-                android:exported="false"/>
-        <activity
-                android:name="com.example.appdoctruyen.views.activities.MainActivity"
-                android:exported="false"/>
-        <activity
-                android:name="com.example.appdoctruyen.views.activities.ComicDetailActivity"
-                android:exported="false"/>
-        <activity
-                android:name="com.example.appdoctruyen.views.activities.ComicReadingActivity"
-                android:exported="false"/>
-        <activity
-                android:name="com.example.appdoctruyen.views.activities.GroupDetailActivity"
-                android:exported="false"/>
-        <activity
-                android:name="com.example.appdoctruyen.views.activities.SearchActivity"
-                android:exported="false"/>
-        <activity
-                android:name="com.example.appdoctruyen.views.activities.FilterActivity"
-                android:exported="false"/>
-        <activity
-                android:name="com.example.appdoctruyen.views.activities.NotificationActivity"
-                android:exported="false"/>
-        <activity
-                android:name="com.example.appdoctruyen.views.activities.NewBookshelfActivity"
-                android:exported="false"/>
-        <activity
-                android:name="com.example.appdoctruyen.views.activities.RankingActivity"
-                android:exported="false"/>
-        <activity
-                android:name="com.example.appdoctruyen.views.activities.LoginActivity"
-                android:exported="true">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN"/>
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.AppDocTruyen"
+        android:usesCleartextTraffic="true"
+        android:networkSecurityConfig="@xml/network_security_config">
 
-            <category android:name="android.intent.category.LAUNCHER"/>
-        </intent-filter>
+        <activity
+            android:name=".views.activities.LoginActivity"
+            android:exported="true"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
+
         <activity
-                android:name="com.example.appdoctruyen.views.activities.RegisterActivity"
-                android:exported="false"/>
+            android:name=".views.activities.RegisterActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
         <activity
-                android:name="com.example.appdoctruyen.views.activities.PostDetailActivity"
-                android:exported="false"/>
+            android:name=".views.activities.MainActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
         <activity
-                android:name="com.example.appdoctruyen.views.activities.RechargeActivity"
-                android:exported="false"/>
+            android:name=".views.activities.RankingActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
         <activity
-                android:name="com.example.appdoctruyen.views.activities.UserDetailsActivity"
-                android:exported="false"/>
+            android:name=".views.activities.FilterActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".views.activities.NewBookshelfActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".views.activities.NotificationActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".views.activities.RechargeActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".views.activities.SearchActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".views.activities.UserDetailsActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".views.activities.ComicDetailActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".views.activities.ComicReadingActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".views.activities.GroupDetailActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
     </application>
 
 </manifest>
