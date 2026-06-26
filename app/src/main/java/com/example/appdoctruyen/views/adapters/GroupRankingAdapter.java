@@ -1,4 +1,4 @@
-package com.example.appdoctruyen;
+package com.example.appdoctruyen.views.adapters;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,6 +7,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.appdoctruyen.R;
 import com.example.appdoctruyen.models.TranslationGroup;
 import java.util.List;
 

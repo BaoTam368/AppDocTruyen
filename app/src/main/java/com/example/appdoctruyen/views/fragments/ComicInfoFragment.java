@@ -29,7 +29,7 @@ import com.example.appdoctruyen.models.Comic;
 public class ComicInfoFragment extends Fragment {
     private static final String ARG_MANGA_ID = "mangaId";
     private static final String ARG_MANGA_TITLE = "mangaTitle";
-    
+
     private ImageView imgCover, imgAuthorAvatar;
     private TextView tvMangaName, tvAuthorName, tvDescription, tvViews, tvLikes;
     private LinearLayout layoutTags;
@@ -73,7 +73,7 @@ public class ComicInfoFragment extends Fragment {
         tvViews = view.findViewById(R.id.tvViews);
         tvLikes = view.findViewById(R.id.tvLikes);
         layoutTags = view.findViewById(R.id.layoutTags);
-        layoutRating = view.findViewById(R.id.layoutRating);
+//        layoutRating = view.findViewById(R.id.layoutRating);
 
         // Load manga info từ API
         if (mangaId != null && !mangaId.isEmpty()) {
@@ -92,30 +92,36 @@ public class ComicInfoFragment extends Fragment {
     }
 
     private void loadMangaInfo() {
+        android.util.Log.d("CHECK_API", "Gửi API chi tiết với ID: " + mangaId);
+
         mangaRepository.getMangaDetail(mangaId, new MangaRepository.RepositoryCallback<Comic>() {
             @Override
+
             public void onSuccess(Comic data) {
+                if (data == null) {
+                    android.util.Log.e("CHECK_API", "Dữ liệu trả về bị NULL!");
+                    return;
+                }
                 mangaInfo = data;
-                
+                android.util.Log.d("CHECK_API", "Title: " + data.getTitle() + " | Desc: " + data.getDescription());
                 // Cập nhật UI với thông tin manga
                 if (tvMangaName != null) {
                     tvMangaName.setText(data.getTitle());
                 }
-                
+
                 if (tvDescription != null) {
                     tvDescription.setText(data.getDescription());
                 }
-                
+
                 if (tvAuthorName != null) {
                     tvAuthorName.setText("MangaDex");
                 }
-                
+
                 // Load ảnh bìa (sử dụng placeholder nếu không có library)
                 if (imgCover != null && data.getCoverUrl() != null && !data.getCoverUrl().isEmpty()) {
-                    // Nếu có Picasso hoặc Glide, load ảnh ở đây
-                    // Hiện tại giữ placeholder
+                    com.bumptech.glide.Glide.with(ComicInfoFragment.this).load(data.getCoverUrl()).into(imgCover);
                 }
-                
+
                 // Hiển thị tags nếu có
                 if (layoutTags != null && data.getTags() != null && !data.getTags().isEmpty()) {
                     layoutTags.removeAllViews();
@@ -126,10 +132,7 @@ public class ComicInfoFragment extends Fragment {
                         tagView.setTextColor(Color.BLACK);
                         tagView.setTextSize(12);
                         tagView.setPadding(24, 16, 24, 16);
-                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.WRAP_CONTENT,
-                                LinearLayout.LayoutParams.WRAP_CONTENT
-                        );
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                         params.setMargins(0, 0, 32, 0);
                         layoutTags.addView(tagView, params);
                     }
@@ -144,13 +147,7 @@ public class ComicInfoFragment extends Fragment {
     }
 
     private void openGroupDetail() {
-        TranslationGroup group = new TranslationGroup(
-                1,
-                "Hoa Hạ Group",
-                R.drawable.placeholder_group,
-                25,
-                1200
-        );
+        TranslationGroup group = new TranslationGroup(1, "Hoa Hạ Group", R.drawable.placeholder_group, 25, 1200);
 
         group.setDescription("Nhóm dịch truyện tranh chất lượng cao");
 

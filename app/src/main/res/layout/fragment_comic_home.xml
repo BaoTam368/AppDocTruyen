@@ -47,7 +47,7 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="40dp"
-                android:id="@+id/iv_search_bar"
+                android:id="@+id/layout_search_bar"
                 android:layout_marginHorizontal="12dp"
                 android:layout_weight="1"
                 android:background="@color/bg_input_light"
@@ -68,6 +68,13 @@
                     android:textColor="@color/text_secondary_light"
                     android:textSize="14sp" />
             </LinearLayout>
+
+            <ImageView
+                android:id="@+id/iv_refresh"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginEnd="8dp"
+                android:src="@android:drawable/ic_popup_sync"/>
 
             <ImageView
                 android:id="@+id/iv_notification"

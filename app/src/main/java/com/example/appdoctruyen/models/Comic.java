@@ -1,5 +1,7 @@
 package com.example.appdoctruyen.models;
 
+import java.util.List;
+
 public class Comic {
 
     private int id;
@@ -76,19 +78,15 @@ public class Comic {
     public void setDownloaded(boolean downloaded) { isDownloaded = downloaded; }
 
     public String getMangaId() { return mangaId; }
-    public void setMangaId(String mangaId) { this.mangaId = mangaId; }
 
-    public String getChapterId() { return chapterId; }
-    public void setChapterId(String chapterId) { this.chapterId = chapterId; }
+    public List<String> getTags() {
+        return tags;
+    }
 
-    public String getChapterName() { return chapterName; }
-    public void setChapterName(String chapterName) { this.chapterName = chapterName; }
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
 
-    public String getLocalPath() { return localPath; }
-    public void setLocalPath(String localPath) { this.localPath = localPath; }
-
-    public long getLastReadTime() { return lastReadTime; }
-    public void setLastReadTime(long lastReadTime) { this.lastReadTime = lastReadTime; }
     public void setMangaId(String mangaId) {
         this.mangaId = mangaId;
     }
@@ -123,13 +121,5 @@ public class Comic {
 
     public void setLastReadTime(long lastReadTime) {
         this.lastReadTime = lastReadTime;
-    }
-
-    public List<String> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<String> tags) {
-        this.tags = tags;
     }
 }

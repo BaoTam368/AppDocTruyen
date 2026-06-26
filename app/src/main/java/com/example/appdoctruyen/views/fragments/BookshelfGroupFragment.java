@@ -11,8 +11,11 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.appdoctruyen.R;
 import com.example.appdoctruyen.data.api.MangaRepository;
 import com.example.appdoctruyen.models.TranslationGroup;
+import com.example.appdoctruyen.views.activities.GroupDetailActivity;
 import com.example.appdoctruyen.views.adapters.BookshelfGroupAdapter;
 import com.example.appdoctruyen.views.adapters.GroupRankingAdapter;
 
@@ -42,7 +45,7 @@ public class BookshelfGroupFragment extends Fragment {
 
         tabAll = view.findViewById(R.id.tabAll);
         tabFamous = view.findViewById(R.id.tabFamous);
-        tabComicCount = view.findViewById(R.id.tabComicCount);
+//        tabComicCount = view.findViewById(R.id.tabComicCount);
         recyclerViewGrid = view.findViewById(R.id.recyclerViewGroup2);
         recyclerViewRanking = view.findViewById(R.id.recyclerViewRanking);
         tvEmpty = view.findViewById(R.id.tvEmptyGroup);
