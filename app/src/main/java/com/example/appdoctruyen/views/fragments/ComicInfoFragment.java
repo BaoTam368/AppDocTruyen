@@ -172,7 +172,22 @@ public class ComicInfoFragment extends Fragment {
 
             if (btnDownload != null) {
                 btnDownload.setOnClickListener(v -> {
-                    Toast.makeText(getContext(), "Tính năng tải xuống đang phát triển", Toast.LENGTH_SHORT).show();
+                    if (mangaId == null || mangaId.isEmpty()) {
+                        Toast.makeText(getContext(), "Không có ID truyện", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    String curUserId = getCurrentUserId();
+                    String title = mangaInfo != null ? mangaInfo.getTitle() : mangaTitle;
+                    String coverUrl = mangaInfo != null ? mangaInfo.getCoverUrl() : null;
+                    String latestChapter = mangaInfo != null ? mangaInfo.getLatestChapter() : "Chapter 1";
+                    
+                    // Giả lập lưu truyện tải xuống
+                    bookshelfDatabaseHelper.addDownloadedComic(curUserId, mangaId, "demo-chap", latestChapter, "/storage/emulated/0/Download/comic.zip", title, coverUrl);
+                    if (firebaseHelper != null) {
+                        firebaseHelper.addDownloadedComic(mangaId, "demo-chap", latestChapter, "/storage/emulated/0/Download/comic.zip", title, coverUrl);
+                    }
+                    Toast.makeText(getContext(), "Đã tải xuống " + title, Toast.LENGTH_SHORT).show();
                 });
             }
         } catch (Exception e) {

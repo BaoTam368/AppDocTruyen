@@ -164,9 +164,6 @@ public class BookshelfFragment extends Fragment {
         
         // 1. Load local SQLite data first
         List<Comic> localComics = bookshelfDatabaseHelper.getReadingHistory(userId);
-        if (localComics.isEmpty()) {
-            localComics = createSampleRecentComics();
-        }
         if (isAdded()) {
             adapter.updateList(localComics);
             updateEmptyState(localComics, 1);
@@ -205,9 +202,6 @@ public class BookshelfFragment extends Fragment {
         
         // 1. Load local SQLite data first
         List<Comic> localComics = bookshelfDatabaseHelper.getDownloadedComics(userId);
-        if (localComics.isEmpty()) {
-            localComics = createSampleDownloadedComics();
-        }
         if (isAdded()) {
             adapter.updateList(localComics);
             updateEmptyState(localComics, 2);
@@ -324,36 +318,10 @@ public class BookshelfFragment extends Fragment {
         return list;
     }
 
-    private List<Comic> createSampleRecentComics() {
-        long now = System.currentTimeMillis();
-        List<Comic> list = new ArrayList<>();
-        list.add(createDemoHistoryComic(4, "Người chơi khô...", "Chapter 95", "Chapter 4", now - 30 * 60 * 1000L));
-        list.add(createDemoHistoryComic(3, "Vạn cổ chí tôn", "Chapter 541", "Chapter 1", now - 2 * 60 * 60 * 1000L));
-        list.add(createDemoHistoryComic(1, "Bất bại chân ma", "Chapter 312", "Chapter 4", now - 5 * 60 * 60 * 1000L));
-        list.add(createDemoHistoryComic(7, "Tứ kỵ sĩ khải huyền", "Chapter 50", "Chapter 14", now - 24 * 60 * 60 * 1000L));
-        list.add(createDemoHistoryComic(6, "Cung quỷ kiếm thần", "Chapter 251", "Chapter 1", now - 2 * 24 * 60 * 60 * 1000L));
-        list.add(createDemoHistoryComic(8, "Thám tử Kindaichi", "Chapter 100", "Chapter 9", now - 3 * 24 * 60 * 60 * 1000L));
-        return list;
-    }
-
-    private List<Comic> createSampleDownloadedComics() {
-        // Tab Đã Tải vẫn để rỗng vì đồ án chưa làm chức năng tải truyện offline thật.
-        return new ArrayList<>();
-    }
 
     private Comic createDemoComic(int id, String title, String latestChapter) {
         Comic comic = new Comic(id, title, R.drawable.placeholder_comic, latestChapter);
         comic.setMangaId("demo-manga-" + id);
-        return comic;
-    }
-
-    private Comic createDemoHistoryComic(int id, String title, String latestChapter,
-                                         String chapterName, long lastReadTime) {
-        Comic comic = createDemoComic(id, title, latestChapter);
-        comic.setChapterId("demo-chapter-" + id);
-        comic.setChapterName(chapterName);
-        comic.setLastReadChapter(chapterName);
-        comic.setLastReadTime(lastReadTime);
         return comic;
     }
 

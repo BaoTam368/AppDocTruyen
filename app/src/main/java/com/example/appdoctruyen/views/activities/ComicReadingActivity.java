@@ -19,6 +19,9 @@ import com.example.appdoctruyen.views.adapters.ComicPageAdapter;
 import com.example.appdoctruyen.models.Chapter;
 import com.example.appdoctruyen.views.adapters.ChapterAdapter;
 import com.example.appdoctruyen.data.api.MangaRepository;
+import com.example.appdoctruyen.data.database.BookshelfDatabaseHelper;
+import com.example.appdoctruyen.data.firebase.AuthManager;
+import com.example.appdoctruyen.data.firebase.BookshelfFirebaseHelper;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.util.ArrayList;
@@ -43,6 +46,12 @@ public class ComicReadingActivity extends AppCompatActivity {
     
     private List<Chapter> chapterList;
     private int currentChapterIndex = 0;
+    
+    private BookshelfDatabaseHelper bookshelfDatabaseHelper;
+    private AuthManager authManager;
+    private BookshelfFirebaseHelper firebaseHelper;
+    
+    private String coverUrl = ""; // To store cover URL if available
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +64,14 @@ public class ComicReadingActivity extends AppCompatActivity {
         chapterId = getIntent().getStringExtra("chapterId");
         chapterName = getIntent().getStringExtra("chapterName");
         currentChapter = getIntent().getIntExtra("CHAPTER_NUM", 1);
+        coverUrl = getIntent().getStringExtra("comic_cover");
+
+        bookshelfDatabaseHelper = new BookshelfDatabaseHelper(this);
+        authManager = new AuthManager();
+        String userId = getCurrentUserId();
+        if (userId != null && !userId.equals("local_user")) {
+            firebaseHelper = new BookshelfFirebaseHelper(userId);
+        }
 
         mangaRepository = new MangaRepository();
         chapterList = new ArrayList<>();
@@ -133,10 +150,29 @@ public class ComicReadingActivity extends AppCompatActivity {
         // Nếu có chapterId, gọi API lấy pages
         if (chapterId != null && !chapterId.isEmpty()) {
             loadChapterPagesFromApi(chapterId);
+            saveHistory();
         } else {
             Toast.makeText(this, "Không có chapterId, hiển thị ảnh mẫu", Toast.LENGTH_SHORT).show();
             loadMockPages(chapterNum);
+            saveHistory();
         }
+    }
+
+    private void saveHistory() {
+        String userId = getCurrentUserId();
+        String title = mangaTitle != null ? mangaTitle : ("Manga " + mangaId);
+        String chName = chapterName != null ? chapterName : ("Chapter " + currentChapter);
+        
+        bookshelfDatabaseHelper.saveReadingHistory(userId, mangaId, chapterId, chName, title, coverUrl);
+        if (firebaseHelper != null) {
+            firebaseHelper.saveReadingHistory(mangaId, chapterId, chName, title, coverUrl);
+        }
+    }
+
+    private String getCurrentUserId() {
+        if (authManager == null) return "local_user";
+        String userId = authManager.getCurrentUserId();
+        return userId != null ? userId : "local_user";
     }
 
     private void loadChapterPagesFromApi(String chapterId) {

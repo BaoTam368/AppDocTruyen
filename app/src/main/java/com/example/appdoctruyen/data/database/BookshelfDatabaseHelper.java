@@ -93,6 +93,11 @@ public class BookshelfDatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    @Override
+    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        onUpgrade(db, oldVersion, newVersion);
+    }
+
     public long addBookmark(String userId, String mangaId, String titleCache, String coverUrlCache) {
         if (isBlank(userId) || isBlank(mangaId)) return -1;
 
