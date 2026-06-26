@@ -141,7 +141,7 @@
         <View android:layout_width="40dp" android:layout_height="40dp" android:layout_marginHorizontal="12dp"
             android:id="@+id/img_google_login" android:background="@drawable/google"/>
         <View android:layout_width="40dp" android:layout_height="40dp" android:layout_marginHorizontal="12dp"
-              android:background="@drawable/twitter"/>
+            android:id="@+id/img_twitter_login"  android:background="@drawable/x"/>
     </LinearLayout>
 
     <Button
