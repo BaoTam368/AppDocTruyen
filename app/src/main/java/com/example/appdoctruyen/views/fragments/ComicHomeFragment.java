@@ -183,7 +183,7 @@ public class ComicHomeFragment extends Fragment {
 
     private void syncPopularMangas() {
         Toast.makeText(requireContext(), "Đang đồng bộ truyện từ MangaDex...", Toast.LENGTH_SHORT).show();
-        mangaRepository.syncPopularMangas(20, new MangaRepository.RepositoryCallback<List<Comic>>() {
+        mangaRepository.syncPopularMangas(200, new MangaRepository.RepositoryCallback<List<Comic>>() {
             @Override
             public void onSuccess(List<Comic> data) {
                 Toast.makeText(requireContext(), "Đã đồng bộ " + data.size() + " truyện!", Toast.LENGTH_SHORT).show();

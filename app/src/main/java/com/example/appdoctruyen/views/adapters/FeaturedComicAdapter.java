@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.appdoctruyen.R;
 import com.example.appdoctruyen.models.Comic;
 
@@ -42,7 +43,13 @@ public class FeaturedComicAdapter extends RecyclerView.Adapter<FeaturedComicAdap
 
         holder.tvComicLargeTitle.setText(comic.getTitle());
 
-        if (comic.getCoverImageResId() != 0) {
+        if (comic.getCoverUrl() != null && !comic.getCoverUrl().isEmpty()) {
+            Glide.with(context)
+                    .load(comic.getCoverUrl())
+                    .placeholder(R.drawable.placeholder_comic)
+                    .error(R.drawable.placeholder_comic)
+                    .into(holder.ivComicLargeCover);
+        } else if (comic.getCoverImageResId() != 0) {
             holder.ivComicLargeCover.setImageResource(comic.getCoverImageResId());
         } else {
             holder.ivComicLargeCover.setImageResource(R.drawable.placeholder_comic);

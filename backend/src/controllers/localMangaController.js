@@ -17,7 +17,7 @@ async function getLocalMangaList(req, res, next) {
 
 async function searchLocalMangas(req, res, next) {
     try {
-        const { q } = req.query;
+        const q = req.query.q || req.query.title;
         const { limit, offset } = req.query;
         
         if (!q) {
@@ -90,8 +90,7 @@ async function syncFromMangaDex(req, res, next) {
 
 async function syncPopular(req, res, next) {
     try {
-        const { count } = req.query;
-        const mangas = await syncService.syncPopularMangas(count ? parseInt(count) : 20);
+        const mangas = await syncService.syncPopularMangas(req.query);
 
         res.json({
             success: true,
@@ -113,7 +112,7 @@ async function searchAndSync(req, res, next) {
             });
         }
 
-        const mangas = await syncService.searchAndSync(q);
+        const mangas = await syncService.searchAndSync(q, req.query);
 
         res.json({
             success: true,

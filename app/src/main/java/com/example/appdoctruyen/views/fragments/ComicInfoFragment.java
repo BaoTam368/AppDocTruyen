@@ -14,9 +14,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.example.appdoctruyen.R;
 import com.example.appdoctruyen.models.TranslationGroup;
 import com.example.appdoctruyen.views.activities.ComicReadingActivity;
@@ -29,16 +29,14 @@ import com.example.appdoctruyen.models.Comic;
 public class ComicInfoFragment extends Fragment {
     private static final String ARG_MANGA_ID = "mangaId";
     private static final String ARG_MANGA_TITLE = "mangaTitle";
-
+    
     private ImageView imgCover, imgAuthorAvatar;
-    private TextView tvMangaName, tvAuthorName, tvDescription, tvViews, tvLikes, tvReadMore;
+    private TextView tvMangaName, tvAuthorName, tvDescription, tvViews, tvLikes;
     private LinearLayout layoutTags;
-    private ConstraintLayout layoutRating;
     private String mangaId;
     private String mangaTitle;
     private MangaRepository mangaRepository;
     private Comic mangaInfo;
-    private boolean isDescriptionExpanded = false;
 
     public static ComicInfoFragment newInstance(String mangaId, String mangaTitle) {
         ComicInfoFragment fragment = new ComicInfoFragment();
@@ -66,88 +64,59 @@ public class ComicInfoFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_comic_info, container, false);
 
-        try {
-            imgCover = view.findViewById(R.id.imgCover);
-            imgAuthorAvatar = view.findViewById(R.id.imgAuthorAvatar);
-            tvMangaName = view.findViewById(R.id.tvMangaName);
-            tvAuthorName = view.findViewById(R.id.tvAuthorName);
-            tvDescription = view.findViewById(R.id.tvDescription);
-            tvViews = view.findViewById(R.id.tvViews);
-            tvLikes = view.findViewById(R.id.tvLikes);
-            tvReadMore = view.findViewById(R.id.tvReadMore);
-            layoutTags = view.findViewById(R.id.layoutTags);
-    //        layoutRating = view.findViewById(R.id.layoutRating);
+        imgCover = view.findViewById(R.id.imgCover);
+        imgAuthorAvatar = view.findViewById(R.id.imgAuthorAvatar);
+        tvMangaName = view.findViewById(R.id.tvMangaName);
+        tvAuthorName = view.findViewById(R.id.tvAuthorName);
+        tvDescription = view.findViewById(R.id.tvDescription);
+        tvViews = view.findViewById(R.id.tvViews);
+        tvLikes = view.findViewById(R.id.tvLikes);
+        layoutTags = view.findViewById(R.id.layoutTags);
 
-            // Load manga info từ API
-            if (mangaId != null && !mangaId.isEmpty()) {
-                loadMangaInfo();
-            } else {
-                Toast.makeText(getContext(), "Không tìm thấy ID truyện", Toast.LENGTH_SHORT).show();
-            }
-
-            if (tvAuthorName != null) {
-                tvAuthorName.setOnClickListener(v -> {
-                    openGroupDetail();
-                });
-            }
-
-            if (imgAuthorAvatar != null) {
-                imgAuthorAvatar.setOnClickListener(v -> {
-                    openGroupDetail();
-                });
-            }
-
-            if (tvReadMore != null) {
-                tvReadMore.setOnClickListener(v -> {
-                    isDescriptionExpanded = !isDescriptionExpanded;
-                    if (isDescriptionExpanded) {
-                        tvDescription.setMaxLines(Integer.MAX_VALUE);
-                        tvReadMore.setText("Thu gọn");
-                    } else {
-                        tvDescription.setMaxLines(3);
-                        tvReadMore.setText("Đọc thêm");
-                    }
-                });
-            }
-        } catch (Exception e) {
-            android.util.Log.e("ComicInfoFragment", "Error initializing views: " + e.getMessage());
-            Toast.makeText(getContext(), "Lỗi khởi tạo giao diện", Toast.LENGTH_SHORT).show();
+        // Load manga info từ API
+        if (mangaId != null && !mangaId.isEmpty()) {
+            loadMangaInfo();
         }
+
+        tvAuthorName.setOnClickListener(v -> {
+            openGroupDetail();
+        });
+
+        imgAuthorAvatar.setOnClickListener(v -> {
+            openGroupDetail();
+        });
 
         return view;
     }
 
     private void loadMangaInfo() {
-        android.util.Log.d("CHECK_API", "Gửi API chi tiết với ID: " + mangaId);
-
         mangaRepository.getMangaDetail(mangaId, new MangaRepository.RepositoryCallback<Comic>() {
             @Override
-
             public void onSuccess(Comic data) {
-                if (data == null) {
-                    android.util.Log.e("CHECK_API", "Dữ liệu trả về bị NULL!");
-                    return;
-                }
                 mangaInfo = data;
-                android.util.Log.d("CHECK_API", "Title: " + data.getTitle() + " | Desc: " + data.getDescription());
+                
                 // Cập nhật UI với thông tin manga
                 if (tvMangaName != null) {
                     tvMangaName.setText(data.getTitle());
                 }
-
+                
                 if (tvDescription != null) {
                     tvDescription.setText(data.getDescription());
                 }
-
+                
                 if (tvAuthorName != null) {
-                    tvAuthorName.setText(data.getAuthor() != null ? data.getAuthor() : "Không có thông tin");
+                    tvAuthorName.setText("MangaDex");
                 }
-
+                
                 // Load ảnh bìa (sử dụng placeholder nếu không có library)
                 if (imgCover != null && data.getCoverUrl() != null && !data.getCoverUrl().isEmpty()) {
-                    com.bumptech.glide.Glide.with(ComicInfoFragment.this).load(data.getCoverUrl()).into(imgCover);
+                    Glide.with(requireContext())
+                            .load(data.getCoverUrl())
+                            .placeholder(R.drawable.placeholder_comic)
+                            .error(R.drawable.placeholder_comic)
+                            .into(imgCover);
                 }
-
+                
                 // Hiển thị tags nếu có
                 if (layoutTags != null && data.getTags() != null && !data.getTags().isEmpty()) {
                     layoutTags.removeAllViews();
@@ -158,7 +127,10 @@ public class ComicInfoFragment extends Fragment {
                         tagView.setTextColor(Color.BLACK);
                         tagView.setTextSize(12);
                         tagView.setPadding(24, 16, 24, 16);
-                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.WRAP_CONTENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT
+                        );
                         params.setMargins(0, 0, 32, 0);
                         layoutTags.addView(tagView, params);
                     }
@@ -173,7 +145,13 @@ public class ComicInfoFragment extends Fragment {
     }
 
     private void openGroupDetail() {
-        TranslationGroup group = new TranslationGroup(1, "Hoa Hạ Group", R.drawable.placeholder_group, 25, 1200);
+        TranslationGroup group = new TranslationGroup(
+                1,
+                "Hoa Hạ Group",
+                R.drawable.placeholder_group,
+                25,
+                1200
+        );
 
         group.setDescription("Nhóm dịch truyện tranh chất lượng cao");
 

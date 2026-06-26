@@ -35,7 +35,7 @@ async function getMangaChapters(req, res, next) {
         const data = await mangadexService.getMangaChapters(req.params.mangaId, {
             limit: req.query.limit,
             offset: req.query.offset,
-            language: req.query.language
+            language: req.query.language || req.query.translatedLanguage
         });
 
         res.json({
