@@ -71,6 +71,18 @@ public class BookshelfFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        String userId = getCurrentUserId();
+        if (userId != null && !userId.equals(DEMO_USER_ID)) {
+            firebaseHelper = new BookshelfFirebaseHelper(userId);
+        } else {
+            firebaseHelper = null;
+        }
+        selectTab(currentTab);
+    }
+
     // Gắn sự kiện cho ba tab của tủ sách: Theo dõi, Vừa xem, Đã tải.
     private void setupTabListeners() {
         tabFollowing.setOnClickListener(v -> selectTab(0));
@@ -104,102 +116,127 @@ public class BookshelfFragment extends Fragment {
         }
     }
 
-    private List<Comic> loadFollowedComics() {
-        // Đọc danh sách manga_id từ SQLite, sau đó lấy thông tin truyện từ Node.js API nếu có mạng.
+    private void loadFollowedComics() {
         String userId = getCurrentUserId();
         
+        // 1. Load local SQLite data first for instant UI response
+        List<Comic> localComics = bookshelfDatabaseHelper.getBookmarks(userId);
+        if (localComics.isEmpty()) {
+            localComics = createSampleFollowedComics();
+        }
+        if (isAdded()) {
+            adapter.updateList(localComics);
+            updateEmptyState(localComics, 0);
+            refreshComicsFromApi(localComics, 0);
+        }
+        
+        // 2. Fetch from Firebase in background and sync
         if (firebaseHelper != null) {
-            // Load from Firebase Realtime Database
-            final List<Comic>[] firebaseComics = new List[]{new ArrayList<>()};
             firebaseHelper.getBookmarks(new BookshelfFirebaseHelper.BookshelfCallback() {
                 @Override
-                public void onSuccess(List<Comic> comics) {
-                    firebaseComics[0] = comics;
-                    if (isAdded()) {
-                        adapter.updateList(comics);
-                        updateEmptyState(comics, 0);
+                public void onSuccess(List<Comic> remoteComics) {
+                    if (!isAdded()) return;
+                    
+                    // Sync remote to local SQLite
+                    for (Comic rc : remoteComics) {
+                        bookshelfDatabaseHelper.addBookmark(userId, rc.getMangaId(), rc.getTitle(), rc.getCoverUrl());
+                    }
+                    
+                    // Reload local SQLite to show synced results
+                    List<Comic> updatedComics = bookshelfDatabaseHelper.getBookmarks(userId);
+                    if (!updatedComics.isEmpty()) {
+                        adapter.updateList(updatedComics);
+                        updateEmptyState(updatedComics, 0);
+                        refreshComicsFromApi(updatedComics, 0);
                     }
                 }
 
                 @Override
                 public void onFailure(String errorMessage) {
-                    // Fallback to SQLite on error
-                    loadFromSQLite(userId);
+                    // Fail silently, we already have SQLite loaded
                 }
             });
-            return firebaseComics[0];
-        } else {
-            return loadFromSQLite(userId);
         }
     }
 
-    private List<Comic> loadFromSQLite(String userId) {
-        List<Comic> comics = bookshelfDatabaseHelper.getBookmarks(userId);
-        return comics.isEmpty() ? createSampleFollowedComics() : comics;
-    }
-
-    private List<Comic> loadReadingHistory() {
+    private void loadReadingHistory() {
         String userId = getCurrentUserId();
         
+        // 1. Load local SQLite data first
+        List<Comic> localComics = bookshelfDatabaseHelper.getReadingHistory(userId);
+        if (localComics.isEmpty()) {
+            localComics = createSampleRecentComics();
+        }
+        if (isAdded()) {
+            adapter.updateList(localComics);
+            updateEmptyState(localComics, 1);
+            refreshComicsFromApi(localComics, 1);
+        }
+        
+        // 2. Fetch from Firebase in background and sync
         if (firebaseHelper != null) {
-            final List<Comic>[] firebaseComics = new List[]{new ArrayList<>()};
             firebaseHelper.getReadingHistory(new BookshelfFirebaseHelper.BookshelfCallback() {
                 @Override
-                public void onSuccess(List<Comic> comics) {
-                    firebaseComics[0] = comics;
-                    if (isAdded()) {
-                        adapter.updateList(comics);
-                        updateEmptyState(comics, 1);
+                public void onSuccess(List<Comic> remoteComics) {
+                    if (!isAdded()) return;
+                    
+                    // Sync remote to local SQLite
+                    for (Comic rc : remoteComics) {
+                        bookshelfDatabaseHelper.saveReadingHistory(userId, rc.getMangaId(), rc.getChapterId(), rc.getChapterName(), rc.getTitle(), rc.getCoverUrl());
+                    }
+                    
+                    // Reload local SQLite
+                    List<Comic> updatedComics = bookshelfDatabaseHelper.getReadingHistory(userId);
+                    if (!updatedComics.isEmpty()) {
+                        adapter.updateList(updatedComics);
+                        updateEmptyState(updatedComics, 1);
+                        refreshComicsFromApi(updatedComics, 1);
                     }
                 }
 
                 @Override
-                public void onFailure(String errorMessage) {
-                    // Fallback to SQLite on error
-                    loadHistoryFromSQLite(userId);
-                }
+                public void onFailure(String errorMessage) {}
             });
-            return firebaseComics[0];
-        } else {
-            return loadHistoryFromSQLite(userId);
         }
     }
 
-    private List<Comic> loadHistoryFromSQLite(String userId) {
-        List<Comic> comics = bookshelfDatabaseHelper.getReadingHistory(userId);
-        return comics.isEmpty() ? createSampleRecentComics() : comics;
-    }
-
-    private List<Comic> loadDownloadedComics() {
+    private void loadDownloadedComics() {
         String userId = getCurrentUserId();
         
+        // 1. Load local SQLite data first
+        List<Comic> localComics = bookshelfDatabaseHelper.getDownloadedComics(userId);
+        if (localComics.isEmpty()) {
+            localComics = createSampleDownloadedComics();
+        }
+        if (isAdded()) {
+            adapter.updateList(localComics);
+            updateEmptyState(localComics, 2);
+        }
+        
+        // 2. Fetch from Firebase in background and sync
         if (firebaseHelper != null) {
-            final List<Comic>[] firebaseComics = new List[]{new ArrayList<>()};
             firebaseHelper.getDownloadedComics(new BookshelfFirebaseHelper.BookshelfCallback() {
                 @Override
-                public void onSuccess(List<Comic> comics) {
-                    firebaseComics[0] = comics;
-                    if (isAdded()) {
-                        adapter.updateList(comics);
-                        updateEmptyState(comics, 2);
+                public void onSuccess(List<Comic> remoteComics) {
+                    if (!isAdded()) return;
+                    
+                    // Sync remote to local SQLite
+                    for (Comic rc : remoteComics) {
+                        bookshelfDatabaseHelper.addDownloadedComic(userId, rc.getMangaId(), rc.getChapterId(), rc.getChapterName(), rc.getLocalPath(), rc.getTitle(), rc.getCoverUrl());
+                    }
+                    
+                    // Reload local SQLite
+                    List<Comic> updatedComics = bookshelfDatabaseHelper.getDownloadedComics(userId);
+                    if (!updatedComics.isEmpty()) {
+                        adapter.updateList(updatedComics);
+                        updateEmptyState(updatedComics, 2);
                     }
                 }
 
                 @Override
-                public void onFailure(String errorMessage) {
-                    // Fallback to SQLite on error
-                    loadDownloadedFromSQLite(userId);
-                }
+                public void onFailure(String errorMessage) {}
             });
-            return firebaseComics[0];
-        } else {
-            return loadDownloadedFromSQLite(userId);
         }
-    }
-
-    private List<Comic> loadDownloadedFromSQLite(String userId) {
-        List<Comic> comics = bookshelfDatabaseHelper.getDownloadedComics(userId);
-        return comics.isEmpty() ? createSampleDownloadedComics() : comics;
     }
 
     private String getCurrentUserId() {

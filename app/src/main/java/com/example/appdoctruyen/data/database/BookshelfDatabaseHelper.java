@@ -209,6 +209,29 @@ public class BookshelfDatabaseHelper extends SQLiteOpenHelper {
         return comics;
     }
 
+    public Comic getReadingHistoryForManga(String userId, String mangaId) {
+        if (isBlank(userId) || isBlank(mangaId)) return null;
+
+        Cursor cursor = getReadableDatabase().query(
+                TABLE_HISTORY,
+                null,
+                userMangaWhere(),
+                new String[]{userId, mangaId},
+                null,
+                null,
+                null
+        );
+
+        try {
+            if (cursor.moveToFirst()) {
+                return readHistoryComic(cursor);
+            }
+        } finally {
+            cursor.close();
+        }
+        return null;
+    }
+
     public long addDownloadedComic(String userId, String mangaId, String chapterId, String chapterName,
                                    String localPath, String titleCache, String coverUrlCache) {
         if (isBlank(userId) || isBlank(mangaId)) return -1;

@@ -86,6 +86,8 @@ class MangaDto {
     String status;
     Integer year;
     List<String> tags;
+    String translationGroupName;
+    String translationGroupId;
 }
 
 class ChapterDto {

@@ -284,6 +284,8 @@ public class MangaRepository {
         );
         comic.setMangaId(mangaId);
         comic.setTags(dto.tags);
+        comic.setTranslationGroupName(dto.translationGroupName);
+        comic.setTranslationGroupId(dto.translationGroupId);
         return comic;
     }
 

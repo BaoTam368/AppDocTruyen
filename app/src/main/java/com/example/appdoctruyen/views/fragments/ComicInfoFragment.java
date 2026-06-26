@@ -30,7 +30,7 @@ public class ComicInfoFragment extends Fragment {
     private static final String ARG_MANGA_ID = "mangaId";
     private static final String ARG_MANGA_TITLE = "mangaTitle";
 
-    private ImageView imgCover, imgAuthorAvatar;
+    private ImageView imgCover, imgAuthorAvatar, btnBookmark, btnShare, btnDownload;
     private TextView tvMangaName, tvAuthorName, tvDescription, tvViews, tvLikes, tvReadMore;
     private LinearLayout layoutTags;
     private ConstraintLayout layoutRating;
@@ -39,6 +39,9 @@ public class ComicInfoFragment extends Fragment {
     private MangaRepository mangaRepository;
     private Comic mangaInfo;
     private boolean isDescriptionExpanded = false;
+    private com.example.appdoctruyen.data.database.BookshelfDatabaseHelper bookshelfDatabaseHelper;
+    private com.example.appdoctruyen.data.firebase.AuthManager authManager;
+    private com.example.appdoctruyen.data.firebase.BookshelfFirebaseHelper firebaseHelper;
 
     public static ComicInfoFragment newInstance(String mangaId, String mangaTitle) {
         ComicInfoFragment fragment = new ComicInfoFragment();
@@ -69,6 +72,9 @@ public class ComicInfoFragment extends Fragment {
         try {
             imgCover = view.findViewById(R.id.imgCover);
             imgAuthorAvatar = view.findViewById(R.id.imgAuthorAvatar);
+            btnBookmark = view.findViewById(R.id.btnBookmark);
+            btnShare = view.findViewById(R.id.btnShare);
+            btnDownload = view.findViewById(R.id.btnDownload);
             tvMangaName = view.findViewById(R.id.tvMangaName);
             tvAuthorName = view.findViewById(R.id.tvAuthorName);
             tvDescription = view.findViewById(R.id.tvDescription);
@@ -78,9 +84,17 @@ public class ComicInfoFragment extends Fragment {
             layoutTags = view.findViewById(R.id.layoutTags);
     //        layoutRating = view.findViewById(R.id.layoutRating);
 
+            bookshelfDatabaseHelper = new com.example.appdoctruyen.data.database.BookshelfDatabaseHelper(requireContext());
+            authManager = new com.example.appdoctruyen.data.firebase.AuthManager();
+            String userId = getCurrentUserId();
+            if (userId != null && !userId.equals("local_user")) {
+                firebaseHelper = new com.example.appdoctruyen.data.firebase.BookshelfFirebaseHelper(userId);
+            }
+
             // Load manga info từ API
             if (mangaId != null && !mangaId.isEmpty()) {
                 loadMangaInfo();
+                checkBookmarkStatus();
             } else {
                 Toast.makeText(getContext(), "Không tìm thấy ID truyện", Toast.LENGTH_SHORT).show();
             }
@@ -109,6 +123,58 @@ public class ComicInfoFragment extends Fragment {
                     }
                 });
             }
+
+            // Add click handlers for action icons
+            if (btnBookmark != null) {
+                btnBookmark.setOnClickListener(v -> {
+                    if (mangaId == null || mangaId.isEmpty()) {
+                        Toast.makeText(getContext(), "Không có ID truyện", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    
+                    String curUserId = getCurrentUserId();
+                    boolean isCurrentlyBookmarked = "bookmarked".equals(btnBookmark.getTag());
+                    
+                    String title = mangaInfo != null ? mangaInfo.getTitle() : mangaTitle;
+                    String coverUrl = mangaInfo != null ? mangaInfo.getCoverUrl() : null;
+                    String latestChapter = mangaInfo != null ? mangaInfo.getLatestChapter() : null;
+                    
+                    if (isCurrentlyBookmarked) {
+                        // Hủy bookmark
+                        bookshelfDatabaseHelper.removeBookmark(curUserId, mangaId);
+                        if (firebaseHelper != null) {
+                            firebaseHelper.removeBookmark(mangaId);
+                        }
+                        updateBookmarkIcon(false);
+                        Toast.makeText(getContext(), "Đã xóa khỏi tủ sách", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Thêm bookmark
+                        bookshelfDatabaseHelper.addBookmark(curUserId, mangaId, title, coverUrl);
+                        if (firebaseHelper != null) {
+                            firebaseHelper.addBookmark(mangaId, title, coverUrl, latestChapter);
+                        }
+                        updateBookmarkIcon(true);
+                        Toast.makeText(getContext(), "Đã lưu vào tủ sách", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            if (btnShare != null) {
+                btnShare.setOnClickListener(v -> {
+                    if (mangaInfo != null) {
+                        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                        shareIntent.setType("text/plain");
+                        shareIntent.putExtra(Intent.EXTRA_TEXT, "Đọc truyện: " + mangaInfo.getTitle());
+                        startActivity(Intent.createChooser(shareIntent, "Chia sẻ truyện"));
+                    }
+                });
+            }
+
+            if (btnDownload != null) {
+                btnDownload.setOnClickListener(v -> {
+                    Toast.makeText(getContext(), "Tính năng tải xuống đang phát triển", Toast.LENGTH_SHORT).show();
+                });
+            }
         } catch (Exception e) {
             android.util.Log.e("ComicInfoFragment", "Error initializing views: " + e.getMessage());
             Toast.makeText(getContext(), "Lỗi khởi tạo giao diện", Toast.LENGTH_SHORT).show();
@@ -129,6 +195,7 @@ public class ComicInfoFragment extends Fragment {
                     return;
                 }
                 mangaInfo = data;
+                checkBookmarkStatus();
                 android.util.Log.d("CHECK_API", "Title: " + data.getTitle() + " | Desc: " + data.getDescription());
                 // Cập nhật UI với thông tin manga
                 if (tvMangaName != null) {
@@ -140,7 +207,12 @@ public class ComicInfoFragment extends Fragment {
                 }
 
                 if (tvAuthorName != null) {
-                    tvAuthorName.setText(data.getAuthor() != null ? data.getAuthor() : "Không có thông tin");
+                    String groupName = data.getTranslationGroupName();
+                    if (groupName != null && !groupName.isEmpty()) {
+                        tvAuthorName.setText(groupName);
+                    } else {
+                        tvAuthorName.setText(data.getAuthor() != null ? data.getAuthor() : "Không có thông tin");
+                    }
                 }
 
                 // Load ảnh bìa (sử dụng placeholder nếu không có library)
@@ -187,5 +259,59 @@ public class ComicInfoFragment extends Fragment {
         intent.putExtra("group_avatar_res_id", group.getAvatarResId());
 
         startActivity(intent);
+    }
+
+    private String getCurrentUserId() {
+        if (authManager == null) return "local_user";
+        String userId = authManager.getCurrentUserId();
+        return userId != null ? userId : "local_user";
+    }
+
+    private void checkBookmarkStatus() {
+        if (mangaId == null || mangaId.isEmpty()) return;
+        
+        String userId = getCurrentUserId();
+        
+        // 1. Kiểm tra SQLite local trước
+        boolean localBookmarked = bookshelfDatabaseHelper.isBookmarked(userId, mangaId);
+        updateBookmarkIcon(localBookmarked);
+        
+        // 2. Nếu đã đăng nhập Firebase, đồng bộ trạng thái từ Firebase về SQLite local nếu có lệch
+        if (firebaseHelper != null) {
+            firebaseHelper.getBookmarks(new com.example.appdoctruyen.data.firebase.BookshelfFirebaseHelper.BookshelfCallback() {
+                @Override
+                public void onSuccess(java.util.List<Comic> comics) {
+                    if (!isAdded()) return;
+                    boolean remoteBookmarked = false;
+                    for (Comic c : comics) {
+                        if (mangaId.equals(c.getMangaId())) {
+                            remoteBookmarked = true;
+                            break;
+                        }
+                    }
+                    if (remoteBookmarked && !localBookmarked) {
+                        String title = mangaInfo != null ? mangaInfo.getTitle() : mangaTitle;
+                        String coverUrl = mangaInfo != null ? mangaInfo.getCoverUrl() : null;
+                        bookshelfDatabaseHelper.addBookmark(userId, mangaId, title, coverUrl);
+                        updateBookmarkIcon(true);
+                    }
+                }
+
+                @Override
+                public void onFailure(String errorMessage) {}
+            });
+        }
+    }
+
+    private void updateBookmarkIcon(boolean isBookmarked) {
+        if (btnBookmark != null && isAdded()) {
+            if (isBookmarked) {
+                btnBookmark.setImageResource(R.drawable.ic_bookmark_filled);
+                btnBookmark.setTag("bookmarked");
+            } else {
+                btnBookmark.setImageResource(R.drawable.ic_bookmark);
+                btnBookmark.setTag("unbookmarked");
+            }
+        }
     }
 }

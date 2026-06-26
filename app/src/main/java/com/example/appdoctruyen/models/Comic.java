@@ -20,6 +20,8 @@ public class Comic {
     private String localPath;
     private long lastReadTime;
     private List<String> tags;
+    private String translationGroupName;
+    private String translationGroupId;
 
     public Comic(int id, String title, int coverImageResId, String coverUrl,
                  String latestChapter, String lastReadChapter, String author,
@@ -121,5 +123,21 @@ public class Comic {
 
     public void setLastReadTime(long lastReadTime) {
         this.lastReadTime = lastReadTime;
+    }
+
+    public String getTranslationGroupName() {
+        return translationGroupName;
+    }
+
+    public void setTranslationGroupName(String translationGroupName) {
+        this.translationGroupName = translationGroupName;
+    }
+
+    public String getTranslationGroupId() {
+        return translationGroupId;
+    }
+
+    public void setTranslationGroupId(String translationGroupId) {
+        this.translationGroupId = translationGroupId;
     }
 }
