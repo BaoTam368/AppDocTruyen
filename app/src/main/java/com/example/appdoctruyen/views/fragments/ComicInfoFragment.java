@@ -14,7 +14,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
@@ -34,7 +33,6 @@ public class ComicInfoFragment extends Fragment {
     private ImageView imgCover, imgAuthorAvatar;
     private TextView tvMangaName, tvAuthorName, tvDescription, tvViews, tvLikes;
     private LinearLayout layoutTags;
-    private ConstraintLayout layoutRating;
     private String mangaId;
     private String mangaTitle;
     private MangaRepository mangaRepository;
@@ -74,7 +72,6 @@ public class ComicInfoFragment extends Fragment {
         tvViews = view.findViewById(R.id.tvViews);
         tvLikes = view.findViewById(R.id.tvLikes);
         layoutTags = view.findViewById(R.id.layoutTags);
-        layoutRating = view.findViewById(R.id.layoutRating);
 
         // Load manga info từ API
         if (mangaId != null && !mangaId.isEmpty()) {

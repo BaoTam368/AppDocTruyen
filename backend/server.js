@@ -5,6 +5,7 @@ const express = require('express');
 
 const chapterRoutes = require('./src/routes/chapterRoutes');
 const commentRoutes = require('./src/routes/commentRoutes');
+const groupRoutes = require('./src/routes/groupRoutes');
 const mangaRoutes = require('./src/routes/mangaRoutes');
 const localMangaRoutes = require('./src/routes/localMangaRoutes');
 const postRoutes = require('./src/routes/postRoutes');
@@ -28,6 +29,7 @@ app.use('/api/chapter', chapterRoutes);
 app.use('/api/local-manga', localMangaRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/comments', commentRoutes);
+app.use('/api/groups', groupRoutes);
 app.use('/api/posts', postRoutes);
 
 app.use((req, res) => {
