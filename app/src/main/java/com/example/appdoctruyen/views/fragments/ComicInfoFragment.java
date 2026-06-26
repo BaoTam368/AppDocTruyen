@@ -245,19 +245,63 @@ public class ComicInfoFragment extends Fragment {
     }
 
     private void openGroupDetail() {
-        TranslationGroup group = new TranslationGroup(1, "Hoa Hạ Group", R.drawable.placeholder_group, 25, 1200);
+        if (mangaInfo == null) {
+            Toast.makeText(getContext(), "Chưa có thông tin truyện", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        group.setDescription("Nhóm dịch truyện tranh chất lượng cao");
+        String groupId = mangaInfo.getTranslationGroupId();
+        String groupName = mangaInfo.getTranslationGroupName();
 
+        if (groupId != null && !groupId.isEmpty()) {
+            // Có groupId → gọi API lấy chi tiết nhóm dịch
+            mangaRepository.getGroupDetail(groupId, new MangaRepository.RepositoryCallback<TranslationGroup>() {
+                @Override
+                public void onSuccess(TranslationGroup group) {
+                    if (!isAdded() || getContext() == null) return;
+                    launchGroupDetailActivity(group);
+                }
+
+                @Override
+                public void onError(String message) {
+                    if (!isAdded() || getContext() == null) return;
+                    // API lỗi → fallback với data có sẵn
+                    TranslationGroup fallback = new TranslationGroup(
+                            0,
+                            groupName != null ? groupName : "Nhóm dịch",
+                            "Không có mô tả",
+                            R.drawable.placeholder_group,
+                            0, 0, 0
+                    );
+                    fallback.setGroupId(groupId);
+                    launchGroupDetailActivity(fallback);
+                }
+            });
+        } else if (groupName != null && !groupName.isEmpty()) {
+            // Không có groupId nhưng có tên → mở với data cơ bản
+            TranslationGroup fallback = new TranslationGroup(
+                    0,
+                    groupName,
+                    "Không có mô tả",
+                    R.drawable.placeholder_group,
+                    0, 0, 0
+            );
+            launchGroupDetailActivity(fallback);
+        } else {
+            Toast.makeText(getContext(), "Không có thông tin nhóm dịch", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void launchGroupDetailActivity(TranslationGroup group) {
         Intent intent = new Intent(requireContext(), GroupDetailActivity.class);
-        intent.putExtra("group_id", group.getId());
+        intent.putExtra("group_id", group.getGroupId());
         intent.putExtra("group_name", group.getName());
-        intent.putExtra("group_description", group.getDescription());
+        intent.putExtra("group_description",
+                group.getDescription() != null ? group.getDescription() : "Không có mô tả");
         intent.putExtra("group_comic_count", group.getComicCount());
         intent.putExtra("group_member_count", group.getMemberCount());
         intent.putExtra("group_follower_count", group.getFollowerCount());
         intent.putExtra("group_avatar_res_id", group.getAvatarResId());
-
         startActivity(intent);
     }
 
