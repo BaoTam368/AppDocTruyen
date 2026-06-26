@@ -12,6 +12,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.appdoctruyen.R;
 import com.example.appdoctruyen.data.firebase.AuthCallback;
 import com.example.appdoctruyen.data.firebase.AuthManager;
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -20,10 +27,13 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.Arrays;
+
 public class LoginActivity extends AppCompatActivity {
     private AuthManager authManager;
     private EditText edtUsername, edtPassword;
     private GoogleSignInClient mGoogleSignInClient;
+    private CallbackManager mCallbackManager;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -34,6 +44,8 @@ public class LoginActivity extends AppCompatActivity {
         authManager = new AuthManager();
         edtUsername = findViewById(R.id.edt_username);
         edtPassword = findViewById(R.id.edt_password);
+
+        mCallbackManager = CallbackManager.Factory.create();
 
         if (authManager.isUserLoggedIn()) {
             goToMainActivity();
@@ -96,6 +108,41 @@ public class LoginActivity extends AppCompatActivity {
             googleSignInLauncher.launch(signInIntent);
         });
 
+        View imgFacebookLogin = findViewById(R.id.img_facebook_login);
+
+        LoginManager.getInstance().registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                AccessToken accessToken = loginResult.getAccessToken();
+                authManager.loginWithFacebook(accessToken.getToken(), new AuthCallback() {
+                    @Override
+                    public void onSuccess(com.google.firebase.auth.FirebaseUser user) {
+                        android.widget.Toast.makeText(LoginActivity.this, "Đăng nhập Facebook thành công!", android.widget.Toast.LENGTH_SHORT).show();
+                        goToMainActivity();
+                    }
+
+                    @Override
+                    public void onFailure(String errorMessage) {
+                        android.widget.Toast.makeText(LoginActivity.this, "Lỗi Firebase: " + errorMessage, android.widget.Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onCancel() {
+                android.widget.Toast.makeText(LoginActivity.this, "Đã hủy đăng nhập Facebook", android.widget.Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                android.widget.Toast.makeText(LoginActivity.this, "Lỗi Facebook: " + error.getMessage(), android.widget.Toast.LENGTH_LONG).show();
+            }
+        });
+
+        imgFacebookLogin.setOnClickListener(v -> {
+            LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email"));
+        });
+
         Button btnRegister = findViewById(R.id.btn_register);
 
         btnRegister.setOnClickListener(v -> {
@@ -133,6 +180,12 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
     );
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        mCallbackManager.onActivityResult(requestCode, resultCode, data);
+    }
     private void goToMainActivity() {
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
