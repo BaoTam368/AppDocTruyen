@@ -81,9 +81,6 @@ public class ComicChaptersFragment extends Fragment {
             // Gửi kèm mangaId, mangaTitle và chapterId
             intent.putExtra("mangaId", mangaId);
             intent.putExtra("mangaTitle", mangaTitle);
-            if (getActivity() != null) {
-                intent.putExtra("coverUrl", getActivity().getIntent().getStringExtra("comic_cover"));
-            }
             intent.putExtra("chapterId", clickedChapter.getChapterId());
             intent.putExtra("chapterName", clickedChapter.getName());
 

@@ -25,7 +25,6 @@ import com.example.appdoctruyen.views.activities.MainActivity;
 import com.example.appdoctruyen.views.activities.NotificationActivity;
 import com.example.appdoctruyen.data.api.MangaRepository;
 import com.example.appdoctruyen.models.Comic;
-import com.example.appdoctruyen.models.Chapter;
 
 public class ComicInfoFragment extends Fragment {
     private static final String ARG_MANGA_ID = "mangaId";
@@ -173,55 +172,7 @@ public class ComicInfoFragment extends Fragment {
 
             if (btnDownload != null) {
                 btnDownload.setOnClickListener(v -> {
-                    if (mangaId == null || mangaId.isEmpty()) {
-                        Toast.makeText(getContext(), "Không có ID truyện", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    
-                    Toast.makeText(getContext(), "Đang bắt đầu tải xuống...", Toast.LENGTH_SHORT).show();
-                    
-                    mangaRepository.getMangaChapters(mangaId, new MangaRepository.RepositoryCallback<java.util.List<Chapter>>() {
-                        @Override
-                        public void onSuccess(java.util.List<Chapter> chapters) {
-                            if (!isAdded() || getContext() == null) return;
-                            
-                            String title = mangaInfo != null ? mangaInfo.getTitle() : mangaTitle;
-                            String coverUrl = mangaInfo != null ? mangaInfo.getCoverUrl() : null;
-                            String curUserId = getCurrentUserId();
-                            
-                            String targetChapterId = "all";
-                            String targetChapterName = "Toàn bộ";
-                            
-                            if (chapters != null && !chapters.isEmpty()) {
-                                Chapter target = chapters.get(0);
-                                targetChapterId = target.getChapterId();
-                                targetChapterName = target.getName();
-                            }
-                            
-                            bookshelfDatabaseHelper.addDownloadedComic(curUserId, mangaId, targetChapterId, targetChapterName, "local_path_placeholder", title, coverUrl);
-                            if (firebaseHelper != null) {
-                                firebaseHelper.addDownloadedComic(mangaId, targetChapterId, targetChapterName, "local_path_placeholder", title, coverUrl);
-                            }
-                            
-                            Toast.makeText(getContext(), "Tải xuống thành công " + targetChapterName + "!", Toast.LENGTH_SHORT).show();
-                        }
-                        
-                        @Override
-                        public void onError(String message) {
-                            if (!isAdded() || getContext() == null) return;
-                            
-                            String title = mangaInfo != null ? mangaInfo.getTitle() : mangaTitle;
-                            String coverUrl = mangaInfo != null ? mangaInfo.getCoverUrl() : null;
-                            String curUserId = getCurrentUserId();
-                            
-                            bookshelfDatabaseHelper.addDownloadedComic(curUserId, mangaId, "demo_ch", "Chương 1", "local_path_placeholder", title, coverUrl);
-                            if (firebaseHelper != null) {
-                                firebaseHelper.addDownloadedComic(mangaId, "demo_ch", "Chương 1", "local_path_placeholder", title, coverUrl);
-                            }
-                            
-                            Toast.makeText(getContext(), "Tải xuống thành công Chương 1!", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                    Toast.makeText(getContext(), "Tính năng tải xuống đang phát triển", Toast.LENGTH_SHORT).show();
                 });
             }
         } catch (Exception e) {

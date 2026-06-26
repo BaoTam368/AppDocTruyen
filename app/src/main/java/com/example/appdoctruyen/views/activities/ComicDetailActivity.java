@@ -104,7 +104,6 @@ public class ComicDetailActivity extends AppCompatActivity {
                             Intent intent = new Intent(ComicDetailActivity.this, ComicReadingActivity.class);
                             intent.putExtra("mangaId", mangaId);
                             intent.putExtra("mangaTitle", mangaTitle);
-                            intent.putExtra("coverUrl", getIntent().getStringExtra("comic_cover"));
                             intent.putExtra("chapterId", targetChapter.getChapterId());
                             intent.putExtra("chapterName", targetChapter.getName());
                             startActivity(intent);
