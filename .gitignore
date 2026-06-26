@@ -68,3 +68,9 @@ coverage/
 # OS
 .DS_Store
 desktop.ini
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+mangas.db
