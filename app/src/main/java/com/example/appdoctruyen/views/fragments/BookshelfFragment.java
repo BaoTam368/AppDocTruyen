@@ -15,6 +15,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.appdoctruyen.R;
 import com.example.appdoctruyen.data.api.MangaRepository;
 import com.example.appdoctruyen.data.database.BookshelfDatabaseHelper;
+import com.example.appdoctruyen.data.firebase.AuthManager;
+import com.example.appdoctruyen.data.firebase.BookshelfFirebaseHelper;
 import com.example.appdoctruyen.models.Comic;
 import com.example.appdoctruyen.views.adapters.BookshelfAdapter;
 import com.example.appdoctruyen.views.activities.ComicDetailActivity;
@@ -31,6 +33,8 @@ public class BookshelfFragment extends Fragment {
     private BookshelfAdapter adapter;
     private BookshelfDatabaseHelper bookshelfDatabaseHelper;
     private MangaRepository mangaRepository;
+    private AuthManager authManager;
+    private BookshelfFirebaseHelper firebaseHelper;
 
     // Tab hiện tại (0 = Theo Dõi, 1 = Vừa Xem, 2 = Đã Tải)
     private int currentTab = 0;
@@ -49,6 +53,12 @@ public class BookshelfFragment extends Fragment {
 
         bookshelfDatabaseHelper = new BookshelfDatabaseHelper(requireContext());
         mangaRepository = new MangaRepository();
+        authManager = new AuthManager();
+        
+        String userId = getCurrentUserId();
+        if (userId != null && !userId.equals(DEMO_USER_ID)) {
+            firebaseHelper = new BookshelfFirebaseHelper(userId);
+        }
 
         recyclerView.setLayoutManager(new GridLayoutManager(requireContext(), 3));
         adapter = new BookshelfAdapter(requireContext(), new ArrayList<>(),
@@ -72,50 +82,129 @@ public class BookshelfFragment extends Fragment {
         currentTab = tabIndex;
         resetAllTabs();
 
-        List<Comic> data;
         switch (tabIndex) {
             case 0:
                 tabFollowing.setBackgroundResource(R.drawable.bg_tab_selected);
                 tabFollowing.setTextColor(getResources().getColor(R.color.white, null));
                 tabFollowing.setTypeface(null, android.graphics.Typeface.BOLD);
-                data = loadFollowedComics();
+                loadFollowedComics();
                 break;
             case 1:
                 tabRecentlyRead.setBackgroundResource(R.drawable.bg_tab_selected);
                 tabRecentlyRead.setTextColor(getResources().getColor(R.color.white, null));
                 tabRecentlyRead.setTypeface(null, android.graphics.Typeface.BOLD);
-                data = loadReadingHistory();
+                loadReadingHistory();
                 break;
             case 2:
                 tabDownloaded.setBackgroundResource(R.drawable.bg_tab_selected);
                 tabDownloaded.setTextColor(getResources().getColor(R.color.white, null));
                 tabDownloaded.setTypeface(null, android.graphics.Typeface.BOLD);
-                data = loadDownloadedComics();
+                loadDownloadedComics();
                 break;
-            default:
-                data = new ArrayList<>();
         }
-
-        adapter.updateList(data);
-        updateEmptyState(data, tabIndex);
-        refreshComicsFromApi(data, tabIndex);
     }
 
     private List<Comic> loadFollowedComics() {
         // Đọc danh sách manga_id từ SQLite, sau đó lấy thông tin truyện từ Node.js API nếu có mạng.
-        List<Comic> comics = bookshelfDatabaseHelper.getBookmarks(DEMO_USER_ID);
-        // Nếu SQLite chưa có dữ liệu hoặc API lỗi thì dùng dữ liệu mẫu/cache để demo.
+        String userId = getCurrentUserId();
+        
+        if (firebaseHelper != null) {
+            // Load from Firebase Realtime Database
+            final List<Comic>[] firebaseComics = new List[]{new ArrayList<>()};
+            firebaseHelper.getBookmarks(new BookshelfFirebaseHelper.BookshelfCallback() {
+                @Override
+                public void onSuccess(List<Comic> comics) {
+                    firebaseComics[0] = comics;
+                    if (isAdded()) {
+                        adapter.updateList(comics);
+                        updateEmptyState(comics, 0);
+                    }
+                }
+
+                @Override
+                public void onFailure(String errorMessage) {
+                    // Fallback to SQLite on error
+                    loadFromSQLite(userId);
+                }
+            });
+            return firebaseComics[0];
+        } else {
+            return loadFromSQLite(userId);
+        }
+    }
+
+    private List<Comic> loadFromSQLite(String userId) {
+        List<Comic> comics = bookshelfDatabaseHelper.getBookmarks(userId);
         return comics.isEmpty() ? createSampleFollowedComics() : comics;
     }
 
     private List<Comic> loadReadingHistory() {
-        List<Comic> comics = bookshelfDatabaseHelper.getReadingHistory(DEMO_USER_ID);
+        String userId = getCurrentUserId();
+        
+        if (firebaseHelper != null) {
+            final List<Comic>[] firebaseComics = new List[]{new ArrayList<>()};
+            firebaseHelper.getReadingHistory(new BookshelfFirebaseHelper.BookshelfCallback() {
+                @Override
+                public void onSuccess(List<Comic> comics) {
+                    firebaseComics[0] = comics;
+                    if (isAdded()) {
+                        adapter.updateList(comics);
+                        updateEmptyState(comics, 1);
+                    }
+                }
+
+                @Override
+                public void onFailure(String errorMessage) {
+                    // Fallback to SQLite on error
+                    loadHistoryFromSQLite(userId);
+                }
+            });
+            return firebaseComics[0];
+        } else {
+            return loadHistoryFromSQLite(userId);
+        }
+    }
+
+    private List<Comic> loadHistoryFromSQLite(String userId) {
+        List<Comic> comics = bookshelfDatabaseHelper.getReadingHistory(userId);
         return comics.isEmpty() ? createSampleRecentComics() : comics;
     }
 
     private List<Comic> loadDownloadedComics() {
-        List<Comic> comics = bookshelfDatabaseHelper.getDownloadedComics(DEMO_USER_ID);
+        String userId = getCurrentUserId();
+        
+        if (firebaseHelper != null) {
+            final List<Comic>[] firebaseComics = new List[]{new ArrayList<>()};
+            firebaseHelper.getDownloadedComics(new BookshelfFirebaseHelper.BookshelfCallback() {
+                @Override
+                public void onSuccess(List<Comic> comics) {
+                    firebaseComics[0] = comics;
+                    if (isAdded()) {
+                        adapter.updateList(comics);
+                        updateEmptyState(comics, 2);
+                    }
+                }
+
+                @Override
+                public void onFailure(String errorMessage) {
+                    // Fallback to SQLite on error
+                    loadDownloadedFromSQLite(userId);
+                }
+            });
+            return firebaseComics[0];
+        } else {
+            return loadDownloadedFromSQLite(userId);
+        }
+    }
+
+    private List<Comic> loadDownloadedFromSQLite(String userId) {
+        List<Comic> comics = bookshelfDatabaseHelper.getDownloadedComics(userId);
         return comics.isEmpty() ? createSampleDownloadedComics() : comics;
+    }
+
+    private String getCurrentUserId() {
+        String userId = authManager.getCurrentUserId();
+        return userId != null ? userId : DEMO_USER_ID;
     }
 
     private void refreshComicsFromApi(List<Comic> comics, int tabIndex) {

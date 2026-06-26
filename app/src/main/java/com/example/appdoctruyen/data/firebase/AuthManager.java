@@ -37,6 +37,15 @@ public class AuthManager {
         return mAuth.getCurrentUser() != null;
     }
 
+    public FirebaseUser getCurrentUser() {
+        return mAuth.getCurrentUser();
+    }
+
+    public String getCurrentUserId() {
+        FirebaseUser user = mAuth.getCurrentUser();
+        return user != null ? user.getUid() : null;
+    }
+
     public void logout() {
         mAuth.signOut();
     }
