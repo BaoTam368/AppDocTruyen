@@ -11,6 +11,7 @@ import com.bumptech.glide.Glide;
 import com.example.appdoctruyen.R;
 import com.example.appdoctruyen.models.Comic;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -22,12 +23,12 @@ public class BookshelfAdapter extends RecyclerView.Adapter<BookshelfAdapter.Comi
 
     public BookshelfAdapter(Context context, List<Comic> comicList, OnItemClickListener listener) {
         this.context = context;
-        this.comicList = comicList;
+        this.comicList = comicList != null ? comicList : new ArrayList<>();
         this.listener = listener;
     }
 
     public void updateList(List<Comic> newList) {
-        this.comicList = newList;
+        this.comicList = newList != null ? newList : new ArrayList<>();
         notifyDataSetChanged();
     }
 
@@ -41,9 +42,18 @@ public class BookshelfAdapter extends RecyclerView.Adapter<BookshelfAdapter.Comi
     @Override
     public void onBindViewHolder(@NonNull ComicViewHolder holder, int position) {
         Comic comic = comicList.get(position);
+        if (comic == null) {
+            holder.tvComicTitle.setText(R.string.comic_title_placeholder);
+            holder.tvComicChapter.setText("");
+            holder.imgComicCover.setImageResource(R.drawable.placeholder_comic);
+            holder.itemView.setOnClickListener(null);
+            return;
+        }
 
         // Bind thông tin truyện lên từng item trong danh sách tủ sách
-        holder.tvComicTitle.setText(comic.getTitle());
+        holder.tvComicTitle.setText(isBlank(comic.getTitle())
+                ? context.getString(R.string.comic_title_placeholder)
+                : comic.getTitle());
 
         String lastReadChapter = !isBlank(comic.getLastReadChapter())
                 ? comic.getLastReadChapter()

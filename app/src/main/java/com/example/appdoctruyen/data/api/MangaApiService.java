@@ -3,9 +3,12 @@ package com.example.appdoctruyen.data.api;
 import java.util.List;
 
 import retrofit2.Call;
+import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.PUT;
 import retrofit2.http.Query;
 
 public interface MangaApiService {
@@ -25,6 +28,9 @@ public interface MangaApiService {
 
     @GET("manga/chapter/{chapterId}/pages")
     Call<ChapterPagesResponse> getChapterPages(@Path("chapterId") String chapterId);
+
+    @GET("chapter/{chapterId}/pages")
+    Call<ChapterPagesResponse> getChapterPagesAlias(@Path("chapterId") String chapterId);
 
     @GET("groups")
     Call<GroupListResponse> getGroups();
@@ -51,6 +57,58 @@ public interface MangaApiService {
 
     @POST("local-manga/sync/popular")
     Call<MangaListResponse> syncPopularMangas(@Query("count") int count);
+
+    @POST("local-manga/sync/popular")
+    Call<MangaListResponse> syncPopularMangas(
+            @Query("total") int total,
+            @Query("limit") int limit,
+            @Query("pages") int pages
+    );
+
+    @GET("users/{userId}")
+    Call<UserResponse> getUser(@Path("userId") String userId);
+
+    @POST("users")
+    Call<UserResponse> createOrUpdateUser(@Body UserDto user);
+
+    @PUT("users/{userId}")
+    Call<UserResponse> updateUser(@Path("userId") String userId, @Body UserDto user);
+
+    @GET("comments")
+    Call<CommentListResponse> getComments(
+            @Query("mangaId") String mangaId,
+            @Query("chapterId") String chapterId
+    );
+
+    @POST("comments")
+    Call<CommentResponse> createComment(@Body CreateCommentRequest request);
+
+    @PUT("comments/{commentId}")
+    Call<CommentResponse> updateComment(
+            @Path("commentId") int commentId,
+            @Body CreateCommentRequest request
+    );
+
+    @DELETE("comments/{commentId}")
+    Call<EmptyResponse> deleteComment(@Path("commentId") int commentId);
+
+    @GET("posts")
+    Call<PostListResponse> getPosts();
+
+    @GET("posts/{postId}")
+    Call<PostResponse> getPost(@Path("postId") int postId);
+
+    @POST("posts")
+    Call<PostResponse> createPost(@Body CreatePostRequest request);
+
+    @PUT("posts/{postId}")
+    Call<PostResponse> updatePost(
+            @Path("postId") int postId,
+            @Body CreatePostRequest request
+    );
+
+    @DELETE("posts/{postId}")
+    Call<EmptyResponse> deletePost(@Path("postId") int postId);
 }
 
 class MangaListResponse extends ApiResponse<List<MangaDto>> {
@@ -86,12 +144,13 @@ class MangaDto {
     String status;
     Integer year;
     List<String> tags;
-    String translationGroupName;
-    String translationGroupId;
+    String contentRating;
+    List<String> availableTranslatedLanguages;
 }
 
 class ChapterDto {
     String chapterId;
+    String mangaId;
     String chapterName;
     String chapterNumber;
     String language;

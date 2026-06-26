@@ -10,6 +10,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.appdoctruyen.views.fragments.BookshelfFragment;
+import com.example.appdoctruyen.views.fragments.BookshelfGroupFragment;
 import com.example.appdoctruyen.views.fragments.ComicHomeFragment;
 import com.example.appdoctruyen.views.fragments.ProfileFragment;
 import com.example.appdoctruyen.R;
@@ -56,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
                     selectedFragment = fragment;
                 }
             } else if (itemId == R.id.nav_translation_team) {
-                // Feature removed - translation teams not needed for API-based manga app
+                selectedFragment = new BookshelfGroupFragment();
             } else if (itemId == R.id.nav_profile) {
                 selectedFragment = new ProfileFragment();
             }

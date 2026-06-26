@@ -215,7 +215,10 @@ public class MangaRepository {
     }
 
     public void syncPopularMangas(int count, RepositoryCallback<List<Comic>> callback) {
-        apiService.syncPopularMangas(count).enqueue(new Callback<MangaListResponse>() {
+        int total = Math.max(count, 1);
+        int limit = Math.min(total, 100);
+        int pages = (int) Math.ceil((double) total / limit);
+        apiService.syncPopularMangas(total, limit, pages).enqueue(new Callback<MangaListResponse>() {
             @Override
             public void onResponse(Call<MangaListResponse> call, Response<MangaListResponse> response) {
                 MangaListResponse body = response.body();
@@ -284,8 +287,10 @@ public class MangaRepository {
         );
         comic.setMangaId(mangaId);
         comic.setTags(dto.tags);
-        comic.setTranslationGroupName(dto.translationGroupName);
-        comic.setTranslationGroupId(dto.translationGroupId);
+        comic.setStatus(dto.status);
+        comic.setYear(dto.year);
+        comic.setContentRating(dto.contentRating);
+        comic.setAvailableTranslatedLanguages(dto.availableTranslatedLanguages);
         return comic;
     }
 
