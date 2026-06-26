@@ -310,6 +310,7 @@ public class BookshelfFragment extends Fragment {
         intent.putExtra("comic_id", comic.getId());
         intent.putExtra("manga_id", resolveMangaId(comic));
         intent.putExtra("comic_title", comic.getTitle());
+        intent.putExtra("comic_cover", comic.getCoverUrl());
         startActivity(intent);
     }
 

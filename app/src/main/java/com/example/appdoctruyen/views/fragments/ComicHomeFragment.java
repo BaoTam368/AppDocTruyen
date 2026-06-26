@@ -187,6 +187,7 @@ public class ComicHomeFragment extends Fragment {
         intent.putExtra("comic_id", comic.getMangaId());
         intent.putExtra("comic_title", comic.getTitle());
         intent.putExtra("mangaId", comic.getMangaId());
+        intent.putExtra("comic_cover", comic.getCoverUrl());
         startActivity(intent);
     }
 

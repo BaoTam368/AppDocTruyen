@@ -24,6 +24,11 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.appdoctruyen.data.database.BookshelfDatabaseHelper;
+import com.example.appdoctruyen.data.firebase.AuthManager;
+import com.example.appdoctruyen.data.firebase.BookshelfFirebaseHelper;
+import com.example.appdoctruyen.models.Comic;
+
 public class ComicReadingActivity extends AppCompatActivity {
 
     private ImageView btnBack, btnChapterList, btnReport, btnReload, btnNextChapter;
@@ -43,6 +48,7 @@ public class ComicReadingActivity extends AppCompatActivity {
     
     private List<Chapter> chapterList;
     private int currentChapterIndex = 0;
+    private String coverUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +58,7 @@ public class ComicReadingActivity extends AppCompatActivity {
         // Nhận extras từ intent
         mangaId = getIntent().getStringExtra("mangaId");
         mangaTitle = getIntent().getStringExtra("mangaTitle");
+        coverUrl = getIntent().getStringExtra("coverUrl");
         chapterId = getIntent().getStringExtra("chapterId");
         chapterName = getIntent().getStringExtra("chapterName");
         currentChapter = getIntent().getIntExtra("CHAPTER_NUM", 1);
@@ -137,6 +144,8 @@ public class ComicReadingActivity extends AppCompatActivity {
             Toast.makeText(this, "Không có chapterId, hiển thị ảnh mẫu", Toast.LENGTH_SHORT).show();
             loadMockPages(chapterNum);
         }
+        
+        saveHistory();
     }
 
     private void loadChapterPagesFromApi(String chapterId) {
@@ -243,5 +252,49 @@ public class ComicReadingActivity extends AppCompatActivity {
 
         bottomSheetDialog.setContentView(bottomSheetView);
         bottomSheetDialog.show(); // Hiển thị bảng lên màn hình
+    }
+
+    private void saveHistory() {
+        if (mangaId == null || mangaId.isEmpty()) return;
+
+        AuthManager authManager = new AuthManager();
+        String userId = authManager.getCurrentUserId();
+        if (userId == null) userId = "local_user";
+
+        final String finalUserId = userId;
+        final String finalChapterId = chapterId;
+        final String finalChapterName = chapterName;
+
+        if (coverUrl != null && !coverUrl.isEmpty()) {
+            BookshelfDatabaseHelper dbHelper = new BookshelfDatabaseHelper(this);
+            dbHelper.saveReadingHistory(finalUserId, mangaId, finalChapterId, finalChapterName, mangaTitle, coverUrl);
+            if (!finalUserId.equals("local_user")) {
+                BookshelfFirebaseHelper firebaseHelper = new BookshelfFirebaseHelper(finalUserId);
+                firebaseHelper.saveReadingHistory(mangaId, finalChapterId, finalChapterName, mangaTitle, coverUrl);
+            }
+        } else {
+            mangaRepository.getMangaDetail(mangaId, new MangaRepository.RepositoryCallback<Comic>() {
+                @Override
+                public void onSuccess(Comic data) {
+                    if (data == null) return;
+                    coverUrl = data.getCoverUrl();
+                    if (mangaTitle == null || mangaTitle.isEmpty()) {
+                        mangaTitle = data.getTitle();
+                    }
+                    BookshelfDatabaseHelper dbHelper = new BookshelfDatabaseHelper(ComicReadingActivity.this);
+                    dbHelper.saveReadingHistory(finalUserId, mangaId, finalChapterId, finalChapterName, mangaTitle, coverUrl);
+                    if (!finalUserId.equals("local_user")) {
+                        BookshelfFirebaseHelper firebaseHelper = new BookshelfFirebaseHelper(finalUserId);
+                        firebaseHelper.saveReadingHistory(mangaId, finalChapterId, finalChapterName, mangaTitle, coverUrl);
+                    }
+                }
+
+                @Override
+                public void onError(String message) {
+                    BookshelfDatabaseHelper dbHelper = new BookshelfDatabaseHelper(ComicReadingActivity.this);
+                    dbHelper.saveReadingHistory(finalUserId, mangaId, finalChapterId, finalChapterName, mangaTitle, "");
+                }
+            });
+        }
     }
 }
