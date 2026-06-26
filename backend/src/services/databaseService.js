@@ -25,6 +25,8 @@ function initializeDatabase() {
             year INTEGER,
             tags TEXT,
             latest_chapter TEXT,
+            content_rating TEXT,
+            available_translated_languages TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
@@ -79,14 +81,16 @@ function initializeDatabase() {
         CREATE INDEX IF NOT EXISTS idx_posts_user_id ON posts(user_id);
         CREATE INDEX IF NOT EXISTS idx_posts_manga_id ON posts(manga_id);
     `);
+
+    ensureMangaMetadataColumns();
 }
 
 function saveManga(manga) {
     const database = getDatabase();
     const stmt = database.prepare(`
         INSERT OR REPLACE INTO mangas 
-        (id, title, description, cover_url, status, year, tags, latest_chapter, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+        (id, title, description, cover_url, status, year, tags, latest_chapter, content_rating, available_translated_languages, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `);
     
     stmt.run(
@@ -97,7 +101,9 @@ function saveManga(manga) {
         manga.status,
         manga.year,
         JSON.stringify(manga.tags || []),
-        manga.latestChapter
+        manga.latestChapter,
+        manga.contentRating,
+        JSON.stringify(manga.availableTranslatedLanguages || [])
     );
 }
 
@@ -120,6 +126,7 @@ function saveChapter(chapter) {
 
 function getAllMangas({ limit = 20, offset = 0 } = {}) {
     const database = getDatabase();
+    const paging = normalizePaging({ limit, offset });
     const stmt = database.prepare(`
         SELECT 
             id as mangaId,
@@ -129,21 +136,25 @@ function getAllMangas({ limit = 20, offset = 0 } = {}) {
             status,
             year,
             tags,
-            latest_chapter as latestChapter
+            latest_chapter as latestChapter,
+            content_rating as contentRating,
+            available_translated_languages as availableTranslatedLanguages
         FROM mangas
         ORDER BY updated_at DESC
         LIMIT ? OFFSET ?
     `);
     
-    const mangas = stmt.all(limit, offset);
+    const mangas = stmt.all(paging.limit, paging.offset);
     return mangas.map(manga => ({
         ...manga,
-        tags: manga.tags ? JSON.parse(manga.tags) : []
+        tags: parseJsonArray(manga.tags),
+        availableTranslatedLanguages: parseJsonArray(manga.availableTranslatedLanguages)
     }));
 }
 
 function searchMangas(query, { limit = 20, offset = 0 } = {}) {
     const database = getDatabase();
+    const paging = normalizePaging({ limit, offset });
     const stmt = database.prepare(`
         SELECT 
             id as mangaId,
@@ -153,7 +164,9 @@ function searchMangas(query, { limit = 20, offset = 0 } = {}) {
             status,
             year,
             tags,
-            latest_chapter as latestChapter
+            latest_chapter as latestChapter,
+            content_rating as contentRating,
+            available_translated_languages as availableTranslatedLanguages
         FROM mangas
         WHERE title LIKE ? OR description LIKE ?
         ORDER BY updated_at DESC
@@ -161,10 +174,11 @@ function searchMangas(query, { limit = 20, offset = 0 } = {}) {
     `);
     
     const searchPattern = `%${query}%`;
-    const mangas = stmt.all(searchPattern, searchPattern, limit, offset);
+    const mangas = stmt.all(searchPattern, searchPattern, paging.limit, paging.offset);
     return mangas.map(manga => ({
         ...manga,
-        tags: manga.tags ? JSON.parse(manga.tags) : []
+        tags: parseJsonArray(manga.tags),
+        availableTranslatedLanguages: parseJsonArray(manga.availableTranslatedLanguages)
     }));
 }
 
@@ -179,7 +193,9 @@ function getMangaById(mangaId) {
             status,
             year,
             tags,
-            latest_chapter as latestChapter
+            latest_chapter as latestChapter,
+            content_rating as contentRating,
+            available_translated_languages as availableTranslatedLanguages
         FROM mangas
         WHERE id = ?
     `);
@@ -189,7 +205,8 @@ function getMangaById(mangaId) {
     
     return {
         ...manga,
-        tags: manga.tags ? JSON.parse(manga.tags) : []
+        tags: parseJsonArray(manga.tags),
+        availableTranslatedLanguages: parseJsonArray(manga.availableTranslatedLanguages)
     };
 }
 
@@ -216,6 +233,42 @@ function closeDatabase() {
         db.close();
         db = null;
     }
+}
+
+function ensureMangaMetadataColumns() {
+    ensureColumn('mangas', 'content_rating', 'TEXT');
+    ensureColumn('mangas', 'available_translated_languages', 'TEXT');
+}
+
+function ensureColumn(tableName, columnName, definition) {
+    const columns = db.prepare(`PRAGMA table_info(${tableName})`).all();
+    const exists = columns.some((column) => column.name === columnName);
+    if (!exists) {
+        db.exec(`ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${definition}`);
+    }
+}
+
+function parseJsonArray(value) {
+    if (!value) return [];
+    try {
+        const parsed = JSON.parse(value);
+        return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+        return [];
+    }
+}
+
+function normalizePaging({ limit = 20, offset = 0 } = {}) {
+    return {
+        limit: clampNumber(limit, 1, 200, 20),
+        offset: clampNumber(offset, 0, 10000, 0)
+    };
+}
+
+function clampNumber(value, min, max, fallback) {
+    const numberValue = Number.parseInt(value, 10);
+    if (Number.isNaN(numberValue)) return fallback;
+    return Math.max(min, Math.min(max, numberValue));
 }
 
 module.exports = {

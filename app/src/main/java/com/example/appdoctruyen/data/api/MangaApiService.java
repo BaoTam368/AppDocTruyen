@@ -29,6 +29,9 @@ public interface MangaApiService {
     @GET("manga/chapter/{chapterId}/pages")
     Call<ChapterPagesResponse> getChapterPages(@Path("chapterId") String chapterId);
 
+    @GET("chapter/{chapterId}/pages")
+    Call<ChapterPagesResponse> getChapterPagesAlias(@Path("chapterId") String chapterId);
+
     @GET("groups")
     Call<GroupListResponse> getGroups();
 
@@ -54,6 +57,13 @@ public interface MangaApiService {
 
     @POST("local-manga/sync/popular")
     Call<MangaListResponse> syncPopularMangas(@Query("count") int count);
+
+    @POST("local-manga/sync/popular")
+    Call<MangaListResponse> syncPopularMangas(
+            @Query("total") int total,
+            @Query("limit") int limit,
+            @Query("pages") int pages
+    );
 
     @GET("users/{userId}")
     Call<UserResponse> getUser(@Path("userId") String userId);
@@ -134,10 +144,13 @@ class MangaDto {
     String status;
     Integer year;
     List<String> tags;
+    String contentRating;
+    List<String> availableTranslatedLanguages;
 }
 
 class ChapterDto {
     String chapterId;
+    String mangaId;
     String chapterName;
     String chapterNumber;
     String language;

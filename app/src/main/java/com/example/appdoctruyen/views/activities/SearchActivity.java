@@ -162,6 +162,7 @@ public class SearchActivity extends AppCompatActivity {
             Intent intent = new Intent(SearchActivity.this, ComicDetailActivity.class);
             intent.putExtra("comic_id", comic.getId());
             intent.putExtra("comic_title", comic.getTitle());
+            intent.putExtra("mangaId", comic.getMangaId());
             startActivity(intent);
         });
 

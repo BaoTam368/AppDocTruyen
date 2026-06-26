@@ -20,6 +20,10 @@ public class Comic {
     private String localPath;
     private long lastReadTime;
     private List<String> tags;
+    private String status;
+    private Integer year;
+    private String contentRating;
+    private List<String> availableTranslatedLanguages;
 
     public Comic(int id, String title, int coverImageResId, String coverUrl,
                  String latestChapter, String lastReadChapter, String author,
@@ -173,5 +177,37 @@ public class Comic {
 
     public void setTags(List<String> tags) {
         this.tags = tags;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Integer getYear() {
+        return year;
+    }
+
+    public void setYear(Integer year) {
+        this.year = year;
+    }
+
+    public String getContentRating() {
+        return contentRating;
+    }
+
+    public void setContentRating(String contentRating) {
+        this.contentRating = contentRating;
+    }
+
+    public List<String> getAvailableTranslatedLanguages() {
+        return availableTranslatedLanguages;
+    }
+
+    public void setAvailableTranslatedLanguages(List<String> availableTranslatedLanguages) {
+        this.availableTranslatedLanguages = availableTranslatedLanguages;
     }
 }

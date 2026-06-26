@@ -17,6 +17,7 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.example.appdoctruyen.R;
 import com.example.appdoctruyen.models.TranslationGroup;
 import com.example.appdoctruyen.views.activities.ComicReadingActivity;
@@ -112,8 +113,11 @@ public class ComicInfoFragment extends Fragment {
                 
                 // Load ảnh bìa (sử dụng placeholder nếu không có library)
                 if (imgCover != null && data.getCoverUrl() != null && !data.getCoverUrl().isEmpty()) {
-                    // Nếu có Picasso hoặc Glide, load ảnh ở đây
-                    // Hiện tại giữ placeholder
+                    Glide.with(requireContext())
+                            .load(data.getCoverUrl())
+                            .placeholder(R.drawable.placeholder_comic)
+                            .error(R.drawable.placeholder_comic)
+                            .into(imgCover);
                 }
                 
                 // Hiển thị tags nếu có
