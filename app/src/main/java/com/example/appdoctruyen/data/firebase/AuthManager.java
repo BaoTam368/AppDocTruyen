@@ -1,6 +1,7 @@
 package com.example.appdoctruyen.data.firebase;
 
 import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
@@ -57,6 +58,18 @@ public class AuthManager {
                         callback.onSuccess(mAuth.getCurrentUser());
                     } else {
                         callback.onFailure(task.getException() != null ? task.getException().getLocalizedMessage() : "Đăng nhập Google thất bại");
+                    }
+                });
+    }
+
+    public void loginWithFacebook(String accessToken, AuthCallback callback) {
+        com.google.firebase.auth.AuthCredential credential = FacebookAuthProvider.getCredential(accessToken);
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        callback.onSuccess(mAuth.getCurrentUser());
+                    } else {
+                        callback.onFailure(task.getException() != null ? task.getException().getLocalizedMessage() : "Đăng nhập Facebook thất bại");
                     }
                 });
     }
