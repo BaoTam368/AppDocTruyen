@@ -41,25 +41,44 @@ public class MangaRepository {
         });
     }
 
-    public void getMangaDetail(String mangaId, RepositoryCallback<Comic> callback) {
+    public void getMangaDetail(String mangaId, final RepositoryCallback<Comic> callback) {
         if (isBlank(mangaId)) {
             callback.onError("Thiếu mangaId");
             return;
         }
 
+        android.util.Log.d("CHECK_API", "Bắt đầu gọi mạng qua Retrofit...");
+
         apiService.getMangaDetail(mangaId).enqueue(new Callback<MangaDetailResponse>() {
             @Override
             public void onResponse(Call<MangaDetailResponse> call, Response<MangaDetailResponse> response) {
-                MangaDetailResponse body = response.body();
-                if (response.isSuccessful() && body != null && body.success && body.data != null) {
-                    callback.onSuccess(mapManga(body.data));
-                } else {
-                    callback.onError(readErrorMessage(body, "Không lấy được chi tiết truyện"));
+                try {
+                    android.util.Log.d("CHECK_API", "Đã nhận phản hồi HTTP từ Node.js: " + response.code());
+
+                    MangaDetailResponse body = response.body();
+                    if (response.isSuccessful() && body != null) {
+                        android.util.Log.d("CHECK_API", "JSON success: " + body.success);
+
+                        if (body.success && body.data != null) {
+                            Comic comic = mapManga(body.data);
+                            callback.onSuccess(comic);
+                        } else {
+                            callback.onError(body.message != null ? body.message : "Server Node.js báo thất bại");
+                        }
+                    } else {
+                        String errorStr = response.errorBody() != null ? response.errorBody().string() : "Rỗng";
+                        android.util.Log.e("CHECK_API", "Lỗi HTTP hoặc Endpoint: " + errorStr);
+                        callback.onError("Lỗi HTTP: " + response.code());
+                    }
+                } catch (Exception e) {
+                    android.util.Log.e("CHECK_API", "Lỗi crash khi parse data: " + e.getMessage());
+                    callback.onError("Lỗi xử lý dữ liệu");
                 }
             }
 
             @Override
             public void onFailure(Call<MangaDetailResponse> call, Throwable throwable) {
+                android.util.Log.e("CHECK_API", "Thất bại mạng (onFailure): " + throwable.getMessage());
                 callback.onError("Không kết nối được Node.js backend");
             }
         });

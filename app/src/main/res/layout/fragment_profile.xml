@@ -1,221 +1,334 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Dùng NestedScrollView ngoài cùng để đảm bảo cuộn mượt mà không lo tràn màn hình -->
-<androidx.core.widget.NestedScrollView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://android.com"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="?android:attr/windowBackground">
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
 
     <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingBottom="32dp">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="24dp">
 
         <LinearLayout
-                android:layout_width="match_parent"
+            android:id="@+id/headerProfile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/brand_blue"
+            android:gravity="center"
+            android:padding="14dp">
+
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@color/bg_input_light"
-                android:orientation="horizontal"
-                android:paddingHorizontal="24dp"
-                android:paddingVertical="30dp"
-                android:gravity="center_vertical">
+                android:text="Cá nhân"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+        <!-- HEADER USER -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="20dp">
 
             <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/iv_user_avatar"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:src="@color/text_secondary_light"
-                    android:scaleType="centerCrop"
-                    app:shapeAppearanceOverlay="@style/CircleImageViewStyle"/>
+                android:id="@+id/iv_user_avatar"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@android:color/darker_gray"
+                app:shapeAppearanceOverlay="@style/CircleImageViewStyle" />
 
             <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_username"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ADMIN"
+                    android:textColor="#000000"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_user_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Hóa Thần"
+                    android:textColor="#444444"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- CÀI ĐẶT -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="8dp"
+            android:text="Cài Đặt"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="12dp"
+            android:background="@drawable/bg_payment_item"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="50dp"-->
+<!--                android:gravity="center_vertical"-->
+<!--                android:orientation="horizontal">-->
+
+<!--                <ImageView-->
+<!--                    android:layout_width="22dp"-->
+<!--                    android:layout_height="22dp"-->
+<!--                    android:src="@drawable/ic_key" />-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginStart="12dp"-->
+<!--                    android:layout_weight="1"-->
+<!--                    android:text="Mở chương VIP tự động"-->
+<!--                    android:textSize="15sp" />-->
+
+<!--                <androidx.appcompat.widget.SwitchCompat-->
+<!--                    android:id="@+id/switch_auto_vip"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content" />-->
+<!--            </LinearLayout>-->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_dark_mode" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:text="Chế độ nền tối"
+                    android:textSize="15sp" />
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/switch_dark_mode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- CHỨC NĂNG -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
+            android:text="Chức Năng"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="12dp"
+            android:background="@drawable/bg_payment_item"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+<!--            <LinearLayout-->
+<!--                android:id="@+id/btn_watch_ads"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="48dp"-->
+<!--                android:gravity="center_vertical"-->
+<!--                android:orientation="horizontal">-->
+
+<!--                <ImageView-->
+<!--                    android:layout_width="20dp"-->
+<!--                    android:layout_height="20dp"-->
+<!--                    android:src="@android:drawable/ic_menu_help" />-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginStart="16dp"-->
+<!--                    android:text="Xem quảng cáo nhận xu" />-->
+<!--            </LinearLayout>-->
+
+<!--            <LinearLayout-->
+<!--                android:id="@+id/btn_notification"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="48dp"-->
+<!--                android:gravity="center_vertical"-->
+<!--                android:orientation="horizontal">-->
+
+<!--                <ImageView-->
+<!--                    android:layout_width="20dp"-->
+<!--                    android:layout_height="20dp"-->
+<!--                    android:src="@android:drawable/ic_popup_reminder" />-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginStart="16dp"-->
+<!--                    android:text="Thông báo của bạn" />-->
+<!--            </LinearLayout>-->
+
+            <LinearLayout
+                android:id="@+id/btn_topup"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@android:drawable/ic_menu_save" />
+
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:orientation="vertical">
-
-                <TextView
-                        android:id="@+id/tv_username"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="User"
-                        android:textColor="@color/text_primary_light"
-                        android:textSize="15sp"
-                        android:textStyle="bold"/>
-
-                <TextView
-                        android:id="@+id/tv_user_title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="aaaaa"
-                        android:textColor="@color/text_secondary_light"
-                        android:textSize="13sp"/>
+                    android:text="Nạp xu" />
             </LinearLayout>
-        </LinearLayout>
 
-        <LinearLayout
+<!--            <LinearLayout-->
+<!--                android:id="@+id/btn_func_join_team"-->
+<!--                style="@style/SettingsRowStyle"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="44dp">-->
+<!--                <ImageView android:layout_width="20dp" android:layout_height="20dp"-->
+<!--                    android:src="@android:drawable/ic_menu_share" app:tint="@color/black"/>-->
+<!--                <TextView style="@style/SettingsTextStyle" android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content" android:text="@string/func_join_team"/>-->
+<!--            </LinearLayout>-->
+
+
+<!--            <LinearLayout-->
+<!--                android:id="@+id/btn_join_team"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="48dp"-->
+<!--                android:gravity="center_vertical"-->
+<!--                android:orientation="horizontal">-->
+
+<!--                <ImageView-->
+<!--                    android:layout_width="20dp"-->
+<!--                    android:layout_height="20dp"-->
+<!--                    android:src="@android:drawable/ic_menu_myplaces" />-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginStart="16dp"-->
+<!--                    android:text="Đăng ký nhóm dịch" />-->
+<!--            </LinearLayout>-->
+
+<!--            <LinearLayout-->
+<!--                android:id="@+id/btn_change_info"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="48dp"-->
+<!--                android:gravity="center_vertical"-->
+<!--                android:orientation="horizontal">-->
+
+<!--                <ImageView-->
+<!--                    android:layout_width="20dp"-->
+<!--                    android:layout_height="20dp"-->
+<!--                    android:src="@android:drawable/ic_menu_edit" />-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginStart="16dp"-->
+<!--                    android:text="Đổi thông tin tài khoản" />-->
+<!--            </LinearLayout>-->
+
+<!--            <LinearLayout-->
+<!--                android:id="@+id/btn_support"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="48dp"-->
+<!--                android:gravity="center_vertical"-->
+<!--                android:orientation="horizontal">-->
+
+<!--                <ImageView-->
+<!--                    android:layout_width="20dp"-->
+<!--                    android:layout_height="20dp"-->
+<!--                    android:src="@android:drawable/ic_menu_info_details" />-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginStart="16dp"-->
+<!--                    android:text="Hỗ trợ người dùng" />-->
+<!--            </LinearLayout>-->
+
+            <LinearLayout
+                android:id="@+id/btn_terms"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
+                android:layout_height="48dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-            <TextView
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@android:drawable/ic_menu_agenda" />
+
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/lbl_section_settings"
-                    android:textColor="@color/text_primary_light"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="8dp"/>
-
-            <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_payment_item"
-                    android:orientation="vertical"
-                    android:padding="12dp"
-                    android:layout_marginBottom="20dp">
-
-                <!-- Dòng: Mở chương VIP tự động -->
-                <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                    <ImageView
-                            android:layout_width="22dp"
-                            android:layout_height="22dp"
-                            android:src="@android:drawable/ic_lock_lock"
-                            app:tint="@color/black"/>
-
-                    <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginStart="12dp"
-                            android:text="@string/option_auto_vip"
-                            android:textColor="@color/text_primary_light"
-                            android:textSize="14sp"/>
-
-                    <androidx.appcompat.widget.SwitchCompat
-                            android:id="@+id/switch_auto_vip"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
-                </LinearLayout>
-
-                <!-- Dòng: Chế độ nền tối -->
-                <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                    <ImageView
-                            android:layout_width="22dp"
-                            android:layout_height="22dp"
-                            android:src="@android:drawable/star_big_on"
-                            app:tint="@color/black"/>
-
-                    <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginStart="12dp"
-                            android:text="@string/option_dark_mode"
-                            android:textColor="@color/text_primary_light"
-                            android:textSize="14sp"/>
-
-                    <androidx.appcompat.widget.SwitchCompat
-                            android:id="@+id/switch_dark_mode"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
-                </LinearLayout>
+                    android:layout_marginStart="16dp"
+                    android:text="Điều khoản sử dụng" />
             </LinearLayout>
 
-            <!-- ================= CỤM 2: CHỨC NĂNG ================= -->
-            <TextView
+            <LinearLayout
+                android:id="@+id/btn_logout"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@android:drawable/ic_lock_power_off" />
+
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/lbl_section_functions"
-                    android:textColor="@color/text_primary_light"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="8dp"/>
-
-            <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_payment_item"
-                    android:orientation="vertical"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="6dp">
-
-                <LinearLayout
-                        android:id="@+id/btn_func_watch_ads"
-                        style="@style/SettingsRowStyle"
-                        android:layout_width="match_parent"
-                        android:layout_height="44dp">
-                    <ImageView android:layout_width="20dp" android:layout_height="20dp"
-                               android:src="@android:drawable/ic_menu_help" app:tint="@color/black"/>
-                    <TextView style="@style/SettingsTextStyle" android:layout_width="match_parent"
-                              android:layout_height="wrap_content" android:text="@string/func_watch_ads"/>
-                </LinearLayout>
-
-                <LinearLayout
-                        android:id="@+id/btn_func_notifications"
-                        style="@style/SettingsRowStyle"
-                        android:layout_width="match_parent"
-                        android:layout_height="44dp">
-                    <ImageView android:layout_width="20dp" android:layout_height="20dp"
-                               android:src="@android:drawable/ic_popup_reminder" app:tint="@color/black"/>
-                    <TextView style="@style/SettingsTextStyle" android:layout_width="match_parent"
-                              android:layout_height="wrap_content" android:text="@string/func_notifications"/>
-                </LinearLayout>
-
-                <LinearLayout
-                        android:id="@+id/btn_func_top_up"
-                        style="@style/SettingsRowStyle"
-                        android:layout_width="match_parent"
-                        android:layout_height="44dp">
-                    <ImageView android:layout_width="20dp" android:layout_height="20dp"
-                               android:src="@android:drawable/ic_menu_save" app:tint="@color/black"/>
-                    <TextView style="@style/SettingsTextStyle" android:layout_width="match_parent"
-                              android:layout_height="wrap_content" android:text="@string/func_top_up"/>
-                </LinearLayout>
-
-                <LinearLayout
-                        android:id="@+id/btn_func_join_team"
-                        style="@style/SettingsRowStyle"
-                        android:layout_width="match_parent"
-                        android:layout_height="44dp">
-                    <ImageView android:layout_width="20dp" android:layout_height="20dp"
-                               android:src="@android:drawable/ic_menu_share" app:tint="@color/black"/>
-                    <TextView style="@style/SettingsTextStyle" android:layout_width="match_parent"
-                              android:layout_height="wrap_content" android:text="@string/func_join_team"/>
-                </LinearLayout>
-
-                <LinearLayout
-                        android:id="@+id/btn_func_change_info"
-                        style="@style/SettingsRowStyle"
-                        android:layout_width="match_parent"
-                        android:layout_height="44dp">
-                </LinearLayout>
-
-                <LinearLayout
-                        android:id="@+id/btn_logout"
-                        style="@style/SettingsRowStyle"
-                        android:layout_width="match_parent"
-                        android:layout_height="44dp">
-                    <ImageView android:layout_width="20dp" android:layout_height="20dp"
-                               android:src="@android:drawable/ic_menu_close_clear_cancel" app:tint="@color/black"/>
-                    <TextView style="@style/SettingsTextStyle" android:layout_width="match_parent"
-                              android:layout_height="wrap_content" android:text="@string/func_logout"/>
-                </LinearLayout>
+                    android:layout_marginStart="16dp"
+                    android:text="Đăng xuất" />
             </LinearLayout>
+
         </LinearLayout>
+
     </LinearLayout>
+
 </androidx.core.widget.NestedScrollView>

@@ -7,7 +7,7 @@
     <string name="tv_forgot_password">Bạn quên mật khẩu ư?</string>
     <string name="text_or">OR</string>
     <string name="btn_register">Tạo tài khoản mới</string>
-    <string name="hint_username">Nhập tài khoản:...</string>
+    <string name="hint_username">Nhập email:...</string>
     <string name="hint_password">Nhập mật khẩu:...</string>
 
     <string name="title_register">Đăng Ký</string>
