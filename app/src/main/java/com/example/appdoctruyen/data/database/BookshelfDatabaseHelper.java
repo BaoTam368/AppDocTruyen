@@ -93,6 +93,11 @@ public class BookshelfDatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    @Override
+    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        onUpgrade(db, oldVersion, newVersion);
+    }
+
     public long addBookmark(String userId, String mangaId, String titleCache, String coverUrlCache) {
         if (isBlank(userId) || isBlank(mangaId)) return -1;
 
@@ -209,6 +214,29 @@ public class BookshelfDatabaseHelper extends SQLiteOpenHelper {
         return comics;
     }
 
+    public Comic getReadingHistoryForManga(String userId, String mangaId) {
+        if (isBlank(userId) || isBlank(mangaId)) return null;
+
+        Cursor cursor = getReadableDatabase().query(
+                TABLE_HISTORY,
+                null,
+                userMangaWhere(),
+                new String[]{userId, mangaId},
+                null,
+                null,
+                null
+        );
+
+        try {
+            if (cursor.moveToFirst()) {
+                return readHistoryComic(cursor);
+            }
+        } finally {
+            cursor.close();
+        }
+        return null;
+    }
+
     public long addDownloadedComic(String userId, String mangaId, String chapterId, String chapterName,
                                    String localPath, String titleCache, String coverUrlCache) {
         if (isBlank(userId) || isBlank(mangaId)) return -1;
@@ -253,6 +281,33 @@ public class BookshelfDatabaseHelper extends SQLiteOpenHelper {
             cursor.close();
         }
         return comics;
+    }
+
+    public boolean isDownloaded(String userId, String mangaId) {
+        if (isBlank(userId) || isBlank(mangaId)) return false;
+        Cursor cursor = getReadableDatabase().query(
+                TABLE_DOWNLOADED,
+                new String[]{COL_ID},
+                COL_USER_ID + " = ? AND " + COL_MANGA_ID + " = ?",
+                new String[]{userId, mangaId},
+                null,
+                null,
+                null
+        );
+        try {
+            return cursor.moveToFirst();
+        } finally {
+            cursor.close();
+        }
+    }
+
+    public int removeDownloadedComic(String userId, String mangaId) {
+        if (isBlank(userId) || isBlank(mangaId)) return 0;
+        return getWritableDatabase().delete(
+                TABLE_DOWNLOADED,
+                COL_USER_ID + " = ? AND " + COL_MANGA_ID + " = ?",
+                new String[]{userId, mangaId}
+        );
     }
 
     // Comment chỉ được lưu local trên máy, không gửi lên server

@@ -7,11 +7,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.example.appdoctruyen.R;
 import com.example.appdoctruyen.data.firebase.AuthManager;
 import com.example.appdoctruyen.views.activities.LoginActivity;
@@ -19,10 +21,12 @@ import com.example.appdoctruyen.views.activities.RechargeActivity;
 import com.example.appdoctruyen.views.activities.SearchActivity;
 import com.example.appdoctruyen.views.activities.UserDetailsActivity;
 import com.google.android.material.imageview.ShapeableImageView;
+import com.google.firebase.auth.FirebaseUser;
 
 public class ProfileFragment extends Fragment {
     LinearLayout btn_logout, btn_topup;
     ShapeableImageView iv_user_avatar;
+    TextView tv_username, tv_user_title;
     private AuthManager authManager;
 
     @SuppressLint("MissingInflatedId")
@@ -34,7 +38,11 @@ public class ProfileFragment extends Fragment {
         btn_logout = view.findViewById(R.id.btn_logout);
         btn_topup = view.findViewById(R.id.btn_topup);
         iv_user_avatar = view.findViewById(R.id.iv_user_avatar);
+        tv_username = view.findViewById(R.id.tv_username);
+        tv_user_title = view.findViewById(R.id.tv_user_title);
         authManager = new AuthManager();
+
+        loadUserInfo();
 
         btn_logout.setOnClickListener(v -> {
             authManager.logout();
@@ -53,5 +61,32 @@ public class ProfileFragment extends Fragment {
             startActivity(intent);
         });
         return view;
+    }
+
+    private void loadUserInfo() {
+        FirebaseUser user = authManager.getCurrentUser();
+        if (user != null) {
+            String displayName = user.getDisplayName();
+            String email = user.getEmail();
+
+            if (displayName != null && !displayName.isEmpty()) {
+                tv_username.setText(displayName);
+            } else if (email != null && !email.isEmpty()) {
+                tv_username.setText(email);
+            } else {
+                tv_username.setText("Người dùng");
+            }
+
+            tv_user_title.setText("Thành viên");
+
+            if (user.getPhotoUrl() != null) {
+                Glide.with(this)
+                        .load(user.getPhotoUrl())
+                        .circleCrop()
+                        .placeholder(R.drawable.placeholder_comic)
+                        .error(R.drawable.placeholder_comic)
+                        .into(iv_user_avatar);
+            }
+        }
     }
 }

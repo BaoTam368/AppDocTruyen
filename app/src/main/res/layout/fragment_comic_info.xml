@@ -37,39 +37,45 @@
                 app:layout_constraintStart_toEndOf="@id/imgCover"
                 app:layout_constraintTop_toTopOf="parent"/>
 
-        <LinearLayout
-                android:id="@+id/layoutTags"
+        <HorizontalScrollView
+                android:id="@+id/scrollTags"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
-                android:orientation="horizontal"
-                android:maxLines="2"
+                android:scrollbars="none"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/imgCover"
                 app:layout_constraintTop_toBottomOf="@id/tvMangaName">
 
-            <TextView
+            <LinearLayout
+                    android:id="@+id/layoutTags"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@color/brand_blue"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="4dp"
-                    android:text="#Thể loại 1"
-                    android:textColor="@color/black"
-                    android:textSize="12sp"/>
+                    android:orientation="horizontal">
 
-            <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:background="@color/brand_blue"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="4dp"
-                    android:text="#Thể loại 2"
-                    android:textColor="@color/black"
-                    android:textSize="12sp"/>
-        </LinearLayout>
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@color/brand_blue"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="4dp"
+                        android:text="#Thể loại 1"
+                        android:textColor="@color/black"
+                        android:textSize="12sp"/>
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:background="@color/brand_blue"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="4dp"
+                        android:text="#Thể loại 2"
+                        android:textColor="@color/black"
+                        android:textSize="12sp"/>
+            </LinearLayout>
+        </HorizontalScrollView>
 
         <LinearLayout
                 android:id="@+id/layoutStats"
@@ -81,32 +87,37 @@
                 android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/imgCover"
-                app:layout_constraintTop_toBottomOf="@id/layoutTags">
+                app:layout_constraintTop_toBottomOf="@id/scrollTags">
 
             <ImageView
                     android:layout_width="16dp"
                     android:layout_height="16dp"
-                    android:src="@android:drawable/ic_menu_view"/>
+                    android:src="@drawable/ic_eye"
+                    app:tint="@color/text_secondary_light"/>
 
             <TextView
                     android:id="@+id/tvViews"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
+                    android:textColor="@color/text_secondary_light"
                     android:text="Lượt xem"
                     android:textSize="14sp"/>
 
             <ImageView
+                    android:id="@+id/imgLikeIcon"
                     android:layout_width="16dp"
                     android:layout_height="16dp"
                     android:layout_marginStart="16dp"
-                    android:src="@android:drawable/btn_star_big_on"/>
+                    android:src="@drawable/ic_favourite"
+                    app:tint="#FF5722"/>
 
             <TextView
                     android:id="@+id/tvLikes"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
+                    android:textColor="@color/text_secondary_light"
                     android:text="Lượt thích"
                     android:textSize="14sp"/>
         </LinearLayout>
@@ -116,36 +127,55 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="12dp"
                 android:orientation="horizontal"
                 app:layout_constraintStart_toEndOf="@id/imgCover"
                 app:layout_constraintTop_toBottomOf="@id/layoutStats">
 
             <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@android:drawable/ic_menu_save"
-                    android:layout_marginEnd="16dp"/>
+                    android:id="@+id/btnBookmark"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:padding="4dp"
+                    android:src="@drawable/ic_bookmark"
+                    android:layout_marginEnd="16dp"
+                    android:contentDescription="Lưu vào tủ sách"/>
             <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@android:drawable/ic_menu_share"
-                    android:layout_marginEnd="16dp"/>
+                    android:id="@+id/btnShare"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:padding="4dp"
+                    android:src="@drawable/ic_share"
+                    android:layout_marginEnd="16dp"
+                    android:contentDescription="Chia sẻ"/>
             <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@android:drawable/stat_sys_download"/>
+                    android:id="@+id/btnDownload"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:padding="4dp"
+                    android:src="@drawable/ic_download"
+                    android:contentDescription="Tải xuống"/>
         </LinearLayout>
+
+        <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/barrierHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:barrierDirection="bottom"
+                app:constraint_referenced_ids="imgCover,layoutActions"/>
 
         <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/imgAuthorAvatar"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_marginTop="24dp"
-                android:src="@android:drawable/ic_menu_report_image"
+                android:layout_marginTop="16dp"
+                android:src="@drawable/avatar_default"
                 app:shapeAppearanceOverlay="@style/CircleImage"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/imgCover"/>
+                app:layout_constraintTop_toBottomOf="@id/barrierHeader"/>
 
         <TextView
                 android:id="@+id/tvAuthorName"
@@ -153,7 +183,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:text="Tên nhóm dịch"
-                android:textColor="@android:color/black"
+                android:textColor="@color/text_primary_light"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="@id/imgAuthorAvatar"
@@ -167,7 +197,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:text="Giới thiệu"
-                android:textColor="@android:color/black"
+                android:textColor="@color/text_primary_light"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
@@ -177,7 +207,7 @@
                 android:layout_width="0dp"
                 android:layout_height="1dp"
                 android:layout_marginStart="8dp"
-                android:background="@android:color/darker_gray"
+                android:background="@color/divider_light"
                 app:layout_constraintBottom_toBottomOf="@id/tvLabelIntro"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/tvLabelIntro"
@@ -191,9 +221,10 @@
                 android:maxLines="3"
                 android:ellipsize="end"
                 android:text="Nội dung giới thiệu"
-                android:textColor="@color/black"
+                android:textColor="@color/text_primary_light"
                 android:textSize="14sp"
-                app:layout_constraintEnd_toStartOf="@id/tvReadMore"
+                android:lineSpacingMultiplier="1.2"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvLabelIntro"/>
 
@@ -201,11 +232,14 @@
                 android:id="@+id/tvReadMore"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
                 android:text="Đọc thêm"
                 android:textColor="@color/brand_blue"
                 android:textStyle="bold"
+                android:padding="4dp"
+                android:background="?attr/selectableItemBackground"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/tvDescription"/>
+                app:layout_constraintTop_toBottomOf="@id/tvDescription"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

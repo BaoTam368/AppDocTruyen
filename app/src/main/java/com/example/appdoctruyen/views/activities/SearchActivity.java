@@ -161,6 +161,7 @@ public class SearchActivity extends AppCompatActivity {
         resultAdapter = new BookshelfAdapter(this, resultList, (comic, position) -> {
             Intent intent = new Intent(SearchActivity.this, ComicDetailActivity.class);
             intent.putExtra("comic_id", comic.getId());
+            intent.putExtra("mangaId", comic.getMangaId());
             intent.putExtra("comic_title", comic.getTitle());
             intent.putExtra("mangaId", comic.getMangaId());
             startActivity(intent);
