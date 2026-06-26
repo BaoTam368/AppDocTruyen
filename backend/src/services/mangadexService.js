@@ -1,8 +1,11 @@
 const axios = require('axios');
 
-const MANGADEX_BASE_URL = process.env.MANGADEX_BASE_URL || 'https://api.mangadex.org';
+const MANGADEX_BASE_URL = trimTrailingSlash(process.env.MANGADEX_BASE_URL || 'https://api.mangadex.org');
+const MANGADEX_UPLOADS_BASE_URL = trimTrailingSlash(process.env.MANGADEX_UPLOADS_BASE_URL || 'https://uploads.mangadex.org');
+const DEFAULT_TRANSLATED_LANGUAGE = process.env.DEFAULT_TRANSLATED_LANGUAGE || 'en';
 const configuredTimeout = Number.parseInt(process.env.REQUEST_TIMEOUT_MS || '10000', 10);
 const REQUEST_TIMEOUT_MS = Number.isNaN(configuredTimeout) ? 10000 : configuredTimeout;
+const MANGADEX_MAX_LIMIT = 100;
 
 const mangadexClient = axios.create({
     baseURL: MANGADEX_BASE_URL,
@@ -39,17 +42,22 @@ const DEMO_GROUPS = [
     }
 ];
 
-async function searchManga({title = '', limit = 20, offset = 0}) {
+async function searchManga(titleOrOptions = '', limit = 20, offset = 0) {
+    const options = typeof titleOrOptions === 'object' && titleOrOptions !== null
+        ? titleOrOptions
+        : {title: titleOrOptions, limit, offset};
+
     const params = new URLSearchParams();
-    params.set('limit', clampNumber(limit, 1, 50, 20));
-    params.set('offset', clampNumber(offset, 0, 10000, 0));
+    params.set('limit', clampNumber(options.limit, 1, MANGADEX_MAX_LIMIT, 20));
+    params.set('offset', clampNumber(options.offset, 0, 10000, 0));
     params.append('includes[]', 'cover_art');
     params.append('contentRating[]', 'safe');
     params.append('contentRating[]', 'suggestive');
     params.set('order[latestUploadedChapter]', 'desc');
 
-    if (title && title.trim()) {
-        params.set('title', title.trim());
+    const searchTitle = options.title || '';
+    if (searchTitle && searchTitle.trim()) {
+        params.set('title', searchTitle.trim());
     }
 
     try {
@@ -80,20 +88,24 @@ async function getMangaDetail(mangaId) {
     }
 }
 
-async function getMangaChapters(mangaId, {limit = 50, offset = 0, language = 'en'} = {}) {
+async function getMangaChapters(mangaId, {limit = 100, offset = 0, language = DEFAULT_TRANSLATED_LANGUAGE} = {}) {
     if (!mangaId || !mangaId.trim()) {
         throw createHttpError(400, 'Thiếu mangaId');
     }
 
     const params = new URLSearchParams();
-    params.set('limit', clampNumber(limit, 1, 100, 50));
+    const selectedLanguage = language && String(language).trim()
+        ? String(language).trim()
+        : DEFAULT_TRANSLATED_LANGUAGE;
+
+    params.set('limit', clampNumber(limit, 1, 100, 100));
     params.set('offset', clampNumber(offset, 0, 10000, 0));
-    params.append('translatedLanguage[]', language || 'en');
+    params.append('translatedLanguage[]', selectedLanguage);
     params.set('order[chapter]', 'asc');
 
     try {
         const response = await mangadexClient.get(`/manga/${mangaId}/feed`, {params});
-        return (response.data.data || []).map(mapChapterSummary);
+        return (response.data.data || []).map((item) => mapChapterSummary(item, mangaId));
     } catch (error) {
         throw normalizeMangaDexError(error, 'Không thể lấy danh sách chapter từ MangaDex');
     }
@@ -170,6 +182,11 @@ function mapMangaSummary(item) {
         title: pickLocalizedText(attributes.title) || 'Chưa có tên',
         description: shortenText(pickLocalizedText(attributes.description), 180),
         coverUrl: buildCoverUrl(item),
+        status: attributes.status || '',
+        year: attributes.year || null,
+        tags: mapTags(attributes.tags),
+        contentRating: attributes.contentRating || '',
+        availableTranslatedLanguages: attributes.availableTranslatedLanguages || [],
         latestChapter: attributes.latestUploadedChapter ? 'Mới cập nhật' : ''
     };
 }
@@ -183,15 +200,19 @@ function mapMangaDetail(item) {
         coverUrl: buildCoverUrl(item),
         status: attributes.status || '',
         year: attributes.year || null,
-        tags: (attributes.tags || []).map((tag) => pickLocalizedText(tag.attributes && tag.attributes.name)).filter(Boolean)
+        tags: mapTags(attributes.tags),
+        contentRating: attributes.contentRating || '',
+        availableTranslatedLanguages: attributes.availableTranslatedLanguages || []
     };
 }
 
-function mapChapterSummary(item) {
+function mapChapterSummary(item, fallbackMangaId = '') {
     const attributes = item.attributes || {};
     const chapterNumber = attributes.chapter || '';
+    const mangaRelation = (item.relationships || []).find((relation) => relation.type === 'manga');
     return {
         chapterId: item.id,
+        mangaId: mangaRelation ? mangaRelation.id : fallbackMangaId,
         chapterName: attributes.title || (chapterNumber ? `Chapter ${chapterNumber}` : 'Chapter'),
         chapterNumber,
         language: attributes.translatedLanguage || '',
@@ -216,12 +237,23 @@ function buildCoverUrl(item) {
     const cover = (item.relationships || []).find((relation) => relation.type === 'cover_art');
     const fileName = cover && cover.attributes && cover.attributes.fileName;
     if (!fileName) return '';
-    return `https://uploads.mangadex.org/covers/${item.id}/${fileName}.256.jpg`;
+    return `${MANGADEX_UPLOADS_BASE_URL}/covers/${item.id}/${fileName}`;
 }
 
-function pickLocalizedText(values) {
+function mapTags(tags) {
+    return (tags || [])
+        .map((tag) => pickLocalizedText(tag.attributes && tag.attributes.name))
+        .filter(Boolean);
+}
+
+function pickLocalizedText(values, preferredLanguage = DEFAULT_TRANSLATED_LANGUAGE) {
     if (!values || typeof values !== 'object') return '';
-    return values.vi || values.en || values['en-us'] || Object.values(values).find(Boolean) || '';
+    return values[preferredLanguage]
+        || values.en
+        || values['en-us']
+        || values.vi
+        || Object.values(values).find(Boolean)
+        || '';
 }
 
 function shortenText(value, maxLength) {
@@ -243,11 +275,19 @@ function normalizeMangaDexError(error, fallbackMessage) {
         return createHttpError(statusCode, message);
     }
 
-    if (error.code === 'ECONNABORTED') {
+    if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT') {
         return createHttpError(504, 'MangaDex API timeout');
     }
 
+    if (error.request || ['ENOTFOUND', 'ECONNRESET', 'ECONNREFUSED', 'EAI_AGAIN'].includes(error.code)) {
+        return createHttpError(503, 'Không kết nối được MangaDex API');
+    }
+
     return createHttpError(503, fallbackMessage);
+}
+
+function trimTrailingSlash(value) {
+    return String(value || '').replace(/\/+$/, '');
 }
 
 function createHttpError(statusCode, message) {
