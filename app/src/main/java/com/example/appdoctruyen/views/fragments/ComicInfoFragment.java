@@ -52,7 +52,6 @@ public class ComicInfoFragment extends Fragment {
         return fragment;
     }
 
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,10 +62,11 @@ public class ComicInfoFragment extends Fragment {
         mangaRepository = new MangaRepository();
     }
 
-    @SuppressLint({"WrongViewCast", "MissingInflatedId"})
+    @SuppressLint({ "WrongViewCast", "MissingInflatedId" })
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_comic_info, container, false);
 
         try {
@@ -82,9 +82,10 @@ public class ComicInfoFragment extends Fragment {
             tvLikes = view.findViewById(R.id.tvLikes);
             tvReadMore = view.findViewById(R.id.tvReadMore);
             layoutTags = view.findViewById(R.id.layoutTags);
-    //        layoutRating = view.findViewById(R.id.layoutRating);
+            // layoutRating = view.findViewById(R.id.layoutRating);
 
-            bookshelfDatabaseHelper = new com.example.appdoctruyen.data.database.BookshelfDatabaseHelper(requireContext());
+            bookshelfDatabaseHelper = new com.example.appdoctruyen.data.database.BookshelfDatabaseHelper(
+                    requireContext());
             authManager = new com.example.appdoctruyen.data.firebase.AuthManager();
             String userId = getCurrentUserId();
             if (userId != null && !userId.equals("local_user")) {
@@ -131,14 +132,14 @@ public class ComicInfoFragment extends Fragment {
                         Toast.makeText(getContext(), "Không có ID truyện", Toast.LENGTH_SHORT).show();
                         return;
                     }
-                    
+
                     String curUserId = getCurrentUserId();
                     boolean isCurrentlyBookmarked = "bookmarked".equals(btnBookmark.getTag());
-                    
+
                     String title = mangaInfo != null ? mangaInfo.getTitle() : mangaTitle;
                     String coverUrl = mangaInfo != null ? mangaInfo.getCoverUrl() : null;
                     String latestChapter = mangaInfo != null ? mangaInfo.getLatestChapter() : null;
-                    
+
                     if (isCurrentlyBookmarked) {
                         // Hủy bookmark
                         bookshelfDatabaseHelper.removeBookmark(curUserId, mangaId);
@@ -181,11 +182,13 @@ public class ComicInfoFragment extends Fragment {
                     String title = mangaInfo != null ? mangaInfo.getTitle() : mangaTitle;
                     String coverUrl = mangaInfo != null ? mangaInfo.getCoverUrl() : null;
                     String latestChapter = mangaInfo != null ? mangaInfo.getLatestChapter() : "Chapter 1";
-                    
+
                     // Giả lập lưu truyện tải xuống
-                    bookshelfDatabaseHelper.addDownloadedComic(curUserId, mangaId, "demo-chap", latestChapter, "/storage/emulated/0/Download/comic.zip", title, coverUrl);
+                    bookshelfDatabaseHelper.addDownloadedComic(curUserId, mangaId, "demo-chap", latestChapter,
+                            "/storage/emulated/0/Download/comic.zip", title, coverUrl);
                     if (firebaseHelper != null) {
-                        firebaseHelper.addDownloadedComic(mangaId, "demo-chap", latestChapter, "/storage/emulated/0/Download/comic.zip", title, coverUrl);
+                        firebaseHelper.addDownloadedComic(mangaId, "demo-chap", latestChapter,
+                                "/storage/emulated/0/Download/comic.zip", title, coverUrl);
                     }
                     Toast.makeText(getContext(), "Đã tải xuống " + title, Toast.LENGTH_SHORT).show();
                 });
@@ -245,7 +248,8 @@ public class ComicInfoFragment extends Fragment {
                         tagView.setTextColor(Color.BLACK);
                         tagView.setTextSize(12);
                         tagView.setPadding(24, 16, 24, 16);
-                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                         params.setMargins(0, 0, 32, 0);
                         layoutTags.addView(tagView, params);
                     }
@@ -273,21 +277,22 @@ public class ComicInfoFragment extends Fragment {
             mangaRepository.getGroupDetail(groupId, new MangaRepository.RepositoryCallback<TranslationGroup>() {
                 @Override
                 public void onSuccess(TranslationGroup group) {
-                    if (!isAdded() || getContext() == null) return;
+                    if (!isAdded() || getContext() == null)
+                        return;
                     launchGroupDetailActivity(group);
                 }
 
                 @Override
                 public void onError(String message) {
-                    if (!isAdded() || getContext() == null) return;
+                    if (!isAdded() || getContext() == null)
+                        return;
                     // API lỗi → fallback với data có sẵn
                     TranslationGroup fallback = new TranslationGroup(
                             0,
                             groupName != null ? groupName : "Nhóm dịch",
                             "Không có mô tả",
                             R.drawable.placeholder_group,
-                            0, 0, 0
-                    );
+                            0, 0, 0);
                     fallback.setGroupId(groupId);
                     launchGroupDetailActivity(fallback);
                 }
@@ -299,8 +304,7 @@ public class ComicInfoFragment extends Fragment {
                     groupName,
                     "Không có mô tả",
                     R.drawable.placeholder_group,
-                    0, 0, 0
-            );
+                    0, 0, 0);
             launchGroupDetailActivity(fallback);
         } else {
             Toast.makeText(getContext(), "Không có thông tin nhóm dịch", Toast.LENGTH_SHORT).show();
@@ -321,44 +325,50 @@ public class ComicInfoFragment extends Fragment {
     }
 
     private String getCurrentUserId() {
-        if (authManager == null) return "local_user";
+        if (authManager == null)
+            return "local_user";
         String userId = authManager.getCurrentUserId();
         return userId != null ? userId : "local_user";
     }
 
     private void checkBookmarkStatus() {
-        if (mangaId == null || mangaId.isEmpty()) return;
-        
+        if (mangaId == null || mangaId.isEmpty())
+            return;
+
         String userId = getCurrentUserId();
-        
+
         // 1. Kiểm tra SQLite local trước
         boolean localBookmarked = bookshelfDatabaseHelper.isBookmarked(userId, mangaId);
         updateBookmarkIcon(localBookmarked);
-        
-        // 2. Nếu đã đăng nhập Firebase, đồng bộ trạng thái từ Firebase về SQLite local nếu có lệch
-        if (firebaseHelper != null) {
-            firebaseHelper.getBookmarks(new com.example.appdoctruyen.data.firebase.BookshelfFirebaseHelper.BookshelfCallback() {
-                @Override
-                public void onSuccess(java.util.List<Comic> comics) {
-                    if (!isAdded()) return;
-                    boolean remoteBookmarked = false;
-                    for (Comic c : comics) {
-                        if (mangaId.equals(c.getMangaId())) {
-                            remoteBookmarked = true;
-                            break;
-                        }
-                    }
-                    if (remoteBookmarked && !localBookmarked) {
-                        String title = mangaInfo != null ? mangaInfo.getTitle() : mangaTitle;
-                        String coverUrl = mangaInfo != null ? mangaInfo.getCoverUrl() : null;
-                        bookshelfDatabaseHelper.addBookmark(userId, mangaId, title, coverUrl);
-                        updateBookmarkIcon(true);
-                    }
-                }
 
-                @Override
-                public void onFailure(String errorMessage) {}
-            });
+        // 2. Nếu đã đăng nhập Firebase, đồng bộ trạng thái từ Firebase về SQLite local
+        // nếu có lệch
+        if (firebaseHelper != null) {
+            firebaseHelper.getBookmarks(
+                    new com.example.appdoctruyen.data.firebase.BookshelfFirebaseHelper.BookshelfCallback() {
+                        @Override
+                        public void onSuccess(java.util.List<Comic> comics) {
+                            if (!isAdded())
+                                return;
+                            boolean remoteBookmarked = false;
+                            for (Comic c : comics) {
+                                if (mangaId.equals(c.getMangaId())) {
+                                    remoteBookmarked = true;
+                                    break;
+                                }
+                            }
+                            if (remoteBookmarked && !localBookmarked) {
+                                String title = mangaInfo != null ? mangaInfo.getTitle() : mangaTitle;
+                                String coverUrl = mangaInfo != null ? mangaInfo.getCoverUrl() : null;
+                                bookshelfDatabaseHelper.addBookmark(userId, mangaId, title, coverUrl);
+                                updateBookmarkIcon(true);
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(String errorMessage) {
+                        }
+                    });
         }
     }
 

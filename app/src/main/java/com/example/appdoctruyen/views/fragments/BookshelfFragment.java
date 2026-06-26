@@ -121,9 +121,6 @@ public class BookshelfFragment extends Fragment {
         
         // 1. Load local SQLite data first for instant UI response
         List<Comic> localComics = bookshelfDatabaseHelper.getBookmarks(userId);
-        if (localComics.isEmpty()) {
-            localComics = createSampleFollowedComics();
-        }
         if (isAdded()) {
             adapter.updateList(localComics);
             updateEmptyState(localComics, 0);
@@ -307,23 +304,7 @@ public class BookshelfFragment extends Fragment {
         startActivity(intent);
     }
 
-    private List<Comic> createSampleFollowedComics() {
-        List<Comic> list = new ArrayList<>();
-        list.add(createDemoComic(1, "Bất bại chân ma", "Chapter 312"));
-        list.add(createDemoComic(2, "Ta không muốn...", "Chapter 251"));
-        list.add(createDemoComic(3, "Vạn cổ chí tôn", "Chapter 541"));
-        list.add(createDemoComic(4, "Người chơi khô...", "Chapter 95"));
-        list.add(createDemoComic(5, "Hảo đồ nhi hãy...", "Chapter 214"));
-        list.add(createDemoComic(6, "Cung quỷ kiếm...", "Chapter 251"));
-        return list;
-    }
 
-
-    private Comic createDemoComic(int id, String title, String latestChapter) {
-        Comic comic = new Comic(id, title, R.drawable.placeholder_comic, latestChapter);
-        comic.setMangaId("demo-manga-" + id);
-        return comic;
-    }
 
     private String resolveMangaId(Comic comic) {
         if (comic.getMangaId() != null && !comic.getMangaId().trim().isEmpty()) {
