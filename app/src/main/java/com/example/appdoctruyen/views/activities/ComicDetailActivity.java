@@ -86,7 +86,7 @@ public class ComicDetailActivity extends AppCompatActivity {
                 public void onSuccess(List<Chapter> chapters) {
                     if (chapters != null && !chapters.isEmpty() && !isFinishing()) {
                         BookshelfDatabaseHelper dbHelper = new BookshelfDatabaseHelper(ComicDetailActivity.this);
-                        AuthManager authManager = new AuthManager();
+                        AuthManager authManager = new AuthManager(ComicDetailActivity.this);
                         String userId = authManager.getCurrentUserId();
                         if (userId == null) userId = "local_user";
 
