@@ -40,8 +40,8 @@ public class GroupDetailActivity extends AppCompatActivity {
         int followerCount = getIntent().getIntExtra("group_follower_count", 0);
         int avatarResId = getIntent().getIntExtra("group_avatar_res_id", 0);
 
-        tvName.setText(name != null ? name : getString(R.string.group_default_name));
-        tvDescription.setText(description != null ? description : getString(R.string.group_default_description));
+        tvName.setText(!isBlank(name) ? name : getString(R.string.group_default_name));
+        tvDescription.setText(!isBlank(description) ? description : getString(R.string.group_default_description));
         tvComicCount.setText(String.valueOf(comicCount));
         tvMemberCount.setText(String.valueOf(memberCount));
         tvFollowerCount.setText(String.valueOf(followerCount));
@@ -81,5 +81,9 @@ public class GroupDetailActivity extends AppCompatActivity {
                 // Giữ data từ intent, không cần báo lỗi
             }
         });
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
     }
 }

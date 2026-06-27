@@ -1,7 +1,7 @@
 {
   "name": "appdoctruyen-mangadex-backend",
   "version": "1.0.0",
-  "description": "RESTful Web Service Node.js cho Android AppDocTruyen, lay du lieu tu MangaDex API.",
+  "description": "RESTful Web Service Node.js cho Android AppDocTruyen, lấy dữ liệu từ MangaDex API.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

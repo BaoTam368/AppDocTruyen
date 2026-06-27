@@ -8,6 +8,7 @@ public class TranslationGroup {
     private String description;
     private int avatarResId;
     private String avatarUrl;
+    private String website;
     private int comicCount;
     private int memberCount;
     private int followerCount;
@@ -100,6 +101,14 @@ public class TranslationGroup {
 
     public void setAvatarUrl(String avatarUrl) {
         this.avatarUrl = avatarUrl;
+    }
+
+    public String getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
     }
 
     public int getComicCount() {

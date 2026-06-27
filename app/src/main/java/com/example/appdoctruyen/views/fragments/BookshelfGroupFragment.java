@@ -1,10 +1,12 @@
 package com.example.appdoctruyen.views.fragments;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -34,7 +36,6 @@ public class BookshelfGroupFragment extends Fragment {
     private MangaRepository mangaRepository;
     private List<TranslationGroup> groupSource = new ArrayList<>();
 
-    // Tab hiện tại (0 = Tất Cả, 1 = Nổi Tiếng, 2 = Số Truyện)
     private int currentTab = 0;
 
     @Nullable
@@ -63,15 +64,15 @@ public class BookshelfGroupFragment extends Fragment {
         recyclerViewRanking.setAdapter(rankingAdapter);
 
         setupTabListeners();
-        groupSource = createSampleGroups();
         selectTab(0);
         loadGroupsFromApi();
 
         return view;
     }
 
-    // Truyền dữ liệu nhóm dịch sang màn chi tiết bằng Intent
     private void openGroupDetail(TranslationGroup group) {
+        if (group == null) return;
+
         Intent intent = new Intent(requireContext(), GroupDetailActivity.class);
         intent.putExtra("group_id", group.getGroupId());
         intent.putExtra("group_name", group.getName());
@@ -85,7 +86,6 @@ public class BookshelfGroupFragment extends Fragment {
         startActivity(intent);
     }
 
-    // Gắn sự kiện cho các tab nhóm dịch: Tất cả, Nổi tiếng, Số truyện
     private void setupTabListeners() {
         tabAll.setOnClickListener(v -> selectTab(0));
         tabFamous.setOnClickListener(v -> selectTab(1));
@@ -93,19 +93,19 @@ public class BookshelfGroupFragment extends Fragment {
     }
 
     private void loadGroupsFromApi() {
-        mangaRepository.getGroups(new MangaRepository.RepositoryCallback<List<TranslationGroup>>() {
+        mangaRepository.getGroups(50, 0, new MangaRepository.RepositoryCallback<List<TranslationGroup>>() {
             @Override
             public void onSuccess(List<TranslationGroup> groups) {
-                if (!isAdded() || groups == null || groups.isEmpty()) {
-                    return;
-                }
-                groupSource = groups;
+                if (!isAdded()) return;
+                groupSource = groups != null ? groups : new ArrayList<>();
                 selectTab(currentTab);
             }
 
             @Override
             public void onError(String message) {
-                // Nếu backend chưa chạy hoặc /api/groups lỗi thì giữ dữ liệu demo local để demo.
+                if (!isAdded()) return;
+                groupSource = new ArrayList<>();
+                selectTab(currentTab);
             }
         });
     }
@@ -125,13 +125,13 @@ public class BookshelfGroupFragment extends Fragment {
                 tabFamous.setBackgroundResource(R.drawable.bg_tab_selected);
                 tabFamous.setTextColor(getResources().getColor(R.color.white, null));
                 tabFamous.setTypeface(null, android.graphics.Typeface.BOLD);
-                showRankingGroups(sortGroupsForTab(1));
+                showRankingGroups(groupsForFamousTab());
                 break;
             case 2:
                 tabComicCount.setBackgroundResource(R.drawable.bg_tab_selected);
                 tabComicCount.setTextColor(getResources().getColor(R.color.white, null));
                 tabComicCount.setTypeface(null, android.graphics.Typeface.BOLD);
-                showGridGroups(sortGroupsForTab(2));
+                showGridGroups(groupsForComicCountTab());
                 break;
             default:
                 showGridGroups(new ArrayList<>());
@@ -139,45 +139,68 @@ public class BookshelfGroupFragment extends Fragment {
         }
     }
 
-    private List<TranslationGroup> sortGroupsForTab(int tabIndex) {
-        // Sắp xếp danh sách nhóm dịch theo tab đang chọn.
+    private List<TranslationGroup> groupsForFamousTab() {
         List<TranslationGroup> sorted = new ArrayList<>(groupSource);
-        if (tabIndex == 1) {
-            Collections.sort(sorted, (g1, g2) -> g2.getFollowerCount() - g1.getFollowerCount());
-        } else if (tabIndex == 2) {
-            Collections.sort(sorted, (g1, g2) -> g2.getComicCount() - g1.getComicCount());
+        if (hasPositiveMemberCount(sorted)) {
+            Collections.sort(sorted, (g1, g2) -> g2.getMemberCount() - g1.getMemberCount());
         }
         assignRanks(sorted);
         return sorted;
     }
 
+    private List<TranslationGroup> groupsForComicCountTab() {
+        List<TranslationGroup> sorted = new ArrayList<>(groupSource);
+        if (hasPositiveComicCount(sorted)) {
+            Collections.sort(sorted, (g1, g2) -> g2.getComicCount() - g1.getComicCount());
+        }
+        return sorted;
+    }
+
+    private boolean hasPositiveMemberCount(List<TranslationGroup> groups) {
+        for (TranslationGroup group : groups) {
+            if (group != null && group.getMemberCount() > 0) return true;
+        }
+        return false;
+    }
+
+    private boolean hasPositiveComicCount(List<TranslationGroup> groups) {
+        for (TranslationGroup group : groups) {
+            if (group != null && group.getComicCount() > 0) return true;
+        }
+        return false;
+    }
+
     private void showGridGroups(List<TranslationGroup> groups) {
+        List<TranslationGroup> safeGroups = groups != null ? groups : new ArrayList<>();
         recyclerViewRanking.setVisibility(View.GONE);
         rankingAdapter.updateList(new ArrayList<>());
 
-        if (groups.isEmpty()) {
+        if (safeGroups.isEmpty()) {
             recyclerViewGrid.setVisibility(View.GONE);
+            gridAdapter.updateList(new ArrayList<>());
             tvEmpty.setVisibility(View.VISIBLE);
             tvEmpty.setText(R.string.group_empty);
         } else {
             recyclerViewGrid.setVisibility(View.VISIBLE);
             tvEmpty.setVisibility(View.GONE);
-            gridAdapter.updateList(groups);
+            gridAdapter.updateList(safeGroups);
         }
     }
 
     private void showRankingGroups(List<TranslationGroup> groups) {
+        List<TranslationGroup> safeGroups = groups != null ? groups : new ArrayList<>();
         recyclerViewGrid.setVisibility(View.GONE);
         gridAdapter.updateList(new ArrayList<>());
 
-        if (groups.isEmpty()) {
+        if (safeGroups.isEmpty()) {
             recyclerViewRanking.setVisibility(View.GONE);
+            rankingAdapter.updateList(new ArrayList<>());
             tvEmpty.setVisibility(View.VISIBLE);
             tvEmpty.setText(R.string.group_empty);
         } else {
             recyclerViewRanking.setVisibility(View.VISIBLE);
             tvEmpty.setVisibility(View.GONE);
-            rankingAdapter.updateList(groups);
+            rankingAdapter.updateList(safeGroups);
         }
     }
 
@@ -195,27 +218,11 @@ public class BookshelfGroupFragment extends Fragment {
         tabComicCount.setTypeface(null, android.graphics.Typeface.NORMAL);
     }
 
-    // DỮ LIỆU MẪU
-    private List<TranslationGroup> createSampleGroups() {
-        List<TranslationGroup> list = new ArrayList<>();
-        list.add(new TranslationGroup(1, "Ánh Dương Team", "Nhóm dịch truyện phiêu lưu và hành động.", R.drawable.placeholder_group, 18, 860, 1450));
-        list.add(new TranslationGroup(2, "Hikari Scan", "Nhóm dịch truyện học đường và đời thường.", R.drawable.placeholder_group, 24, 1240, 2310));
-        list.add(new TranslationGroup(3, "Manga Việt Group", "Nhóm cộng tác dịch nhiều thể loại truyện mới.", R.drawable.placeholder_group, 31, 1750, 2680));
-        list.add(new TranslationGroup(4, "Lam Ngọc Team", "Nhóm dịch truyện lãng mạn và giả tưởng.", R.drawable.placeholder_group, 15, 620, 980));
-        list.add(new TranslationGroup(5, "Sakura Scan", "Nhóm dịch truyện Nhật Bản cập nhật hằng tuần.", R.drawable.placeholder_group, 28, 1325, 2040));
-        list.add(new TranslationGroup(6, "Trăng Non Team", "Nhóm dịch nhỏ tập trung vào truyện mới nổi.", R.drawable.placeholder_group, 9, 410, 720));
-        list.add(new TranslationGroup(7, "Bút Mực Team", "Nhóm dịch truyện hài và đời sống học đường.", R.drawable.placeholder_group, 12, 540, 800));
-        list.add(new TranslationGroup(8, "Lá Xanh Scan", "Nhóm dịch truyện nhẹ nhàng, dễ đọc.", R.drawable.placeholder_group, 20, 930, 1190));
-        list.add(new TranslationGroup(9, "Aster Scan", "Nhóm dịch truyện fantasy và siêu nhiên.", R.drawable.placeholder_group, 26, 1600, 2500));
-        list.add(new TranslationGroup(10, "Vầng Trăng Team", "Nhóm dịch truyện romance và drama.", R.drawable.placeholder_group, 17, 780, 1340));
-        list.add(new TranslationGroup(11, "Nova Comics", "Nhóm dịch truyện hành động và võ thuật.", R.drawable.placeholder_group, 34, 1890, 3100));
-        list.add(new TranslationGroup(12, "Mộc Truyện", "Nhóm dịch truyện ngắn, cập nhật ổn định.", R.drawable.placeholder_group, 11, 360, 640));
-        return list;
-    }
-
     private void assignRanks(List<TranslationGroup> groups) {
         for (int i = 0; i < groups.size(); i++) {
-            groups.get(i).setRank(i + 1);
+            if (groups.get(i) != null) {
+                groups.get(i).setRank(i + 1);
+            }
         }
     }
 }

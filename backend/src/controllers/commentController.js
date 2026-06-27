@@ -25,7 +25,7 @@ function createComment(req, res, next) {
         res.status(201).json({
             success: true,
             data,
-            message: 'Comment created'
+            message: 'Đã tạo bình luận'
         });
     } catch (error) {
         next(error);
@@ -39,7 +39,7 @@ function updateComment(req, res, next) {
         res.json({
             success: true,
             data,
-            message: 'Comment updated'
+            message: 'Đã cập nhật bình luận'
         });
     } catch (error) {
         next(error);
@@ -53,14 +53,14 @@ function deleteComment(req, res, next) {
         if (!deleted) {
             return res.status(404).json({
                 success: false,
-                message: 'Comment not found'
+                message: 'Không tìm thấy bình luận'
             });
         }
 
         res.json({
             success: true,
             data: null,
-            message: 'Comment deleted'
+            message: 'Đã xóa bình luận'
         });
     } catch (error) {
         next(error);

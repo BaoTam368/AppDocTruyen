@@ -43,11 +43,11 @@ function createComment(payload = {}) {
     const content = normalizeText(payload.content);
 
     if (!mangaId) {
-        throw createHttpError(400, 'Missing mangaId');
+        throw createHttpError(400, 'Thiếu mangaId');
     }
 
     if (!content) {
-        throw createHttpError(400, 'Missing comment content');
+        throw createHttpError(400, 'Thiếu nội dung bình luận');
     }
 
     userService.createOrUpdateUser({ userId });
@@ -65,12 +65,12 @@ function createComment(payload = {}) {
 function updateComment(commentId, payload = {}) {
     const existing = getCommentById(commentId);
     if (!existing) {
-        throw createHttpError(404, 'Comment not found');
+        throw createHttpError(404, 'Không tìm thấy bình luận');
     }
 
     const content = payload.content === undefined ? existing.content : normalizeText(payload.content);
     if (!content) {
-        throw createHttpError(400, 'Missing comment content');
+        throw createHttpError(400, 'Thiếu nội dung bình luận');
     }
 
     const chapterId = hasOwn(payload, 'chapterId')
