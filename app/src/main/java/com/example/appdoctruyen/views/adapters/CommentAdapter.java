@@ -1,4 +1,5 @@
 package com.example.appdoctruyen.views.adapters;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,10 +29,6 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         this.commentList = commentList;
         this.listener = listener;
     }
-//    public CommentAdapter(Context context, List<Comment> commentList) {
-//        this.context = context;
-//        this.commentList = commentList;
-//    }
 
     @NonNull
     @Override
@@ -43,15 +40,23 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
     @Override
     public void onBindViewHolder(@NonNull CommentViewHolder holder, int position) {
         Comment comment = commentList.get(position);
-        holder.tvUsername.setText(comment.getUsername());
-        holder.tvTime.setText(comment.getTime());
-        holder.tvContent.setText(comment.getContent());
-//        holder.tvComicName.setText(comment.getComicName());
+        if (comment == null) return;
+
+        holder.tvUsername.setText(comment.getUsername() != null ? comment.getUsername() : "Unknown");
+        holder.tvTime.setText(comment.getTime() != null ? comment.getTime() : "");
+        holder.tvContent.setText(comment.getContent() != null ? comment.getContent() : "");
 
         Glide.with(context)
                 .load(comment.getAvatarUrl())
                 .placeholder(android.R.drawable.ic_menu_myplaces)
+                .error(android.R.drawable.ic_menu_myplaces)
                 .into(holder.imgAvatar);
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onItemClick(comment, position);
+            }
+        });
     }
 
     @Override
@@ -61,17 +66,15 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
     public static class CommentViewHolder extends RecyclerView.ViewHolder {
         ImageView imgAvatar;
-        TextView tvUsername, tvTime, tvContent, tvNumFavourites;
+        TextView tvUsername, tvTime, tvContent;
 
         public CommentViewHolder(@NonNull View itemView) {
             super(itemView);
+
             imgAvatar = itemView.findViewById(R.id.avatar_cmt);
             tvUsername = itemView.findViewById(R.id.username_cmt);
             tvContent = itemView.findViewById(R.id.content_cmt);
-//            tvComicName = itemView.findViewById(R.id.comic_name);
             tvTime = itemView.findViewById(R.id.time_cmt);
-            tvNumFavourites = itemView.findViewById(R.id.num_favourites);
-
         }
     }
 }

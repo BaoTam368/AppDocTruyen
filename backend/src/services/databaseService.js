@@ -54,11 +54,8 @@ function initializeDatabase() {
         CREATE TABLE IF NOT EXISTS comments (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id TEXT NOT NULL,
-            manga_id TEXT NOT NULL,
-            chapter_id TEXT,
             content TEXT NOT NULL,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            created_at DATETIME DEFAULT (datetime('now', '+7 hours')),
             FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
         );
 
@@ -85,8 +82,6 @@ function initializeDatabase() {
 
         CREATE INDEX IF NOT EXISTS idx_mangas_title ON mangas(title);
         CREATE INDEX IF NOT EXISTS idx_chapters_manga_id ON chapters(manga_id);
-        CREATE INDEX IF NOT EXISTS idx_comments_manga_id ON comments(manga_id);
-        CREATE INDEX IF NOT EXISTS idx_comments_chapter_id ON comments(chapter_id);
         CREATE INDEX IF NOT EXISTS idx_posts_user_id ON posts(user_id);
     `);
 

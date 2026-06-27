@@ -4,6 +4,7 @@ import com.example.appdoctruyen.R;
 import com.example.appdoctruyen.models.Chapter;
 import com.example.appdoctruyen.models.Comic;
 import com.example.appdoctruyen.models.ComicPage;
+import com.example.appdoctruyen.models.Comment;
 import com.example.appdoctruyen.models.TranslationGroup;
 import com.example.appdoctruyen.models.Post;
 import com.example.appdoctruyen.models.User;
@@ -478,6 +479,99 @@ public class MangaRepository {
         return new User(dto.id, dto.userId, dto.displayName, dto.email, dto.avatarUrl, dto.createdAt, dto.updatedAt);
     }
 
+    private Comment mapComment(CommentDto dto) {
+        return new Comment(dto.id, dto.userId, dto.displayName, dto.createdAt, dto.content, dto.avatarUrl);
+    }
+
+    public void getComments(final RepositoryCallback<List<Comment>> callback) {
+        apiService.getComments(null, null).enqueue(new Callback<CommentListResponse>() {
+            @Override
+            public void onResponse(Call<CommentListResponse> call, Response<CommentListResponse> response) {
+                CommentListResponse body = response.body();
+
+                if (response.isSuccessful() && body != null && body.isSuccess()) {
+                    callback.onSuccess(mapCommentList(body.getData()));
+                } else {
+                    callback.onError(readErrorMessage(body, "Không lấy được danh sách bình luận"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CommentListResponse> call, Throwable t) {
+                callback.onError("Không kết nối được Node.js backend");
+            }
+        });
+    }
+
+    public void createComment(CreateCommentRequest request, final RepositoryCallback<Comment> callback) {
+        apiService.createComment(request).enqueue(new Callback<CommentResponse>() {
+            @Override
+            public void onResponse(Call<CommentResponse> call, Response<CommentResponse> response) {
+                CommentResponse body = response.body();
+
+                if (response.isSuccessful() && body != null && body.isSuccess() && body.getData() != null) {
+                    callback.onSuccess(mapComment(body.getData()));
+                } else {
+                    callback.onError(readErrorMessage(body, "Không tạo được bình luận"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CommentResponse> call, Throwable t) {
+                callback.onError("Không kết nối được Node.js backend");
+            }
+        });
+    }
+
+    public void updateComment(int commentId, CreateCommentRequest request, final RepositoryCallback<Comment> callback) {
+        apiService.updateComment(commentId, request).enqueue(new Callback<CommentResponse>() {
+            @Override
+            public void onResponse(Call<CommentResponse> call, Response<CommentResponse> response) {
+                CommentResponse body = response.body();
+
+                if (response.isSuccessful() && body != null && body.isSuccess() && body.getData() != null) {
+                    callback.onSuccess(mapComment(body.getData()));
+                } else {
+                    callback.onError(readErrorMessage(body, "Không cập nhật được bình luận"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CommentResponse> call, Throwable t) {
+                callback.onError("Không kết nối được Node.js backend");
+            }
+        });
+    }
+
+    public void deleteComment(int commentId, final RepositoryCallback<Void> callback) {
+        apiService.deleteComment(commentId).enqueue(new Callback<EmptyResponse>() {
+            @Override
+            public void onResponse(Call<EmptyResponse> call, Response<EmptyResponse> response) {
+                EmptyResponse body = response.body();
+
+                if (response.isSuccessful() && body != null && body.success) {
+                    callback.onSuccess(null);
+                } else {
+                    callback.onError(readErrorMessage(body, "Không xóa được bình luận"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<EmptyResponse> call, Throwable t) {
+                callback.onError("Không kết nối được Node.js backend");
+            }
+        });
+    }
+
+    private List<Comment> mapCommentList(List<CommentDto> dtoList) {
+        List<Comment> comments = new ArrayList<>();
+        if (dtoList == null) return comments;
+        for (CommentDto dto : dtoList) {
+            comments.add(mapComment(dto));
+        }
+        return comments;
+    }
+
     public void getUserProfile(String userId, RepositoryCallback<com.example.appdoctruyen.models.User> callback) {
         apiService.getUser(userId).enqueue(new retrofit2.Callback<UserResponse>() {
 
@@ -498,6 +592,7 @@ public class MangaRepository {
             }
         });
     }
+
     public void toggleLikePost(int postId, String userId, final RepositoryCallback<LikeResponse> callback) {
         LikeDto request = new LikeDto(userId);
 
