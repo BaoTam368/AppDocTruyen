@@ -37,13 +37,13 @@ async function searchManga(titleOrOptions = '', limit = 20, offset = 0) {
         const response = await mangadexClient.get('/manga', {params});
         return (response.data.data || []).map(mapMangaSummary);
     } catch (error) {
-        throw normalizeMangaDexError(error, 'Khong the lay danh sach truyen tu MangaDex');
+        throw normalizeMangaDexError(error, 'Không thể lấy danh sách truyện từ MangaDex');
     }
 }
 
 async function getMangaDetail(mangaId) {
     if (!mangaId || !mangaId.trim()) {
-        throw createHttpError(400, 'Thieu mangaId');
+        throw createHttpError(400, 'Thiếu mangaId');
     }
 
     const params = new URLSearchParams();
@@ -52,18 +52,18 @@ async function getMangaDetail(mangaId) {
     try {
         const response = await mangadexClient.get(`/manga/${mangaId}`, {params});
         if (!response.data.data) {
-            throw createHttpError(404, 'Khong tim thay truyen');
+            throw createHttpError(404, 'Không tìm thấy truyện');
         }
         return mapMangaDetail(response.data.data);
     } catch (error) {
         if (error.statusCode) throw error;
-        throw normalizeMangaDexError(error, 'Khong the lay chi tiet truyen tu MangaDex');
+        throw normalizeMangaDexError(error, 'Không thể lấy chi tiết truyện từ MangaDex');
     }
 }
 
 async function getMangaChapters(mangaId, {limit = 100, offset = 0, language = DEFAULT_TRANSLATED_LANGUAGE} = {}) {
     if (!mangaId || !mangaId.trim()) {
-        throw createHttpError(400, 'Thieu mangaId');
+        throw createHttpError(400, 'Thiếu mangaId');
     }
 
     const params = new URLSearchParams();
@@ -80,20 +80,20 @@ async function getMangaChapters(mangaId, {limit = 100, offset = 0, language = DE
         const response = await mangadexClient.get(`/manga/${mangaId}/feed`, {params});
         return (response.data.data || []).map((item) => mapChapterSummary(item, mangaId));
     } catch (error) {
-        throw normalizeMangaDexError(error, 'Khong the lay danh sach chapter tu MangaDex');
+        throw normalizeMangaDexError(error, 'Không thể lấy danh sách chapter từ MangaDex');
     }
 }
 
 async function getChapterPages(chapterId) {
     if (!chapterId || !chapterId.trim()) {
-        throw createHttpError(400, 'Thieu chapterId');
+        throw createHttpError(400, 'Thiếu chapterId');
     }
 
     try {
         const response = await mangadexClient.get(`/at-home/server/${chapterId}`);
         const chapter = response.data.chapter;
         if (!chapter || !chapter.hash || !Array.isArray(chapter.data)) {
-            throw createHttpError(404, 'Khong tim thay anh cua chapter');
+            throw createHttpError(404, 'Không tìm thấy ảnh của chapter');
         }
 
         return {
@@ -104,7 +104,7 @@ async function getChapterPages(chapterId) {
         };
     } catch (error) {
         if (error.statusCode) throw error;
-        throw normalizeMangaDexError(error, 'Khong the lay anh doc truyen tu MangaDex');
+        throw normalizeMangaDexError(error, 'Không thể lấy ảnh đọc truyện từ MangaDex');
     }
 }
 
@@ -121,7 +121,7 @@ async function getGroups({limit = 50, offset = 0, name = ''} = {}) {
         const response = await mangadexClient.get('/group', {params});
         return (response.data.data || []).map(mapGroupSummary);
     } catch (error) {
-        throw normalizeMangaDexError(error, 'Khong the lay danh sach nhom dich tu MangaDex');
+        throw normalizeMangaDexError(error, 'Không thể lấy danh sách nhóm dịch từ MangaDex');
     }
 }
 
@@ -131,18 +131,18 @@ async function searchGroups(name, {limit = 50, offset = 0} = {}) {
 
 async function getGroupDetail(groupId) {
     if (!groupId || !groupId.trim()) {
-        throw createHttpError(400, 'Thieu groupId');
+        throw createHttpError(400, 'Thiếu groupId');
     }
 
     try {
         const response = await mangadexClient.get(`/group/${groupId}`);
         if (!response.data.data) {
-            throw createHttpError(404, 'Khong tim thay nhom dich');
+            throw createHttpError(404, 'Không tìm thấy nhóm dịch');
         }
         return mapGroupSummary(response.data.data);
     } catch (error) {
         if (error.statusCode) throw error;
-        throw normalizeMangaDexError(error, 'Khong the lay chi tiet nhom dich tu MangaDex');
+        throw normalizeMangaDexError(error, 'Không thể lấy chi tiết nhóm dịch từ MangaDex');
     }
 }
 
@@ -150,7 +150,7 @@ function mapMangaSummary(item) {
     const attributes = item.attributes || {};
     return {
         mangaId: item.id,
-        title: pickLocalizedText(attributes.title) || 'Chua co ten',
+        title: pickLocalizedText(attributes.title) || 'Chưa có tên',
         description: shortenText(pickLocalizedText(attributes.description), 180),
         coverUrl: buildCoverUrl(item),
         status: attributes.status || '',
@@ -158,7 +158,7 @@ function mapMangaSummary(item) {
         tags: mapTags(attributes.tags),
         contentRating: attributes.contentRating || '',
         availableTranslatedLanguages: attributes.availableTranslatedLanguages || [],
-        latestChapter: attributes.latestUploadedChapter ? 'Moi cap nhat' : ''
+        latestChapter: attributes.latestUploadedChapter ? 'Mới cập nhật' : ''
     };
 }
 
@@ -166,7 +166,7 @@ function mapMangaDetail(item) {
     const attributes = item.attributes || {};
     return {
         mangaId: item.id,
-        title: pickLocalizedText(attributes.title) || 'Chua co ten',
+        title: pickLocalizedText(attributes.title) || 'Chưa có tên',
         description: pickLocalizedText(attributes.description) || '',
         coverUrl: buildCoverUrl(item),
         status: attributes.status || '',
@@ -249,11 +249,11 @@ function normalizeMangaDexError(error, fallbackMessage) {
     }
 
     if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT') {
-        return createHttpError(504, 'MangaDex API timeout');
+        return createHttpError(504, 'Hết thời gian chờ MangaDex API');
     }
 
     if (error.request || ['ENOTFOUND', 'ECONNRESET', 'ECONNREFUSED', 'EAI_AGAIN'].includes(error.code)) {
-        return createHttpError(503, 'Khong ket noi duoc MangaDex API');
+        return createHttpError(503, 'Không kết nối được MangaDex API');
     }
 
     return createHttpError(503, fallbackMessage);

@@ -20,7 +20,7 @@ app.use(express.json());
 app.get('/api/health', (req, res) => {
     res.json({
         success: true,
-        message: 'Node.js MangaDex service is running'
+        message: 'Dịch vụ Node.js MangaDex đang chạy'
     });
 });
 

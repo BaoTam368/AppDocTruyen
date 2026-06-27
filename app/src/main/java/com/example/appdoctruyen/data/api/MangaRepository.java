@@ -163,13 +163,13 @@ public class MangaRepository {
                 if (response.isSuccessful() && body != null && body.success) {
                     callback.onSuccess(mapGroupList(body.data));
                 } else {
-                    callback.onError(readErrorMessage(body, "KhÃ´ng tÃ¬m tháº¥y nhÃ³m dá»‹ch"));
+                    callback.onError(readErrorMessage(body, "Không tìm thấy nhóm dịch"));
                 }
             }
 
             @Override
             public void onFailure(Call<GroupListResponse> call, Throwable throwable) {
-                callback.onError("KhÃ´ng káº¿t ná»‘i Ä‘Æ°á»£c Node.js backend");
+                callback.onError("Không kết nối được Node.js backend");
             }
         });
     }
