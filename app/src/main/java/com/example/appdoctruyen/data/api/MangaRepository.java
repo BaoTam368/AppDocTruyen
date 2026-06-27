@@ -5,6 +5,8 @@ import com.example.appdoctruyen.models.Chapter;
 import com.example.appdoctruyen.models.Comic;
 import com.example.appdoctruyen.models.ComicPage;
 import com.example.appdoctruyen.models.TranslationGroup;
+import com.example.appdoctruyen.models.Post;
+import com.example.appdoctruyen.models.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +23,7 @@ public class MangaRepository {
         apiService = ApiClient.getMangaApiService();
     }
 
-    public void searchManga(String title, int limit, int offset,
-                            RepositoryCallback<List<Comic>> callback) {
+    public void searchManga(String title, int limit, int offset, RepositoryCallback<List<Comic>> callback) {
         apiService.searchManga(title, limit, offset).enqueue(new Callback<MangaListResponse>() {
             @Override
             public void onResponse(Call<MangaListResponse> call, Response<MangaListResponse> response) {
@@ -274,9 +275,7 @@ public class MangaRepository {
         if (dtoList == null) return chapters;
 
         for (ChapterDto dto : dtoList) {
-            String chapterName = isBlank(dto.chapterName)
-                    ? "Chapter " + (isBlank(dto.chapterNumber) ? "" : dto.chapterNumber)
-                    : dto.chapterName;
+            String chapterName = isBlank(dto.chapterName) ? "Chapter " + (isBlank(dto.chapterNumber) ? "" : dto.chapterNumber) : dto.chapterName;
             chapters.add(new Chapter(dto.chapterId, chapterName.trim(), dto.createdAt, true));
         }
         return chapters;
@@ -296,18 +295,7 @@ public class MangaRepository {
 
     private Comic mapManga(MangaDto dto) {
         String mangaId = dto.mangaId;
-        Comic comic = new Comic(
-                numericIdFromString(mangaId),
-                isBlank(dto.title) ? "Manga " + mangaId : dto.title,
-                R.drawable.placeholder_comic,
-                dto.coverUrl,
-                dto.latestChapter,
-                null,
-                null,
-                dto.description,
-                false,
-                false
-        );
+        Comic comic = new Comic(numericIdFromString(mangaId), isBlank(dto.title) ? "Manga " + mangaId : dto.title, R.drawable.placeholder_comic, dto.coverUrl, dto.latestChapter, null, null, dto.description, false, false);
         comic.setMangaId(mangaId);
         comic.setTags(dto.tags);
         comic.setStatus(dto.status);
@@ -323,15 +311,7 @@ public class MangaRepository {
 
         for (GroupDto dto : dtoList) {
             int comicCount = dto.comicCount > 0 ? dto.comicCount : dto.mangaCount;
-            TranslationGroup group = new TranslationGroup(
-                    numericIdFromString(dto.groupId),
-                    isBlank(dto.name) ? "Nhóm dịch" : dto.name,
-                    dto.description,
-                    R.drawable.placeholder_group,
-                    comicCount,
-                    dto.memberCount,
-                    dto.followerCount
-            );
+            TranslationGroup group = new TranslationGroup(numericIdFromString(dto.groupId), isBlank(dto.name) ? "Nhóm dịch" : dto.name, dto.description, R.drawable.placeholder_group, comicCount, dto.memberCount, dto.followerCount);
             group.setGroupId(dto.groupId);
             group.setWebsite(dto.website);
             group.setAvatarUrl(dto.avatarUrl);
@@ -343,15 +323,7 @@ public class MangaRepository {
 
     private TranslationGroup mapGroup(GroupDto dto) {
         int comicCount = dto.comicCount > 0 ? dto.comicCount : dto.mangaCount;
-        TranslationGroup group = new TranslationGroup(
-                numericIdFromString(dto.groupId),
-                isBlank(dto.name) ? "Nhóm dịch" : dto.name,
-                dto.description,
-                R.drawable.placeholder_group,
-                comicCount,
-                dto.memberCount,
-                dto.followerCount
-        );
+        TranslationGroup group = new TranslationGroup(numericIdFromString(dto.groupId), isBlank(dto.name) ? "Nhóm dịch" : dto.name, dto.description, R.drawable.placeholder_group, comicCount, dto.memberCount, dto.followerCount);
         group.setGroupId(dto.groupId);
         group.setWebsite(dto.website);
         group.setAvatarUrl(dto.avatarUrl);
@@ -384,4 +356,166 @@ public class MangaRepository {
 
         void onError(String message);
     }
+
+    //Dành cho post
+    public void getPosts(RepositoryCallback<List<Post>> callback) {
+        apiService.getPosts(null).enqueue(new Callback<PostListResponse>() {
+            @Override
+            public void onResponse(Call<PostListResponse> call, Response<PostListResponse> response) {
+                PostListResponse body = response.body();
+
+                if (response.isSuccessful() && body != null && body.success) {
+                    callback.onSuccess(mapPostList(body.data));
+                } else {
+                    callback.onError(readErrorMessage(body, "Không lấy được danh sách bài viết"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PostListResponse> call, Throwable t) {
+                callback.onError("Không kết nối được Node.js backend");
+            }
+        });
+    }
+
+    public void getPostsByUser(String userId, RepositoryCallback<List<Post>> callback) {
+        apiService.getPosts(userId).enqueue(new Callback<PostListResponse>() {
+            @Override
+            public void onResponse(Call<PostListResponse> call, Response<PostListResponse> response) {
+                PostListResponse body = response.body();
+
+                if (response.isSuccessful() && body != null && body.success) {
+                    callback.onSuccess(mapPostList(body.data));
+                } else {
+                    callback.onError(readErrorMessage(body, "Không lấy được danh sách bài viết"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PostListResponse> call, Throwable t) {
+                callback.onError("Không kết nối được Node.js backend");
+            }
+        });
+    }
+
+    public void createPost(CreatePostRequest request, RepositoryCallback<Post> callback) {
+        apiService.createPost(request).enqueue(new Callback<PostResponse>() {
+
+            @Override
+            public void onResponse(Call<PostResponse> call, Response<PostResponse> response) {
+                PostResponse body = response.body();
+                android.util.Log.e("API_STATUS", "Mã phản hồi từ Server: " + response.code());
+                if (response.isSuccessful() && body != null && body.success && body.data != null) {
+                    callback.onSuccess(mapPost(body.data));
+                } else {
+                    callback.onError(readErrorMessage(body, "Không tạo được bài viết"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PostResponse> call, Throwable t) {
+                callback.onError("Không kết nối được Node.js backend");
+            }
+        });
+    }
+
+    public void updatePost(int postId, CreatePostRequest request, RepositoryCallback<Post> callback) {
+        apiService.updatePost(postId, request).enqueue(new Callback<PostResponse>() {
+
+            @Override
+            public void onResponse(Call<PostResponse> call, Response<PostResponse> response) {
+                PostResponse body = response.body();
+
+                if (response.isSuccessful() && body != null && body.success && body.data != null) {
+                    callback.onSuccess(mapPost(body.data));
+                } else {
+                    callback.onError(readErrorMessage(body, "Không cập nhật được bài viết"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PostResponse> call, Throwable t) {
+                callback.onError("Không kết nối được Node.js backend");
+            }
+        });
+    }
+
+    public void deletePost(int postId, RepositoryCallback<Void> callback) {
+        apiService.deletePost(postId).enqueue(new Callback<EmptyResponse>() {
+
+            @Override
+            public void onResponse(Call<EmptyResponse> call, Response<EmptyResponse> response) {
+
+                EmptyResponse body = response.body();
+                if (response.isSuccessful() && body != null && body.success) {
+                    callback.onSuccess(null);
+                } else {
+                    callback.onError(readErrorMessage(body, "Không xóa được bài viết"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<EmptyResponse> call, Throwable t) {
+                callback.onError("Không kết nối được Node.js backend");
+            }
+        });
+    }
+
+    private List<Post> mapPostList(List<PostDto> dtoList) {
+        List<Post> posts = new ArrayList<>();
+        if (dtoList == null) return posts;
+        for (PostDto dto : dtoList) {
+            posts.add(mapPost(dto));
+        }
+        return posts;
+    }
+
+    private Post mapPost(PostDto dto) {
+        return new Post(dto.id, dto.userId, dto.displayName, dto.avatarUrl, dto.content, dto.imageUrl, dto.likeCount, dto.createdAt);
+    }
+
+    private User mapUser(UserDto dto) {
+        return new User(dto.id, dto.userId, dto.displayName, dto.email, dto.avatarUrl, dto.createdAt, dto.updatedAt);
+    }
+
+    public void getUserProfile(String userId, RepositoryCallback<com.example.appdoctruyen.models.User> callback) {
+        apiService.getUser(userId).enqueue(new retrofit2.Callback<UserResponse>() {
+
+            @Override
+            public void onResponse(retrofit2.Call<UserResponse> call, retrofit2.Response<UserResponse> response) {
+                UserResponse body = response.body();
+
+                if (response.isSuccessful() && body != null && body.success && body.data != null) {
+                    callback.onSuccess(mapUser(body.data));
+                } else {
+                    callback.onError(readErrorMessage(body, "Không lấy được user"));
+                }
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<UserResponse> call, Throwable t) {
+                callback.onError("Không kết nối được Node.js backend");
+            }
+        });
+    }
+    public void toggleLikePost(int postId, String userId, final RepositoryCallback<LikeResponse> callback) {
+        LikeDto request = new LikeDto(userId);
+
+        apiService.toggleLikePost(postId, request).enqueue(new Callback<LikeResponse>() {
+            @Override
+            public void onResponse(Call<LikeResponse> call, Response<LikeResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    callback.onSuccess(response.body());
+                } else {
+                    callback.onError("Không thể thực hiện tương tác thích");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<LikeResponse> call, Throwable t) {
+                callback.onError("Lỗi kết nối: " + t.getLocalizedMessage());
+            }
+        });
+    }
+
 }

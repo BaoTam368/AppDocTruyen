@@ -29,7 +29,7 @@ public class CommentFragment extends Fragment {
     private RecyclerView rvComments;
     private List<Comment> commentList;
     private CommentAdapter commentAdapter;
-    private Spinner spinnerComic;
+    //    private Spinner spinnerComic;
     private EditText edtComment;
     private ImageButton btnSendComment;
 
@@ -38,10 +38,10 @@ public class CommentFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.list_world_comment, container, false);
         rvComments = view.findViewById(R.id.recyclerViewComment);
-        spinnerComic = view.findViewById(R.id.spinner_comic);
+//        spinnerComic = view.findViewById(R.id.spinner_comic);
         edtComment = view.findViewById(R.id.edt_comment);
         btnSendComment = view.findViewById(R.id.btn_send_comment);
-        setupSpinner();
+//        setupSpinner();
         setupCommentList();
         setupSendButton();
 
@@ -67,9 +67,12 @@ public class CommentFragment extends Fragment {
                 return;
             }
 
-            String comicName = spinnerComic.getSelectedItem().toString();
-            Comment comment = new Comment("Nguyễn Thị Linh", "Vừa xong", content, "https://i.pinimg.com/736x/87/9b/a9/879ba9d3f1cc4821a37c92b0c369fc48.jpg", comicName);
+//            String comicName = spinnerComic.getSelectedItem().toString();
+//            Comment comment = new Comment("Nguyễn Thị Linh", "Vừa xong", content, "https://i.pinimg.com/736x/87/9b/a9/879ba9d3f1cc4821a37c92b0c369fc48.jpg", comicName);
+            Comment comment = new Comment("Nguyễn Thị Linh", "Vừa xong", content, "https://i.pinimg.com/736x/87/9b/a9/879ba9d3f1cc4821a37c92b0c369fc48.jpg");
+
             addComment(comment);
+
             edtComment.setText("");
         });
     }
@@ -84,11 +87,11 @@ public class CommentFragment extends Fragment {
 
         rvComments.setAdapter(commentAdapter);
 
-        addComment(new Comment("Thần Đông", "10 phút trước", "Bộ truyện Tiên Nghịch này ra chương mới cuốn quá đạo hữu ơi!", "https://i.pinimg.com/736x/87/9b/a9/879ba9d3f1cc4821a37c92b0c369fc48.jpg", "..."));
-        addComment(new Comment("Tiêu Đỉnh", "20 phút trước", "Mấy chap VIP sau này cần bao nhiêu xu để mở khóa vậy app?", "https://i.pinimg.com/736x/87/9b/a9/879ba9d3f1cc4821a37c92b0c369fc48.jpg", "..."));
-        addComment(new Comment("Ngã Cật Tây Hồng Thị", "30 phút trước", "Art đẹp, dịch mượt, xứng đáng 5 sao nhen nhóm!", "https://i.pinimg.com/736x/87/9b/a9/879ba9d3f1cc4821a37c92b0c369fc48.jpg", "..."));
-        addComment(new Comment("Đường Gia Tam Thiếu", "120 phút trước", "Có ai biết lịch ra chương cụ thể của bộ này không?", "https://i.pinimg.com/736x/87/9b/a9/879ba9d3f1cc4821a37c92b0c369fc48.jpg", "..."));
-        addComment(new Comment("Nhĩ Căn", "300 phút trước", "Mới nạp 50k vào ví, mở khóa đọc một mạch phê chữ ê kéo dài.", "https://i.pinimg.com/736x/87/9b/a9/879ba9d3f1cc4821a37c92b0c369fc48.jpg", "..."));
+        addComment(new Comment("Thần Đông", "10 phút trước", "Bộ truyện Tiên Nghịch này ra chương mới cuốn quá đạo hữu ơi!", "https://i.pinimg.com/736x/87/9b/a9/879ba9d3f1cc4821a37c92b0c369fc48.jpg"));
+        addComment(new Comment("Tiêu Đỉnh", "20 phút trước", "Mấy chap VIP sau này cần bao nhiêu xu để mở khóa vậy app?", "https://i.pinimg.com/736x/87/9b/a9/879ba9d3f1cc4821a37c92b0c369fc48.jpg"));
+        addComment(new Comment("Ngã Cật Tây Hồng Thị", "30 phút trước", "Art đẹp, dịch mượt, xứng đáng 5 sao nhen nhóm!", "https://i.pinimg.com/736x/87/9b/a9/879ba9d3f1cc4821a37c92b0c369fc48.jpg"));
+        addComment(new Comment("Đường Gia Tam Thiếu", "120 phút trước", "Có ai biết lịch ra chương cụ thể của bộ này không?", "https://i.pinimg.com/736x/87/9b/a9/879ba9d3f1cc4821a37c92b0c369fc48.jpg"));
+        addComment(new Comment("Nhĩ Căn", "300 phút trước", "Mới nạp 50k vào ví, mở khóa đọc một mạch phê chữ ê kéo dài.", "https://i.pinimg.com/736x/87/9b/a9/879ba9d3f1cc4821a37c92b0c369fc48.jpg"));
 
     }
 
@@ -100,20 +103,19 @@ public class CommentFragment extends Fragment {
         rvComments.scrollToPosition(0);
     }
 
-    private void setupSpinner() {
-
-        List<String> comics = new ArrayList<>();
-
-        comics.add("Tiên Nghịch");
-        comics.add("Đấu Phá Thương Khung");
-        comics.add("Nhất Niệm Vĩnh Hằng");
-        comics.add("Phàm Nhân Tu Tiên");
-        comics.add("Vạn Cổ Chí Tôn");
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, comics);
-
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        spinnerComic.setAdapter(adapter);
-    }
+//    private void setupSpinner() {
+//
+//        List<String> comics = new ArrayList<>();
+//
+//        comics.add("Tiên Nghịch");
+//        comics.add("Đấu Phá Thương Khung");
+//        comics.add("Nhất Niệm Vĩnh Hằng");
+//        comics.add("Phàm Nhân Tu Tiên");
+//        comics.add("Vạn Cổ Chí Tôn");
+//
+//        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, comics);
+//
+//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//
+////        spinnerComic.setAdapter(adapter);
 }

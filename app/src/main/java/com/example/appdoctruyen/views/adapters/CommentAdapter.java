@@ -46,7 +46,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         holder.tvUsername.setText(comment.getUsername());
         holder.tvTime.setText(comment.getTime());
         holder.tvContent.setText(comment.getContent());
-        holder.tvComicName.setText(comment.getComicName());
+//        holder.tvComicName.setText(comment.getComicName());
 
         Glide.with(context)
                 .load(comment.getAvatarUrl())
@@ -61,15 +61,17 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
     public static class CommentViewHolder extends RecyclerView.ViewHolder {
         ImageView imgAvatar;
-        TextView tvUsername, tvTime, tvContent, tvComicName;
+        TextView tvUsername, tvTime, tvContent, tvNumFavourites;
 
         public CommentViewHolder(@NonNull View itemView) {
             super(itemView);
             imgAvatar = itemView.findViewById(R.id.avatar_cmt);
             tvUsername = itemView.findViewById(R.id.username_cmt);
             tvContent = itemView.findViewById(R.id.content_cmt);
-            tvComicName = itemView.findViewById(R.id.comic_name);
+//            tvComicName = itemView.findViewById(R.id.comic_name);
             tvTime = itemView.findViewById(R.id.time_cmt);
+            tvNumFavourites = itemView.findViewById(R.id.num_favourites);
+
         }
     }
 }

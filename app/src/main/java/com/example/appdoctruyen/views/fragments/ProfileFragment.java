@@ -40,7 +40,7 @@ public class ProfileFragment extends Fragment {
         iv_user_avatar = view.findViewById(R.id.iv_user_avatar);
         tv_username = view.findViewById(R.id.tv_username);
         tv_user_title = view.findViewById(R.id.tv_user_title);
-        authManager = new AuthManager();
+        authManager = new AuthManager(requireContext());
 
         loadUserInfo();
 

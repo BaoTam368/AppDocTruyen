@@ -1,14 +1,15 @@
 package com.example.appdoctruyen.models;
 
 public class Comment {
-    private String username, time, content, avatarUrl, comicName;
+    private String username, time, content, avatarUrl;
+//            comicName;
 
-    public Comment(String username, String time, String content, String avatarUrl, String comicName) {
+    public Comment(String username, String time, String content, String avatarUrl) {
         this.username = username;
         this.time = time;
         this.content = content;
         this.avatarUrl = avatarUrl;
-        this.comicName = comicName;
+//        this.comicName = comicName;
     }
 
     public String getUsername() {
@@ -43,11 +44,11 @@ public class Comment {
         this.avatarUrl = avatarUrl;
     }
 
-    public String getComicName() {
-        return comicName;
-    }
-
-    public void setComicName(String comicName) {
-        this.comicName = comicName;
-    }
+//    public String getComicName() {
+//        return comicName;
+//    }
+//
+//    public void setComicName(String comicName) {
+//        this.comicName = comicName;
+//    }
 }

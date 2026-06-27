@@ -3,41 +3,54 @@ package com.example.appdoctruyen.models;
 import java.io.Serializable;
 
 public class Post implements Serializable {
-    private String username, time, caption, avatarUrl, imageUrl;
-    private int numLikes, numComments;
+//    private String username, time, caption, avatarUrl, imageUrl;
+//    private int numLikes;
+//            numComments;
 
-    public Post(String username, String time, String caption, String avatarUrl, String imageUrl, int numLikes, int numComments) {
-        this.username = username;
-        this.time = time;
-        this.caption = caption;
+    private int id;
+    private String userId;
+    private String displayName;
+    private String avatarUrl;
+
+    private String content;
+    private String imageUrl;
+
+    private int likeCount;
+    private String createdAt;
+
+    public Post(int id, String userId, String displayName, String avatarUrl, String content, String imageUrl, int likeCount, String createdAt) {
+        this.id = id;
+        this.userId = userId;
+        this.displayName = displayName;
         this.avatarUrl = avatarUrl;
+        this.content = content;
         this.imageUrl = imageUrl;
-        this.numLikes = numLikes;
-        this.numComments = numComments;
+        this.likeCount = likeCount;
+        this.createdAt = createdAt;
     }
 
-    public String getUsername() {
-        return username;
+    public int getId() {
+        return id;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public String getTime() {
-        return time;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setTime(String time) {
-        this.time = time;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
-    public String getCaption() {
-        return caption;
+    public String getDisplayName() {
+        return displayName;
     }
 
-    public void setCaption(String caption) {
-        this.caption = caption;
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     public String getAvatarUrl() {
@@ -48,6 +61,14 @@ public class Post implements Serializable {
         this.avatarUrl = avatarUrl;
     }
 
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
     public String getImageUrl() {
         return imageUrl;
     }
@@ -56,19 +77,19 @@ public class Post implements Serializable {
         this.imageUrl = imageUrl;
     }
 
-    public int getNumLikes() {
-        return numLikes;
+    public int getLikeCount() {
+        return likeCount;
     }
 
-    public void setNumLikes(int numLikes) {
-        this.numLikes = numLikes;
+    public void setLikeCount(int likeCount) {
+        this.likeCount = likeCount;
     }
 
-    public int getNumComments() {
-        return numComments;
+    public String getCreatedAt() {
+        return createdAt;
     }
 
-    public void setNumComments(int numComments) {
-        this.numComments = numComments;
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
     }
 }
