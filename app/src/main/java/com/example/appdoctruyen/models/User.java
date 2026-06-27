@@ -1,25 +1,37 @@
 package com.example.appdoctruyen.models;
 
 public class User {
-    private int rank;
-    private String name;
-    private int avatar;
 
-    public User(int rank, String name, int avatar) {
-        this.rank = rank;
-        this.name = name;
-        this.avatar = avatar;
+    private int id;
+    private String userId;
+    private String displayName;
+    private String email;
+    private String avatarUrl;
+    private String createdAt;
+    private String updatedAt;
+
+    public User(int id, String userId, String displayName, String email,
+                String avatarUrl, String createdAt, String updatedAt) {
+        this.id = id;
+        this.userId = userId;
+        this.displayName = displayName;
+        this.email = email;
+        this.avatarUrl = avatarUrl;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
-    public int getRank() {
-        return rank;
-    }
+    public int getId() { return id; }
 
-    public String getName() {
-        return name;
-    }
+    public String getUserId() { return userId; }
 
-    public int getAvatar() {
-        return avatar;
-    }
+    public String getDisplayName() { return displayName; }
+
+    public String getEmail() { return email; }
+
+    public String getAvatarUrl() { return avatarUrl; }
+
+    public String getCreatedAt() { return createdAt; }
+
+    public String getUpdatedAt() { return updatedAt; }
 }

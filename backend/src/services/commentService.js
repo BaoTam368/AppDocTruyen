@@ -1,34 +1,24 @@
 const databaseService = require('./databaseService');
 const userService = require('./userService');
 
-function getComments({ mangaId, chapterId, limit = 50, offset = 0 } = {}) {
+function getComments({  limit = 50, offset = 0 } = {}) {
     const database = databaseService.getDatabase();
     const filters = [];
     const params = [];
 
-    if (mangaId) {
-        filters.push('manga_id = ?');
-        params.push(mangaId);
-    }
-
-    if (chapterId) {
-        filters.push('chapter_id = ?');
-        params.push(chapterId);
-    }
-
     const whereClause = filters.length ? `WHERE ${filters.join(' AND ')}` : '';
     const stmt = database.prepare(`
         SELECT
-            id,
-            user_id,
-            manga_id,
-            chapter_id,
-            content,
-            created_at,
-            updated_at
-        FROM comments
+            c.id,
+            c.user_id,
+            c.content,
+            c.created_at,
+            u.display_name,
+            u.avatar_url
+        FROM comments c
+        LEFT JOIN users u ON c.user_id = u.user_id
         ${whereClause}
-        ORDER BY created_at DESC
+        ORDER BY c.created_at DESC
         LIMIT ? OFFSET ?
     `);
 
@@ -37,14 +27,8 @@ function getComments({ mangaId, chapterId, limit = 50, offset = 0 } = {}) {
 }
 
 function createComment(payload = {}) {
-    const userId = normalizeText(payload.userId || payload.user_id || 'local_user');
-    const mangaId = normalizeText(payload.mangaId || payload.manga_id);
-    const chapterId = normalizeNullable(payload.chapterId || payload.chapter_id);
+    const userId = normalizeText(payload.userId || payload.user_id);
     const content = normalizeText(payload.content);
-
-    if (!mangaId) {
-        throw createHttpError(400, 'Thiếu mangaId');
-    }
 
     if (!content) {
         throw createHttpError(400, 'Thiếu nội dung bình luận');
@@ -54,11 +38,11 @@ function createComment(payload = {}) {
 
     const database = databaseService.getDatabase();
     const stmt = database.prepare(`
-        INSERT INTO comments (user_id, manga_id, chapter_id, content, updated_at)
-        VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+        INSERT INTO comments (user_id, content)
+        VALUES (?, ?)
     `);
 
-    const result = stmt.run(userId, mangaId, chapterId, content);
+    const result = stmt.run(userId, content);
     return getCommentById(result.lastInsertRowid);
 }
 
@@ -73,20 +57,14 @@ function updateComment(commentId, payload = {}) {
         throw createHttpError(400, 'Thiếu nội dung bình luận');
     }
 
-    const chapterId = hasOwn(payload, 'chapterId')
-        ? normalizeNullable(payload.chapterId)
-        : hasOwn(payload, 'chapter_id')
-            ? normalizeNullable(payload.chapter_id)
-            : existing.chapterId || null;
-
     const database = databaseService.getDatabase();
     const stmt = database.prepare(`
         UPDATE comments
-        SET chapter_id = ?, content = ?, updated_at = CURRENT_TIMESTAMP
+        SET content = ?
         WHERE id = ?
     `);
 
-    stmt.run(chapterId, content, commentId);
+    stmt.run( content, commentId);
     return getCommentById(commentId);
 }
 
@@ -101,15 +79,15 @@ function getCommentById(commentId) {
     const database = databaseService.getDatabase();
     const stmt = database.prepare(`
         SELECT
-            id,
-            user_id,
-            manga_id,
-            chapter_id,
-            content,
-            created_at,
-            updated_at
-        FROM comments
-        WHERE id = ?
+            c.id,
+            c.user_id,
+            c.content,
+            c.created_at,
+            u.display_name,
+            u.avatar_url
+        FROM comments c
+        LEFT JOIN users u ON c.user_id = u.user_id
+        WHERE c.id = ?
     `);
 
     const row = stmt.get(commentId);
@@ -120,11 +98,10 @@ function mapComment(row) {
     return {
         id: row.id,
         userId: row.user_id,
-        mangaId: row.manga_id,
-        chapterId: row.chapter_id,
         content: row.content,
-        createdAt: row.created_at,
-        updatedAt: row.updated_at
+        created_at: row.created_at,
+        display_name: row.display_name,
+        avatar_url: row.avatar_url
     };
 }
 
@@ -156,6 +133,7 @@ function createHttpError(statusCode, message) {
 module.exports = {
     getComments,
     createComment,
+    getCommentById,
     updateComment,
     deleteComment
 };

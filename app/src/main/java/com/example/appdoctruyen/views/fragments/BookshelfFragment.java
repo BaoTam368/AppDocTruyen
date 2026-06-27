@@ -192,7 +192,7 @@ public class BookshelfFragment extends Fragment {
 
     private String getCurrentUserId() {
         try {
-            AuthManager authManager = new AuthManager();
+            AuthManager authManager = new AuthManager(requireContext());
             String userId = authManager.getCurrentUserId();
             return !isBlank(userId) ? userId : LOCAL_USER_ID;
         } catch (RuntimeException ignored) {

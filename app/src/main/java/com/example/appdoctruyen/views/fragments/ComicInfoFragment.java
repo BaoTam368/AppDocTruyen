@@ -67,7 +67,7 @@ public class ComicInfoFragment extends Fragment {
         }
         mangaRepository = new MangaRepository();
         bookshelfDatabaseHelper = new BookshelfDatabaseHelper(requireContext().getApplicationContext());
-        authManager = new AuthManager();
+        authManager = new AuthManager(requireContext());
         String userId = getCurrentUserId();
         if (userId != null && !userId.equals("local_user")) {
             firebaseHelper = new BookshelfFirebaseHelper(userId);

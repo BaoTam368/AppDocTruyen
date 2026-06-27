@@ -22,7 +22,7 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        authManager = new AuthManager();
+        authManager = new AuthManager(this);
         edtEmailPhone = findViewById(R.id.edt_email_phone);
         edtUsername = findViewById(R.id.edt_username);
         edtPassword = findViewById(R.id.edt_password);

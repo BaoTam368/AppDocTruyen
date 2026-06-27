@@ -4,7 +4,6 @@ function getPosts(req, res, next) {
     try {
         const data = postService.getPosts({
             userId: req.query.userId,
-            mangaId: req.query.mangaId,
             limit: req.query.limit,
             offset: req.query.offset
         });
@@ -87,10 +86,32 @@ function deletePost(req, res, next) {
     }
 }
 
+function toggleLike(req, res, next) {
+    try {
+        const { postId } = req.params;
+        const { userId } = req.body;
+
+        if (!userId) {
+            return res.status(400).json({ success: false, message: 'Thiếu userId' });
+        }
+
+        const result = postService.toggleLikePost(postId, userId);
+        res.json({
+            success: true,
+            liked: result.liked,
+            likeCount: result.likeCount,
+            message: result.liked ? 'Đã tăng 1 like' : 'Đã giảm 1 like'
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
 module.exports = {
     getPosts,
     getPost,
     createPost,
     updatePost,
-    deletePost
+    deletePost,
+    toggleLike
 };
