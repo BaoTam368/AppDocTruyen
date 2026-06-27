@@ -16,6 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.appdoctruyen.R;
 import com.example.appdoctruyen.data.api.MangaRepository;
 import com.example.appdoctruyen.data.database.BookshelfDatabaseHelper;
+import com.example.appdoctruyen.data.firebase.AuthManager;
+import com.example.appdoctruyen.data.firebase.BookshelfFirebaseHelper;
 import com.example.appdoctruyen.models.Comic;
 import com.example.appdoctruyen.views.activities.ComicDetailActivity;
 import com.example.appdoctruyen.views.adapters.BookshelfAdapter;
@@ -61,6 +63,13 @@ public class BookshelfFragment extends Fragment {
         selectTab(0);
 
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        selectTab(currentTab);
+        syncWithFirebase();
     }
 
     @Override
@@ -157,7 +166,7 @@ public class BookshelfFragment extends Fragment {
     private List<Comic> getBookmarksFromDatabase() {
         if (bookshelfDatabaseHelper == null) return new ArrayList<>();
         try {
-            return bookshelfDatabaseHelper.getBookmarks(LOCAL_USER_ID);
+            return bookshelfDatabaseHelper.getBookmarks(getCurrentUserId());
         } catch (RuntimeException ignored) {
             return new ArrayList<>();
         }
@@ -166,7 +175,7 @@ public class BookshelfFragment extends Fragment {
     private List<Comic> getReadingHistoryFromDatabase() {
         if (bookshelfDatabaseHelper == null) return new ArrayList<>();
         try {
-            return bookshelfDatabaseHelper.getReadingHistory(LOCAL_USER_ID);
+            return bookshelfDatabaseHelper.getReadingHistory(getCurrentUserId());
         } catch (RuntimeException ignored) {
             return new ArrayList<>();
         }
@@ -175,10 +184,97 @@ public class BookshelfFragment extends Fragment {
     private List<Comic> getDownloadedComicsFromDatabase() {
         if (bookshelfDatabaseHelper == null) return new ArrayList<>();
         try {
-            return bookshelfDatabaseHelper.getDownloadedComics(LOCAL_USER_ID);
+            return bookshelfDatabaseHelper.getDownloadedComics(getCurrentUserId());
         } catch (RuntimeException ignored) {
             return new ArrayList<>();
         }
+    }
+
+    private String getCurrentUserId() {
+        try {
+            AuthManager authManager = new AuthManager();
+            String userId = authManager.getCurrentUserId();
+            return !isBlank(userId) ? userId : LOCAL_USER_ID;
+        } catch (RuntimeException ignored) {
+            return LOCAL_USER_ID;
+        }
+    }
+
+    private void syncWithFirebase() {
+        String userId = getCurrentUserId();
+        if (LOCAL_USER_ID.equals(userId) || bookshelfDatabaseHelper == null) return;
+
+        BookshelfFirebaseHelper firebaseHelper = new BookshelfFirebaseHelper(userId);
+
+        firebaseHelper.getBookmarks(new BookshelfFirebaseHelper.BookshelfCallback() {
+            @Override
+            public void onSuccess(List<Comic> comics) {
+                if (!isAdded() || comics == null || bookshelfDatabaseHelper == null) return;
+
+                boolean hasNew = false;
+                for (Comic comic : comics) {
+                    if (comic == null || isBlank(comic.getMangaId())) continue;
+                    if (!bookshelfDatabaseHelper.isBookmarked(userId, comic.getMangaId())) {
+                        bookshelfDatabaseHelper.addBookmark(userId, comic);
+                        hasNew = true;
+                    }
+                }
+                if (hasNew && currentTab == 0) {
+                    requireActivity().runOnUiThread(() -> selectTab(0));
+                }
+            }
+
+            @Override
+            public void onFailure(String errorMessage) {
+            }
+        });
+
+        firebaseHelper.getReadingHistory(new BookshelfFirebaseHelper.BookshelfCallback() {
+            @Override
+            public void onSuccess(List<Comic> comics) {
+                if (!isAdded() || comics == null || bookshelfDatabaseHelper == null) return;
+
+                boolean hasNew = false;
+                for (Comic comic : comics) {
+                    if (comic == null || isBlank(comic.getMangaId())) continue;
+                    Comic localHistory = bookshelfDatabaseHelper.getReadingHistoryForManga(userId, comic.getMangaId());
+                    if (localHistory == null || localHistory.getLastReadTime() < comic.getLastReadTime()) {
+                        bookshelfDatabaseHelper.saveReadingHistory(userId, comic);
+                        hasNew = true;
+                    }
+                }
+                if (hasNew && currentTab == 1) {
+                    requireActivity().runOnUiThread(() -> selectTab(1));
+                }
+            }
+
+            @Override
+            public void onFailure(String errorMessage) {
+            }
+        });
+
+        firebaseHelper.getDownloadedComics(new BookshelfFirebaseHelper.BookshelfCallback() {
+            @Override
+            public void onSuccess(List<Comic> comics) {
+                if (!isAdded() || comics == null || bookshelfDatabaseHelper == null) return;
+
+                boolean hasNew = false;
+                for (Comic comic : comics) {
+                    if (comic == null || isBlank(comic.getMangaId())) continue;
+                    if (!bookshelfDatabaseHelper.isDownloaded(userId, comic.getMangaId())) {
+                        bookshelfDatabaseHelper.addDownloadedComic(userId, comic);
+                        hasNew = true;
+                    }
+                }
+                if (hasNew && currentTab == 2) {
+                    requireActivity().runOnUiThread(() -> selectTab(2));
+                }
+            }
+
+            @Override
+            public void onFailure(String errorMessage) {
+            }
+        });
     }
 
     private void enrichMissingComicDetails(List<Comic> comics, int tabIndex) {
@@ -208,6 +304,7 @@ public class BookshelfFragment extends Fragment {
 
     private boolean needsRemoteDetails(Comic comic) {
         return isBlank(comic.getTitle())
+                || "Unknown".equalsIgnoreCase(comic.getTitle())
                 || isBlank(comic.getCoverUrl())
                 || isBlank(comic.getDescription())
                 || isBlank(comic.getStatus())
@@ -233,7 +330,7 @@ public class BookshelfFragment extends Fragment {
     private void cacheRemoteComic(Comic comic) {
         if (bookshelfDatabaseHelper == null || comic == null || isBlank(comic.getMangaId())) return;
         try {
-            bookshelfDatabaseHelper.updateComicCache(LOCAL_USER_ID, comic);
+            bookshelfDatabaseHelper.updateComicCache(getCurrentUserId(), comic);
         } catch (RuntimeException ignored) {
             // Cache refresh failure must not break the bookshelf UI.
         }

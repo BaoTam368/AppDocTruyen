@@ -58,6 +58,11 @@ public class BookshelfDatabaseHelper extends SQLiteOpenHelper {
         ensureComicCacheColumns(db, TABLE_DOWNLOADED);
     }
 
+    @Override
+    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        onUpgrade(db, oldVersion, newVersion);
+    }
+
     private void createTables(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_BOOKMARKS + " (" +
                 COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -266,6 +271,29 @@ public class BookshelfDatabaseHelper extends SQLiteOpenHelper {
         return comics;
     }
 
+    public Comic getReadingHistoryForManga(String userId, String mangaId) {
+        if (isBlank(userId) || isBlank(mangaId)) return null;
+
+        Cursor cursor = getReadableDatabase().query(
+                TABLE_HISTORY,
+                null,
+                userMangaWhere(),
+                new String[]{userId, mangaId},
+                null,
+                null,
+                null
+        );
+
+        try {
+            if (cursor.moveToFirst()) {
+                return readHistoryComic(cursor);
+            }
+        } finally {
+            cursor.close();
+        }
+        return null;
+    }
+
     public long addDownloadedComic(String userId, String mangaId, String chapterId, String chapterName,
                                    String localPath, String titleCache, String coverUrlCache) {
         return addDownloadedComic(userId, mangaId, chapterId, chapterName, localPath, titleCache,
@@ -336,6 +364,35 @@ public class BookshelfDatabaseHelper extends SQLiteOpenHelper {
             cursor.close();
         }
         return comics;
+    }
+
+    public boolean isDownloaded(String userId, String mangaId) {
+        if (isBlank(userId) || isBlank(mangaId)) return false;
+
+        Cursor cursor = getReadableDatabase().query(
+                TABLE_DOWNLOADED,
+                new String[]{COL_ID},
+                COL_USER_ID + " = ? AND " + COL_MANGA_ID + " = ?",
+                new String[]{userId, mangaId},
+                null,
+                null,
+                null
+        );
+
+        try {
+            return cursor.moveToFirst();
+        } finally {
+            cursor.close();
+        }
+    }
+
+    public int removeDownloadedComic(String userId, String mangaId) {
+        if (isBlank(userId) || isBlank(mangaId)) return 0;
+        return getWritableDatabase().delete(
+                TABLE_DOWNLOADED,
+                COL_USER_ID + " = ? AND " + COL_MANGA_ID + " = ?",
+                new String[]{userId, mangaId}
+        );
     }
 
     public void updateComicCache(String userId, Comic comic) {

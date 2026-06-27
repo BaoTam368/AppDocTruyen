@@ -134,4 +134,7 @@
     <string name="group_members_zero">0 thành viên</string>
     <string name="group_rank_number_placeholder">1</string>
     <string name="zero_count">0</string>
+    <string name="facebook_app_id">1682621013065960</string>
+    <string name="fb_login_protocol_scheme">fb1682621013065960</string>
+    <string name="facebook_client_token">785628ce7ef3319bfb100fe2176b5836</string>
 </resources>
