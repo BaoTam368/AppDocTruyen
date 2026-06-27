@@ -303,6 +303,8 @@ public class MangaRepository {
         comic.setYear(dto.year);
         comic.setContentRating(dto.contentRating);
         comic.setAvailableTranslatedLanguages(dto.availableTranslatedLanguages);
+        comic.setViews(dto.views);
+        comic.setLikes(dto.likes);
         return comic;
     }
 

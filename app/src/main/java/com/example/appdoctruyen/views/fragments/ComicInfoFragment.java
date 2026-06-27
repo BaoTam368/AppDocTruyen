@@ -85,7 +85,6 @@ public class ComicInfoFragment extends Fragment {
         tvMangaName = view.findViewById(R.id.tvMangaName);
         tvAuthorName = view.findViewById(R.id.tvAuthorName);
         tvDescription = view.findViewById(R.id.tvDescription);
-        tvViews = view.findViewById(R.id.tvViews);
         tvLikes = view.findViewById(R.id.tvLikes);
         layoutTags = view.findViewById(R.id.layoutTags);
         
@@ -239,10 +238,18 @@ public class ComicInfoFragment extends Fragment {
                 if (tvMangaName != null) {
                     tvMangaName.setText(data.getTitle());
                 }
-                
+
                 if (tvDescription != null) {
                     tvDescription.setText(data.getDescription());
+                    tvDescription.setMaxLines(Integer.MAX_VALUE); // Hiển thị toàn bộ
                 }
+
+                // Ẩn nút "Đọc thêm" vì giờ đã hiện toàn bộ
+                TextView tvReadMore = getView().findViewById(R.id.tvReadMore);
+                if (tvReadMore != null) tvReadMore.setVisibility(View.GONE);
+
+                // Cập nhật Lượt thích
+                if (tvLikes != null) tvLikes.setText(String.valueOf(data.getLikes()));
                 
                 if (tvAuthorName != null) {
                     tvAuthorName.setText("MangaDex");

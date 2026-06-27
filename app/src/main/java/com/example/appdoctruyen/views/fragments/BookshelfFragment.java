@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -20,6 +19,7 @@ import com.example.appdoctruyen.data.firebase.AuthManager;
 import com.example.appdoctruyen.data.firebase.BookshelfFirebaseHelper;
 import com.example.appdoctruyen.models.Comic;
 import com.example.appdoctruyen.views.activities.ComicDetailActivity;
+import com.example.appdoctruyen.views.activities.ComicReadingActivity;
 import com.example.appdoctruyen.views.adapters.BookshelfAdapter;
 
 import java.util.ArrayList;

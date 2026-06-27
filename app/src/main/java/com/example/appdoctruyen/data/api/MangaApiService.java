@@ -166,6 +166,8 @@ class MangaDto {
     List<String> tags;
     String contentRating;
     List<String> availableTranslatedLanguages;
+    int views;
+    int likes;
 }
 
 class ChapterDto {

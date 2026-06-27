@@ -29,6 +29,7 @@ public class ComicDetailActivity extends AppCompatActivity {
     private MaterialButton btnReadChapter;
     private String mangaId;
     private String mangaTitle;
+    private String currentCoverUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,7 +135,7 @@ public class ComicDetailActivity extends AppCompatActivity {
     }
 
     private Chapter findFirstChapter(List<Chapter> chapters) {
-        Chapter firstChapter = chapters.get(chapters.size() - 1);
+        Chapter firstChapter = chapters.get(0);
         for (Chapter ch : chapters) {
             String name = ch.getName().toLowerCase();
             if (name.contains("chapter 1") || name.contains("chương 1") || name.equals("1")) {
@@ -143,5 +144,17 @@ public class ComicDetailActivity extends AppCompatActivity {
             }
         }
         return firstChapter;
+    }
+
+    public String getMangaId() {
+        return mangaId;
+    }
+
+    public String getMangaTitle() {
+        return mangaTitle;
+    }
+
+    public String getCoverUrl() {
+        return currentCoverUrl;
     }
 }
