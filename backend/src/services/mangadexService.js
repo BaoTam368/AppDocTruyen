@@ -54,7 +54,15 @@ async function getMangaDetail(mangaId) {
         if (!response.data.data) {
             throw createHttpError(404, 'Không tìm thấy truyện');
         }
-        return mapMangaDetail(response.data.data);
+
+        let statsData = {};
+        try {
+            const statsRes = await mangadexClient.get(`/statistics/manga/${mangaId}`);
+            statsData = statsRes.data.statistics[mangaId] || {};
+        } catch (statsError) {
+            console.warn(`Không thể lấy thống kê cho manga ${mangaId}:`, statsError.message);
+        }
+        return mapMangaDetail(response.data.data, statsData);
     } catch (error) {
         if (error.statusCode) throw error;
         throw normalizeMangaDexError(error, 'Không thể lấy chi tiết truyện từ MangaDex');
@@ -162,7 +170,7 @@ function mapMangaSummary(item) {
     };
 }
 
-function mapMangaDetail(item) {
+function mapMangaDetail(item, stats = {}) {
     const attributes = item.attributes || {};
     return {
         mangaId: item.id,
@@ -173,7 +181,9 @@ function mapMangaDetail(item) {
         year: attributes.year || null,
         tags: mapTags(attributes.tags),
         contentRating: attributes.contentRating || '',
-        availableTranslatedLanguages: attributes.availableTranslatedLanguages || []
+        availableTranslatedLanguages: attributes.availableTranslatedLanguages || [],
+        likes: stats.follows || 0,
+        views: 0
     };
 }
 
