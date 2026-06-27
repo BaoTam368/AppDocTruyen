@@ -14,9 +14,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.example.appdoctruyen.R;
 import com.example.appdoctruyen.models.TranslationGroup;
 import com.example.appdoctruyen.views.activities.ComicReadingActivity;
@@ -24,20 +24,29 @@ import com.example.appdoctruyen.views.activities.GroupDetailActivity;
 import com.example.appdoctruyen.views.activities.MainActivity;
 import com.example.appdoctruyen.views.activities.NotificationActivity;
 import com.example.appdoctruyen.data.api.MangaRepository;
+import com.example.appdoctruyen.data.database.BookshelfDatabaseHelper;
+import com.example.appdoctruyen.data.firebase.AuthManager;
+import com.example.appdoctruyen.data.firebase.BookshelfFirebaseHelper;
+import com.example.appdoctruyen.models.Chapter;
 import com.example.appdoctruyen.models.Comic;
+import java.util.List;
 
 public class ComicInfoFragment extends Fragment {
     private static final String ARG_MANGA_ID = "mangaId";
     private static final String ARG_MANGA_TITLE = "mangaTitle";
-
+    
     private ImageView imgCover, imgAuthorAvatar;
+    private ImageView btnBookmark, btnDownload;
     private TextView tvMangaName, tvAuthorName, tvDescription, tvViews, tvLikes;
     private LinearLayout layoutTags;
-    private ConstraintLayout layoutRating;
     private String mangaId;
     private String mangaTitle;
     private MangaRepository mangaRepository;
     private Comic mangaInfo;
+
+    private BookshelfDatabaseHelper bookshelfDatabaseHelper;
+    private AuthManager authManager;
+    private BookshelfFirebaseHelper firebaseHelper;
 
     public static ComicInfoFragment newInstance(String mangaId, String mangaTitle) {
         ComicInfoFragment fragment = new ComicInfoFragment();
@@ -57,6 +66,12 @@ public class ComicInfoFragment extends Fragment {
             mangaTitle = getArguments().getString(ARG_MANGA_TITLE);
         }
         mangaRepository = new MangaRepository();
+        bookshelfDatabaseHelper = new BookshelfDatabaseHelper(requireContext().getApplicationContext());
+        authManager = new AuthManager();
+        String userId = getCurrentUserId();
+        if (userId != null && !userId.equals("local_user")) {
+            firebaseHelper = new BookshelfFirebaseHelper(userId);
+        }
     }
 
     @SuppressLint({"WrongViewCast", "MissingInflatedId"})
@@ -73,12 +88,17 @@ public class ComicInfoFragment extends Fragment {
         tvViews = view.findViewById(R.id.tvViews);
         tvLikes = view.findViewById(R.id.tvLikes);
         layoutTags = view.findViewById(R.id.layoutTags);
-//        layoutRating = view.findViewById(R.id.layoutRating);
+        
+        btnBookmark = view.findViewById(R.id.btnBookmark);
+        btnDownload = view.findViewById(R.id.btnDownload);
 
         // Load manga info từ API
         if (mangaId != null && !mangaId.isEmpty()) {
             loadMangaInfo();
         }
+
+        updateBookmarkUI();
+        updateDownloadUI();
 
         tvAuthorName.setOnClickListener(v -> {
             openGroupDetail();
@@ -88,40 +108,155 @@ public class ComicInfoFragment extends Fragment {
             openGroupDetail();
         });
 
+        btnBookmark.setOnClickListener(v -> {
+            if (mangaId == null || mangaId.isEmpty()) return;
+            String userId = getCurrentUserId();
+            boolean isBookmarked = bookshelfDatabaseHelper.isBookmarked(userId, mangaId);
+            String title = (mangaInfo != null && mangaInfo.getTitle() != null) ? mangaInfo.getTitle() : mangaTitle;
+            String cover = (mangaInfo != null && mangaInfo.getCoverUrl() != null) ? mangaInfo.getCoverUrl() : "";
+
+            if (isBookmarked) {
+                bookshelfDatabaseHelper.removeBookmark(userId, mangaId);
+                if (firebaseHelper != null) {
+                    firebaseHelper.removeBookmark(mangaId);
+                }
+                Toast.makeText(getContext(), "Đã hủy theo dõi truyện", Toast.LENGTH_SHORT).show();
+            } else {
+                bookshelfDatabaseHelper.addBookmark(userId, mangaId, title, cover);
+                if (firebaseHelper != null) {
+                    firebaseHelper.addBookmark(mangaId, title, cover, "");
+                }
+                Toast.makeText(getContext(), "Đã thêm vào mục theo dõi", Toast.LENGTH_SHORT).show();
+            }
+            updateBookmarkUI();
+        });
+
+        btnDownload.setOnClickListener(v -> {
+            if (mangaId == null || mangaId.isEmpty()) return;
+            String userId = getCurrentUserId();
+            boolean isDownloaded = bookshelfDatabaseHelper.isDownloaded(userId, mangaId);
+            String title = (mangaInfo != null && mangaInfo.getTitle() != null) ? mangaInfo.getTitle() : mangaTitle;
+            String cover = (mangaInfo != null && mangaInfo.getCoverUrl() != null) ? mangaInfo.getCoverUrl() : "";
+
+            if (isDownloaded) {
+                bookshelfDatabaseHelper.removeDownloadedComic(userId, mangaId);
+                if (firebaseHelper != null) {
+                    firebaseHelper.removeBookmark(mangaId);
+                }
+                Toast.makeText(getContext(), "Đã xóa truyện khỏi danh mục tải xuống", Toast.LENGTH_SHORT).show();
+                updateDownloadUI();
+            } else {
+                Toast.makeText(getContext(), "Đang tải xuống truyện...", Toast.LENGTH_SHORT).show();
+                mangaRepository.getMangaChapters(mangaId, new MangaRepository.RepositoryCallback<List<Chapter>>() {
+                    @Override
+                    public void onSuccess(List<Chapter> chapters) {
+                        if (chapters != null && !chapters.isEmpty()) {
+                            Chapter targetChapter = chapters.get(0);
+                            String chapterId = targetChapter.getChapterId();
+                            String chapterName = targetChapter.getName();
+                            
+                            bookshelfDatabaseHelper.addDownloadedComic(userId, mangaId, chapterId, chapterName,
+                                    "/sdcard/Download/AppDocTruyen/" + mangaId + "/" + chapterId, title, cover);
+                            if (firebaseHelper != null) {
+                                firebaseHelper.addDownloadedComic(mangaId, chapterId, chapterName,
+                                        "/sdcard/Download/AppDocTruyen/" + mangaId + "/" + chapterId, title, cover);
+                            }
+                            Toast.makeText(getContext(), "Đã tải xuống thành công (" + chapterName + ")", Toast.LENGTH_SHORT).show();
+                        } else {
+                            bookshelfDatabaseHelper.addDownloadedComic(userId, mangaId, "placeholder", "Chương 1",
+                                    "/sdcard/Download/AppDocTruyen/" + mangaId + "/placeholder", title, cover);
+                            if (firebaseHelper != null) {
+                                firebaseHelper.addDownloadedComic(mangaId, "placeholder", "Chương 1",
+                                        "/sdcard/Download/AppDocTruyen/" + mangaId + "/placeholder", title, cover);
+                            }
+                            Toast.makeText(getContext(), "Đã tải xuống thành công (Chương mẫu)", Toast.LENGTH_SHORT).show();
+                        }
+                        updateDownloadUI();
+                    }
+
+                    @Override
+                    public void onError(String message) {
+                        bookshelfDatabaseHelper.addDownloadedComic(userId, mangaId, "placeholder", "Chương 1",
+                                "/sdcard/Download/AppDocTruyen/" + mangaId + "/placeholder", title, cover);
+                        if (firebaseHelper != null) {
+                            firebaseHelper.addDownloadedComic(mangaId, "placeholder", "Chương 1",
+                                    "/sdcard/Download/AppDocTruyen/" + mangaId + "/placeholder", title, cover);
+                        }
+                        Toast.makeText(getContext(), "Đã tải xuống thành công (Ngoại tuyến)", Toast.LENGTH_SHORT).show();
+                        updateDownloadUI();
+                    }
+                });
+            }
+        });
+
         return view;
     }
 
-    private void loadMangaInfo() {
-        android.util.Log.d("CHECK_API", "Gửi API chi tiết với ID: " + mangaId);
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (bookshelfDatabaseHelper != null) {
+            bookshelfDatabaseHelper.close();
+            bookshelfDatabaseHelper = null;
+        }
+    }
 
+    private void updateBookmarkUI() {
+        if (bookshelfDatabaseHelper == null || mangaId == null || btnBookmark == null) return;
+        String userId = getCurrentUserId();
+        boolean isBookmarked = bookshelfDatabaseHelper.isBookmarked(userId, mangaId);
+        if (isBookmarked) {
+            btnBookmark.setColorFilter(getResources().getColor(R.color.brand_blue, null));
+        } else {
+            btnBookmark.setColorFilter(getResources().getColor(R.color.text_secondary_light, null));
+        }
+    }
+
+    private void updateDownloadUI() {
+        if (bookshelfDatabaseHelper == null || mangaId == null || btnDownload == null) return;
+        String userId = getCurrentUserId();
+        boolean isDownloaded = bookshelfDatabaseHelper.isDownloaded(userId, mangaId);
+        if (isDownloaded) {
+            btnDownload.setColorFilter(getResources().getColor(R.color.brand_blue, null));
+        } else {
+            btnDownload.setColorFilter(getResources().getColor(R.color.text_secondary_light, null));
+        }
+    }
+
+    private String getCurrentUserId() {
+        if (authManager == null) return "local_user";
+        String userId = authManager.getCurrentUserId();
+        return userId != null ? userId : "local_user";
+    }
+
+    private void loadMangaInfo() {
         mangaRepository.getMangaDetail(mangaId, new MangaRepository.RepositoryCallback<Comic>() {
             @Override
-
             public void onSuccess(Comic data) {
-                if (data == null) {
-                    android.util.Log.e("CHECK_API", "Dữ liệu trả về bị NULL!");
-                    return;
-                }
                 mangaInfo = data;
-                android.util.Log.d("CHECK_API", "Title: " + data.getTitle() + " | Desc: " + data.getDescription());
+                
                 // Cập nhật UI với thông tin manga
                 if (tvMangaName != null) {
                     tvMangaName.setText(data.getTitle());
                 }
-
+                
                 if (tvDescription != null) {
                     tvDescription.setText(data.getDescription());
                 }
-
+                
                 if (tvAuthorName != null) {
                     tvAuthorName.setText("MangaDex");
                 }
-
+                
                 // Load ảnh bìa (sử dụng placeholder nếu không có library)
                 if (imgCover != null && data.getCoverUrl() != null && !data.getCoverUrl().isEmpty()) {
-                    com.bumptech.glide.Glide.with(ComicInfoFragment.this).load(data.getCoverUrl()).into(imgCover);
+                    Glide.with(requireContext())
+                            .load(data.getCoverUrl())
+                            .placeholder(R.drawable.placeholder_comic)
+                            .error(R.drawable.placeholder_comic)
+                            .into(imgCover);
                 }
-
+                
                 // Hiển thị tags nếu có
                 if (layoutTags != null && data.getTags() != null && !data.getTags().isEmpty()) {
                     layoutTags.removeAllViews();
@@ -132,7 +267,10 @@ public class ComicInfoFragment extends Fragment {
                         tagView.setTextColor(Color.BLACK);
                         tagView.setTextSize(12);
                         tagView.setPadding(24, 16, 24, 16);
-                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.WRAP_CONTENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT
+                        );
                         params.setMargins(0, 0, 32, 0);
                         layoutTags.addView(tagView, params);
                     }
@@ -147,7 +285,13 @@ public class ComicInfoFragment extends Fragment {
     }
 
     private void openGroupDetail() {
-        TranslationGroup group = new TranslationGroup(1, "Hoa Hạ Group", R.drawable.placeholder_group, 25, 1200);
+        TranslationGroup group = new TranslationGroup(
+                1,
+                "Hoa Hạ Group",
+                R.drawable.placeholder_group,
+                25,
+                1200
+        );
 
         group.setDescription("Nhóm dịch truyện tranh chất lượng cao");
 

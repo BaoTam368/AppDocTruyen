@@ -20,6 +20,10 @@ public class Comic {
     private String localPath;
     private long lastReadTime;
     private List<String> tags;
+    private String status;
+    private Integer year;
+    private String contentRating;
+    private List<String> availableTranslatedLanguages;
 
     public Comic(int id, String title, int coverImageResId, String coverUrl,
                  String latestChapter, String lastReadChapter, String author,
@@ -47,44 +51,88 @@ public class Comic {
         this.mangaId = String.valueOf(id);
     }
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
-
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
-
-    public int getCoverImageResId() { return coverImageResId; }
-    public void setCoverImageResId(int coverImageResId) { this.coverImageResId = coverImageResId; }
-
-    public String getCoverUrl() { return coverUrl; }
-    public void setCoverUrl(String coverUrl) { this.coverUrl = coverUrl; }
-
-    public String getLatestChapter() { return latestChapter; }
-    public void setLatestChapter(String latestChapter) { this.latestChapter = latestChapter; }
-
-    public String getLastReadChapter() { return lastReadChapter; }
-    public void setLastReadChapter(String lastReadChapter) { this.lastReadChapter = lastReadChapter; }
-
-    public String getAuthor() { return author; }
-    public void setAuthor(String author) { this.author = author; }
-
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
-
-    public boolean isFollowed() { return isFollowed; }
-    public void setFollowed(boolean followed) { isFollowed = followed; }
-
-    public boolean isDownloaded() { return isDownloaded; }
-    public void setDownloaded(boolean downloaded) { isDownloaded = downloaded; }
-
-    public String getMangaId() { return mangaId; }
-
-    public List<String> getTags() {
-        return tags;
+    public int getId() {
+        return id;
     }
 
-    public void setTags(List<String> tags) {
-        this.tags = tags;
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public int getCoverImageResId() {
+        return coverImageResId;
+    }
+
+    public void setCoverImageResId(int coverImageResId) {
+        this.coverImageResId = coverImageResId;
+    }
+
+    public String getCoverUrl() {
+        return coverUrl;
+    }
+
+    public void setCoverUrl(String coverUrl) {
+        this.coverUrl = coverUrl;
+    }
+
+    public String getLatestChapter() {
+        return latestChapter;
+    }
+
+    public void setLatestChapter(String latestChapter) {
+        this.latestChapter = latestChapter;
+    }
+
+    public String getLastReadChapter() {
+        return lastReadChapter;
+    }
+
+    public void setLastReadChapter(String lastReadChapter) {
+        this.lastReadChapter = lastReadChapter;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public boolean isFollowed() {
+        return isFollowed;
+    }
+
+    public void setFollowed(boolean followed) {
+        isFollowed = followed;
+    }
+
+    public boolean isDownloaded() {
+        return isDownloaded;
+    }
+
+    public void setDownloaded(boolean downloaded) {
+        isDownloaded = downloaded;
+    }
+
+    public String getMangaId() {
+        return mangaId;
     }
 
     public void setMangaId(String mangaId) {
@@ -121,5 +169,45 @@ public class Comic {
 
     public void setLastReadTime(long lastReadTime) {
         this.lastReadTime = lastReadTime;
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Integer getYear() {
+        return year;
+    }
+
+    public void setYear(Integer year) {
+        this.year = year;
+    }
+
+    public String getContentRating() {
+        return contentRating;
+    }
+
+    public void setContentRating(String contentRating) {
+        this.contentRating = contentRating;
+    }
+
+    public List<String> getAvailableTranslatedLanguages() {
+        return availableTranslatedLanguages;
+    }
+
+    public void setAvailableTranslatedLanguages(List<String> availableTranslatedLanguages) {
+        this.availableTranslatedLanguages = availableTranslatedLanguages;
     }
 }

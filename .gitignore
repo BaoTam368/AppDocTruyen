@@ -60,6 +60,11 @@ pnpm-debug.log*
 dist/
 coverage/
 
+# SQLite runtime database files
+*.db
+*.db-shm
+*.db-wal
+
 # Environment / secrets
 .env
 .env.local
@@ -68,3 +73,14 @@ coverage/
 # OS
 .DS_Store
 desktop.ini
+
+# Database files
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# AI
+.agents
+skills-lock.json

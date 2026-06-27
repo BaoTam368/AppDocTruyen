@@ -7,12 +7,13 @@
     <string name="tv_forgot_password">Bạn quên mật khẩu ư?</string>
     <string name="text_or">OR</string>
     <string name="btn_register">Tạo tài khoản mới</string>
-    <string name="hint_username">Nhập email:...</string>
-    <string name="hint_password">Nhập mật khẩu:...</string>
+    <string name="hint_login_email">Nhập email</string>
+    <string name="hint_username">Nhập tên đăng nhập</string>
+    <string name="hint_password">Nhập mật khẩu</string>
 
     <string name="title_register">Đăng Ký</string>
-    <string name="hint_email_phone">Email hoặc số điện thoại:...</string>
-    <string name="hint_confirm_password">Nhập lại mật khẩu:...</string>
+    <string name="hint_email">Nhập email</string>
+    <string name="hint_confirm_password">Nhập lại mật khẩu</string>
 
 
     <string name="menu_bookshelf">Tủ Sách</string>
@@ -133,4 +134,7 @@
     <string name="group_members_zero">0 thành viên</string>
     <string name="group_rank_number_placeholder">1</string>
     <string name="zero_count">0</string>
+    <string name="facebook_app_id">1682621013065960</string>
+    <string name="fb_login_protocol_scheme">fb1682621013065960</string>
+    <string name="facebook_client_token">785628ce7ef3319bfb100fe2176b5836</string>
 </resources>

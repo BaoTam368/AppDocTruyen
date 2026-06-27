@@ -45,7 +45,7 @@ public class BookshelfGroupFragment extends Fragment {
 
         tabAll = view.findViewById(R.id.tabAll);
         tabFamous = view.findViewById(R.id.tabFamous);
-//        tabComicCount = view.findViewById(R.id.tabComicCount);
+        tabComicCount = view.findViewById(R.id.tabComicCount);
         recyclerViewGrid = view.findViewById(R.id.recyclerViewGroup2);
         recyclerViewRanking = view.findViewById(R.id.recyclerViewRanking);
         tvEmpty = view.findViewById(R.id.tvEmptyGroup);
