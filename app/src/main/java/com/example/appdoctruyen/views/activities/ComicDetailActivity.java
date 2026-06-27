@@ -135,7 +135,7 @@ public class ComicDetailActivity extends AppCompatActivity {
     }
 
     private Chapter findFirstChapter(List<Chapter> chapters) {
-        Chapter firstChapter = chapters.get(chapters.size() - 1);
+        Chapter firstChapter = chapters.get(0);
         for (Chapter ch : chapters) {
             String name = ch.getName().toLowerCase();
             if (name.contains("chapter 1") || name.contains("chương 1") || name.equals("1")) {
