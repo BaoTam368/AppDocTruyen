@@ -98,9 +98,9 @@
     <string name="func_support">Hỗ trợ người dùng</string>
     <string name="func_terms">Điều khoản sử dụng</string>
     <string name="func_logout">Đăng xuất</string>
-    <string name="bookshelf_empty_following">Không có truyện theo dõi</string>
-    <string name="bookshelf_empty_history">Không có lịch sử đọc</string>
-    <string name="bookshelf_empty_downloaded">Không có truyện đã tải</string>
+    <string name="bookshelf_empty_following">Bạn chưa theo dõi truyện nào</string>
+    <string name="bookshelf_empty_history">Bạn chưa đọc truyện nào</string>
+    <string name="bookshelf_empty_downloaded">Bạn chưa tải truyện nào</string>
     <string name="bookshelf_last_read_format">Vừa đọc: %1$s</string>
     <string name="bookshelf_last_read_with_time_format">Vừa đọc: %1$s - %2$s</string>
     <string name="bookshelf_local_comment_title">Bình luận local</string>
@@ -134,7 +134,4 @@
     <string name="group_members_zero">0 thành viên</string>
     <string name="group_rank_number_placeholder">1</string>
     <string name="zero_count">0</string>
-    <string name="facebook_app_id">1682621013065960</string>
-    <string name="fb_login_protocol_scheme">fb1682621013065960</string>
-    <string name="facebook_client_token">785628ce7ef3319bfb100fe2176b5836</string>
 </resources>

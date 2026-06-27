@@ -1,9 +1,11 @@
 package com.example.appdoctruyen.data.database;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
 import com.example.appdoctruyen.R;
 import com.example.appdoctruyen.models.Comic;
 import com.example.appdoctruyen.models.LocalComment;
@@ -11,11 +13,10 @@ import com.example.appdoctruyen.models.LocalComment;
 import java.util.ArrayList;
 import java.util.List;
 
-// SQLite helper dùng để lưu bookmark, lịch sử đọc, truyện đã tải và comment local
 public class BookshelfDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "bookshelf.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     private static final String TABLE_BOOKMARKS = "bookmarks";
     private static final String TABLE_HISTORY = "reading_history";
@@ -30,6 +31,9 @@ public class BookshelfDatabaseHelper extends SQLiteOpenHelper {
     private static final String COL_LOCAL_PATH = "local_path";
     private static final String COL_TITLE_CACHE = "title_cache";
     private static final String COL_COVER_URL_CACHE = "cover_url_cache";
+    private static final String COL_DESCRIPTION_CACHE = "description_cache";
+    private static final String COL_STATUS_CACHE = "status_cache";
+    private static final String COL_YEAR_CACHE = "year_cache";
     private static final String COL_COMMENT_CONTENT = "comment_content";
     private static final String COL_CREATED_AT = "created_at";
     private static final String COL_UPDATED_AT = "updated_at";
@@ -42,16 +46,32 @@ public class BookshelfDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLE_BOOKMARKS + " (" +
+        createTables(db);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS followed_comics");
+        createTables(db);
+        ensureComicCacheColumns(db, TABLE_BOOKMARKS);
+        ensureComicCacheColumns(db, TABLE_HISTORY);
+        ensureComicCacheColumns(db, TABLE_DOWNLOADED);
+    }
+
+    private void createTables(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_BOOKMARKS + " (" +
                 COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COL_USER_ID + " TEXT NOT NULL, " +
                 COL_MANGA_ID + " TEXT NOT NULL, " +
                 COL_CREATED_AT + " INTEGER NOT NULL, " +
                 COL_TITLE_CACHE + " TEXT, " +
                 COL_COVER_URL_CACHE + " TEXT, " +
+                COL_DESCRIPTION_CACHE + " TEXT, " +
+                COL_STATUS_CACHE + " TEXT, " +
+                COL_YEAR_CACHE + " INTEGER, " +
                 "UNIQUE(" + COL_USER_ID + ", " + COL_MANGA_ID + "))");
 
-        db.execSQL("CREATE TABLE " + TABLE_HISTORY + " (" +
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_HISTORY + " (" +
                 COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COL_USER_ID + " TEXT NOT NULL, " +
                 COL_MANGA_ID + " TEXT NOT NULL, " +
@@ -60,9 +80,12 @@ public class BookshelfDatabaseHelper extends SQLiteOpenHelper {
                 COL_LAST_READ_TIME + " INTEGER NOT NULL, " +
                 COL_TITLE_CACHE + " TEXT, " +
                 COL_COVER_URL_CACHE + " TEXT, " +
+                COL_DESCRIPTION_CACHE + " TEXT, " +
+                COL_STATUS_CACHE + " TEXT, " +
+                COL_YEAR_CACHE + " INTEGER, " +
                 "UNIQUE(" + COL_USER_ID + ", " + COL_MANGA_ID + "))");
 
-        db.execSQL("CREATE TABLE " + TABLE_DOWNLOADED + " (" +
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_DOWNLOADED + " (" +
                 COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COL_USER_ID + " TEXT NOT NULL, " +
                 COL_MANGA_ID + " TEXT NOT NULL, " +
@@ -72,9 +95,12 @@ public class BookshelfDatabaseHelper extends SQLiteOpenHelper {
                 COL_DOWNLOADED_TIME + " INTEGER NOT NULL, " +
                 COL_TITLE_CACHE + " TEXT, " +
                 COL_COVER_URL_CACHE + " TEXT, " +
+                COL_DESCRIPTION_CACHE + " TEXT, " +
+                COL_STATUS_CACHE + " TEXT, " +
+                COL_YEAR_CACHE + " INTEGER, " +
                 "UNIQUE(" + COL_USER_ID + ", " + COL_MANGA_ID + ", " + COL_CHAPTER_ID + "))");
 
-        db.execSQL("CREATE TABLE " + TABLE_COMMENTS + " (" +
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_COMMENTS + " (" +
                 COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COL_USER_ID + " TEXT NOT NULL, " +
                 COL_MANGA_ID + " TEXT NOT NULL, " +
@@ -83,38 +109,45 @@ public class BookshelfDatabaseHelper extends SQLiteOpenHelper {
                 COL_UPDATED_AT + " INTEGER NOT NULL)");
     }
 
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS followed_comics");
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOKMARKS);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_HISTORY);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_DOWNLOADED);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_COMMENTS);
-        onCreate(db);
-    }
-
-    @Override
-    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        onUpgrade(db, oldVersion, newVersion);
-    }
-
     public long addBookmark(String userId, String mangaId, String titleCache, String coverUrlCache) {
+        return addBookmark(userId, mangaId, titleCache, coverUrlCache, null, null, null);
+    }
+
+    public long addBookmark(String userId, Comic comic) {
+        if (comic == null) return -1;
+        return addBookmark(
+                userId,
+                comic.getMangaId(),
+                comic.getTitle(),
+                comic.getCoverUrl(),
+                comic.getDescription(),
+                comic.getStatus(),
+                comic.getYear()
+        );
+    }
+
+    public long saveBookmark(String userId, Comic comic) {
+        return addBookmark(userId, comic);
+    }
+
+    public long addBookmark(String userId, String mangaId, String titleCache, String coverUrlCache,
+                            String descriptionCache, String statusCache, Integer yearCache) {
         if (isBlank(userId) || isBlank(mangaId)) return -1;
 
         ContentValues values = new ContentValues();
         values.put(COL_USER_ID, userId);
         values.put(COL_MANGA_ID, mangaId);
-        values.put(COL_TITLE_CACHE, titleCache);
-        values.put(COL_COVER_URL_CACHE, coverUrlCache);
         values.put(COL_CREATED_AT, System.currentTimeMillis());
+        putCacheValues(values, titleCache, coverUrlCache, descriptionCache, statusCache, yearCache, true);
 
         SQLiteDatabase db = getWritableDatabase();
         long result = db.insertWithOnConflict(TABLE_BOOKMARKS, null, values, SQLiteDatabase.CONFLICT_IGNORE);
         if (result == -1) {
             ContentValues cacheValues = new ContentValues();
-            cacheValues.put(COL_TITLE_CACHE, titleCache);
-            cacheValues.put(COL_COVER_URL_CACHE, coverUrlCache);
-            db.update(TABLE_BOOKMARKS, cacheValues, userMangaWhere(), new String[]{userId, mangaId});
+            putCacheValues(cacheValues, titleCache, coverUrlCache, descriptionCache, statusCache, yearCache, false);
+            if (cacheValues.size() > 0) {
+                db.update(TABLE_BOOKMARKS, cacheValues, userMangaWhere(), new String[]{userId, mangaId});
+            }
         }
         return result;
     }
@@ -168,10 +201,30 @@ public class BookshelfDatabaseHelper extends SQLiteOpenHelper {
         return comics;
     }
 
-    // Lưu hoặc cập nhật chapter đọc gần nhất của một truyện.
-    // Màn đọc truyện có thể gọi hàm này khi người dùng mở chapter để lưu lịch sử đọc.
     public void saveReadingHistory(String userId, String mangaId, String chapterId, String chapterName,
                                    String titleCache, String coverUrlCache) {
+        saveReadingHistory(userId, mangaId, chapterId, chapterName, titleCache, coverUrlCache,
+                null, null, null);
+    }
+
+    public void saveReadingHistory(String userId, Comic comic) {
+        if (comic == null) return;
+        saveReadingHistory(
+                userId,
+                comic.getMangaId(),
+                comic.getChapterId(),
+                comic.getChapterName(),
+                comic.getTitle(),
+                comic.getCoverUrl(),
+                comic.getDescription(),
+                comic.getStatus(),
+                comic.getYear()
+        );
+    }
+
+    public void saveReadingHistory(String userId, String mangaId, String chapterId, String chapterName,
+                                   String titleCache, String coverUrlCache, String descriptionCache,
+                                   String statusCache, Integer yearCache) {
         if (isBlank(userId) || isBlank(mangaId)) return;
 
         ContentValues values = new ContentValues();
@@ -180,8 +233,7 @@ public class BookshelfDatabaseHelper extends SQLiteOpenHelper {
         values.put(COL_CHAPTER_ID, chapterId);
         values.put(COL_CHAPTER_NAME, chapterName);
         values.put(COL_LAST_READ_TIME, System.currentTimeMillis());
-        values.put(COL_TITLE_CACHE, titleCache);
-        values.put(COL_COVER_URL_CACHE, coverUrlCache);
+        putCacheValues(values, titleCache, coverUrlCache, descriptionCache, statusCache, yearCache, true);
 
         SQLiteDatabase db = getWritableDatabase();
         int updated = db.update(TABLE_HISTORY, values, userMangaWhere(), new String[]{userId, mangaId});
@@ -214,31 +266,35 @@ public class BookshelfDatabaseHelper extends SQLiteOpenHelper {
         return comics;
     }
 
-    public Comic getReadingHistoryForManga(String userId, String mangaId) {
-        if (isBlank(userId) || isBlank(mangaId)) return null;
+    public long addDownloadedComic(String userId, String mangaId, String chapterId, String chapterName,
+                                   String localPath, String titleCache, String coverUrlCache) {
+        return addDownloadedComic(userId, mangaId, chapterId, chapterName, localPath, titleCache,
+                coverUrlCache, null, null, null);
+    }
 
-        Cursor cursor = getReadableDatabase().query(
-                TABLE_HISTORY,
-                null,
-                userMangaWhere(),
-                new String[]{userId, mangaId},
-                null,
-                null,
-                null
+    public long addDownloadedComic(String userId, Comic comic) {
+        if (comic == null) return -1;
+        return addDownloadedComic(
+                userId,
+                comic.getMangaId(),
+                comic.getChapterId(),
+                comic.getChapterName(),
+                comic.getLocalPath(),
+                comic.getTitle(),
+                comic.getCoverUrl(),
+                comic.getDescription(),
+                comic.getStatus(),
+                comic.getYear()
         );
+    }
 
-        try {
-            if (cursor.moveToFirst()) {
-                return readHistoryComic(cursor);
-            }
-        } finally {
-            cursor.close();
-        }
-        return null;
+    public long saveDownloadedComic(String userId, Comic comic) {
+        return addDownloadedComic(userId, comic);
     }
 
     public long addDownloadedComic(String userId, String mangaId, String chapterId, String chapterName,
-                                   String localPath, String titleCache, String coverUrlCache) {
+                                   String localPath, String titleCache, String coverUrlCache,
+                                   String descriptionCache, String statusCache, Integer yearCache) {
         if (isBlank(userId) || isBlank(mangaId)) return -1;
 
         ContentValues values = new ContentValues();
@@ -248,8 +304,7 @@ public class BookshelfDatabaseHelper extends SQLiteOpenHelper {
         values.put(COL_CHAPTER_NAME, chapterName);
         values.put(COL_LOCAL_PATH, localPath);
         values.put(COL_DOWNLOADED_TIME, System.currentTimeMillis());
-        values.put(COL_TITLE_CACHE, titleCache);
-        values.put(COL_COVER_URL_CACHE, coverUrlCache);
+        putCacheValues(values, titleCache, coverUrlCache, descriptionCache, statusCache, yearCache, true);
 
         return getWritableDatabase().insertWithOnConflict(
                 TABLE_DOWNLOADED,
@@ -283,34 +338,21 @@ public class BookshelfDatabaseHelper extends SQLiteOpenHelper {
         return comics;
     }
 
-    public boolean isDownloaded(String userId, String mangaId) {
-        if (isBlank(userId) || isBlank(mangaId)) return false;
-        Cursor cursor = getReadableDatabase().query(
-                TABLE_DOWNLOADED,
-                new String[]{COL_ID},
-                COL_USER_ID + " = ? AND " + COL_MANGA_ID + " = ?",
-                new String[]{userId, mangaId},
-                null,
-                null,
-                null
-        );
-        try {
-            return cursor.moveToFirst();
-        } finally {
-            cursor.close();
-        }
+    public void updateComicCache(String userId, Comic comic) {
+        if (isBlank(userId) || comic == null || isBlank(comic.getMangaId())) return;
+
+        ContentValues values = new ContentValues();
+        putCacheValues(values, comic.getTitle(), comic.getCoverUrl(), comic.getDescription(),
+                comic.getStatus(), comic.getYear(), false);
+        if (values.size() == 0) return;
+
+        SQLiteDatabase db = getWritableDatabase();
+        String[] args = new String[]{userId, comic.getMangaId()};
+        db.update(TABLE_BOOKMARKS, values, userMangaWhere(), args);
+        db.update(TABLE_HISTORY, values, userMangaWhere(), args);
+        db.update(TABLE_DOWNLOADED, values, userMangaWhere(), args);
     }
 
-    public int removeDownloadedComic(String userId, String mangaId) {
-        if (isBlank(userId) || isBlank(mangaId)) return 0;
-        return getWritableDatabase().delete(
-                TABLE_DOWNLOADED,
-                COL_USER_ID + " = ? AND " + COL_MANGA_ID + " = ?",
-                new String[]{userId, mangaId}
-        );
-    }
-
-    // Comment chỉ được lưu local trên máy, không gửi lên server
     public long addLocalComment(String userId, String mangaId, String content) {
         if (isBlank(userId) || isBlank(mangaId) || isBlank(content)) return -1;
 
@@ -372,21 +414,13 @@ public class BookshelfDatabaseHelper extends SQLiteOpenHelper {
     }
 
     private Comic readBookmarkComic(Cursor cursor) {
-        Comic comic = createComicFromCache(
-                readString(cursor, COL_MANGA_ID),
-                readString(cursor, COL_TITLE_CACHE),
-                readString(cursor, COL_COVER_URL_CACHE)
-        );
+        Comic comic = createComicFromCache(cursor);
         comic.setFollowed(true);
         return comic;
     }
 
     private Comic readHistoryComic(Cursor cursor) {
-        Comic comic = createComicFromCache(
-                readString(cursor, COL_MANGA_ID),
-                readString(cursor, COL_TITLE_CACHE),
-                readString(cursor, COL_COVER_URL_CACHE)
-        );
+        Comic comic = createComicFromCache(cursor);
         comic.setChapterId(readString(cursor, COL_CHAPTER_ID));
         comic.setChapterName(readString(cursor, COL_CHAPTER_NAME));
         comic.setLastReadChapter(readString(cursor, COL_CHAPTER_NAME));
@@ -395,11 +429,7 @@ public class BookshelfDatabaseHelper extends SQLiteOpenHelper {
     }
 
     private Comic readDownloadedComic(Cursor cursor) {
-        Comic comic = createComicFromCache(
-                readString(cursor, COL_MANGA_ID),
-                readString(cursor, COL_TITLE_CACHE),
-                readString(cursor, COL_COVER_URL_CACHE)
-        );
+        Comic comic = createComicFromCache(cursor);
         comic.setChapterId(readString(cursor, COL_CHAPTER_ID));
         comic.setChapterName(readString(cursor, COL_CHAPTER_NAME));
         comic.setLatestChapter(readString(cursor, COL_CHAPTER_NAME));
@@ -408,21 +438,45 @@ public class BookshelfDatabaseHelper extends SQLiteOpenHelper {
         return comic;
     }
 
-    private Comic createComicFromCache(String mangaId, String titleCache, String coverUrlCache) {
+    private Comic createComicFromCache(Cursor cursor) {
+        String mangaId = readString(cursor, COL_MANGA_ID);
         Comic comic = new Comic(
                 numericIdFromMangaId(mangaId),
-                isBlank(titleCache) ? "Manga " + mangaId : titleCache,
+                readString(cursor, COL_TITLE_CACHE),
                 R.drawable.placeholder_comic,
-                coverUrlCache,
+                readString(cursor, COL_COVER_URL_CACHE),
                 null,
                 null,
                 null,
-                null,
+                readString(cursor, COL_DESCRIPTION_CACHE),
                 false,
                 false
         );
         comic.setMangaId(mangaId);
+        comic.setStatus(readString(cursor, COL_STATUS_CACHE));
+        comic.setYear(readInteger(cursor, COL_YEAR_CACHE));
         return comic;
+    }
+
+    private void putCacheValues(ContentValues values, String title, String coverUrl, String description,
+                                String status, Integer year, boolean includeNulls) {
+        putText(values, COL_TITLE_CACHE, title, includeNulls);
+        putText(values, COL_COVER_URL_CACHE, coverUrl, includeNulls);
+        putText(values, COL_DESCRIPTION_CACHE, description, includeNulls);
+        putText(values, COL_STATUS_CACHE, status, includeNulls);
+        if (year != null) {
+            values.put(COL_YEAR_CACHE, year);
+        } else if (includeNulls) {
+            values.putNull(COL_YEAR_CACHE);
+        }
+    }
+
+    private void putText(ContentValues values, String key, String value, boolean includeNulls) {
+        if (!isBlank(value)) {
+            values.put(key, value);
+        } else if (includeNulls) {
+            values.putNull(key);
+        }
     }
 
     private int numericIdFromMangaId(String mangaId) {
@@ -430,7 +484,7 @@ public class BookshelfDatabaseHelper extends SQLiteOpenHelper {
         try {
             return Integer.parseInt(mangaId);
         } catch (NumberFormatException ignored) {
-            return Math.abs(mangaId.hashCode());
+            return 0;
         }
     }
 
@@ -440,10 +494,36 @@ public class BookshelfDatabaseHelper extends SQLiteOpenHelper {
         return cursor.getString(index);
     }
 
+    private Integer readInteger(Cursor cursor, String columnName) {
+        int index = cursor.getColumnIndex(columnName);
+        if (index < 0 || cursor.isNull(index)) return null;
+        return cursor.getInt(index);
+    }
+
     private long readLong(Cursor cursor, String columnName) {
         int index = cursor.getColumnIndex(columnName);
         if (index < 0 || cursor.isNull(index)) return 0L;
         return cursor.getLong(index);
+    }
+
+    private void ensureComicCacheColumns(SQLiteDatabase db, String tableName) {
+        ensureColumn(db, tableName, COL_DESCRIPTION_CACHE, "TEXT");
+        ensureColumn(db, tableName, COL_STATUS_CACHE, "TEXT");
+        ensureColumn(db, tableName, COL_YEAR_CACHE, "INTEGER");
+    }
+
+    private void ensureColumn(SQLiteDatabase db, String tableName, String columnName, String definition) {
+        Cursor cursor = db.rawQuery("PRAGMA table_info(" + tableName + ")", null);
+        try {
+            while (cursor.moveToNext()) {
+                if (columnName.equals(cursor.getString(cursor.getColumnIndexOrThrow("name")))) {
+                    return;
+                }
+            }
+        } finally {
+            cursor.close();
+        }
+        db.execSQL("ALTER TABLE " + tableName + " ADD COLUMN " + columnName + " " + definition);
     }
 
     private String userMangaWhere() {
