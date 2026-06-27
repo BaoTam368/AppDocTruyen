@@ -33,7 +33,17 @@ public interface MangaApiService {
     Call<ChapterPagesResponse> getChapterPagesAlias(@Path("chapterId") String chapterId);
 
     @GET("groups")
-    Call<GroupListResponse> getGroups();
+    Call<GroupListResponse> getGroups(
+            @Query("limit") int limit,
+            @Query("offset") int offset
+    );
+
+    @GET("groups/search")
+    Call<GroupListResponse> searchGroups(
+            @Query("name") String name,
+            @Query("limit") int limit,
+            @Query("offset") int offset
+    );
 
     @GET("groups/{groupId}")
     Call<GroupDetailResponse> getGroupDetail(@Path("groupId") String groupId);
@@ -165,7 +175,10 @@ class ChapterPagesDto {
 class GroupDto {
     String groupId;
     String name;
+    String website;
     String description;
+    String avatarUrl;
+    int mangaCount;
     int comicCount;
     int memberCount;
     int followerCount;

@@ -1,32 +1,37 @@
 package com.example.appdoctruyen.views.adapters;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.appdoctruyen.R;
 import com.example.appdoctruyen.models.TranslationGroup;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class GroupRankingAdapter extends RecyclerView.Adapter<GroupRankingAdapter.RankingViewHolder> {
 
-    private Context context;
+    private final Context context;
     private List<TranslationGroup> groupList;
-    private OnRankingClickListener listener;
+    private final OnRankingClickListener listener;
 
     public GroupRankingAdapter(Context context, List<TranslationGroup> groupList,
                                OnRankingClickListener listener) {
         this.context = context;
-        this.groupList = groupList;
+        this.groupList = groupList != null ? groupList : new ArrayList<>();
         this.listener = listener;
     }
 
     public void updateList(List<TranslationGroup> newList) {
-        this.groupList = newList;
+        this.groupList = newList != null ? newList : new ArrayList<>();
         notifyDataSetChanged();
     }
 
@@ -40,27 +45,33 @@ public class GroupRankingAdapter extends RecyclerView.Adapter<GroupRankingAdapte
     @Override
     public void onBindViewHolder(@NonNull RankingViewHolder holder, int position) {
         TranslationGroup group = groupList.get(position);
+        if (group == null) {
+            holder.tvRankNumber.setText(String.valueOf(position + 1));
+            holder.tvRankGroupName.setText(R.string.group_default_name);
+            holder.tvRankMemberCount.setText(context.getString(R.string.group_members_count_format, 0));
+            holder.imgRankAvatar.setImageResource(R.drawable.placeholder_group);
+            holder.imgRankTrophy.setVisibility(View.GONE);
+            holder.itemView.setOnClickListener(null);
+            return;
+        }
 
         int displayRank = group.getRank() > 0 ? group.getRank() : position + 1;
         holder.tvRankNumber.setText(String.valueOf(displayRank));
-        holder.tvRankGroupName.setText(group.getName());
+        holder.tvRankGroupName.setText(isBlank(group.getName())
+                ? context.getString(R.string.group_default_name)
+                : group.getName());
         holder.tvRankMemberCount.setText(context.getString(
-                R.string.group_followers_count_format,
-                group.getFollowerCount()
+                R.string.group_members_count_format,
+                group.getMemberCount()
         ));
 
-        if (group.getAvatarResId() != 0) {
-            holder.imgRankAvatar.setImageResource(group.getAvatarResId());
-        } else {
-            holder.imgRankAvatar.setImageResource(R.drawable.placeholder_group);
-        }
+        Glide.with(holder.itemView.getContext())
+                .load(group.getAvatarUrl())
+                .placeholder(R.drawable.placeholder_group)
+                .error(R.drawable.placeholder_group)
+                .into(holder.imgRankAvatar);
 
-        // Hiển thị biểu tượng trophy cho ba nhóm có thứ hạng cao nhất
-        if (position < 3) {
-            holder.imgRankTrophy.setVisibility(View.VISIBLE);
-        } else {
-            holder.imgRankTrophy.setVisibility(View.GONE);
-        }
+        holder.imgRankTrophy.setVisibility(position < 3 ? View.VISIBLE : View.GONE);
 
         if (position == 0) {
             holder.tvRankNumber.setTextColor(context.getResources().getColor(R.color.badge_red, null));
@@ -80,6 +91,10 @@ public class GroupRankingAdapter extends RecyclerView.Adapter<GroupRankingAdapte
     @Override
     public int getItemCount() {
         return groupList != null ? groupList.size() : 0;
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
     }
 
     public interface OnRankingClickListener {

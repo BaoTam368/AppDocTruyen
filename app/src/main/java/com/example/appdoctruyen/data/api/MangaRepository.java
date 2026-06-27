@@ -133,7 +133,11 @@ public class MangaRepository {
     }
 
     public void getGroups(RepositoryCallback<List<TranslationGroup>> callback) {
-        apiService.getGroups().enqueue(new Callback<GroupListResponse>() {
+        getGroups(50, 0, callback);
+    }
+
+    public void getGroups(int limit, int offset, RepositoryCallback<List<TranslationGroup>> callback) {
+        apiService.getGroups(limit, offset).enqueue(new Callback<GroupListResponse>() {
             @Override
             public void onResponse(Call<GroupListResponse> call, Response<GroupListResponse> response) {
                 GroupListResponse body = response.body();
@@ -141,6 +145,25 @@ public class MangaRepository {
                     callback.onSuccess(mapGroupList(body.data));
                 } else {
                     callback.onError(readErrorMessage(body, "Không lấy được nhóm dịch"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<GroupListResponse> call, Throwable throwable) {
+                callback.onError("Không kết nối được Node.js backend");
+            }
+        });
+    }
+
+    public void searchGroups(String name, int limit, int offset, RepositoryCallback<List<TranslationGroup>> callback) {
+        apiService.searchGroups(name, limit, offset).enqueue(new Callback<GroupListResponse>() {
+            @Override
+            public void onResponse(Call<GroupListResponse> call, Response<GroupListResponse> response) {
+                GroupListResponse body = response.body();
+                if (response.isSuccessful() && body != null && body.success) {
+                    callback.onSuccess(mapGroupList(body.data));
+                } else {
+                    callback.onError(readErrorMessage(body, "Không tìm thấy nhóm dịch"));
                 }
             }
 
@@ -299,16 +322,19 @@ public class MangaRepository {
         if (dtoList == null) return groups;
 
         for (GroupDto dto : dtoList) {
+            int comicCount = dto.comicCount > 0 ? dto.comicCount : dto.mangaCount;
             TranslationGroup group = new TranslationGroup(
                     numericIdFromString(dto.groupId),
                     isBlank(dto.name) ? "Nhóm dịch" : dto.name,
                     dto.description,
                     R.drawable.placeholder_group,
-                    dto.comicCount,
+                    comicCount,
                     dto.memberCount,
                     dto.followerCount
             );
             group.setGroupId(dto.groupId);
+            group.setWebsite(dto.website);
+            group.setAvatarUrl(dto.avatarUrl);
             group.setRank(dto.rank);
             groups.add(group);
         }
@@ -316,16 +342,19 @@ public class MangaRepository {
     }
 
     private TranslationGroup mapGroup(GroupDto dto) {
+        int comicCount = dto.comicCount > 0 ? dto.comicCount : dto.mangaCount;
         TranslationGroup group = new TranslationGroup(
                 numericIdFromString(dto.groupId),
                 isBlank(dto.name) ? "Nhóm dịch" : dto.name,
                 dto.description,
                 R.drawable.placeholder_group,
-                dto.comicCount,
+                comicCount,
                 dto.memberCount,
                 dto.followerCount
         );
         group.setGroupId(dto.groupId);
+        group.setWebsite(dto.website);
+        group.setAvatarUrl(dto.avatarUrl);
         group.setRank(dto.rank);
         return group;
     }

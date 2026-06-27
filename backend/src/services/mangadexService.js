@@ -15,33 +15,6 @@ const mangadexClient = axios.create({
     }
 });
 
-const DEMO_GROUPS = [
-    {
-        groupId: 'demo-group-1',
-        name: 'Ánh Dương Team',
-        description: 'Nhóm dịch truyện phiêu lưu và hành động.',
-        comicCount: 18,
-        memberCount: 860,
-        followerCount: 1450
-    },
-    {
-        groupId: 'demo-group-2',
-        name: 'Hikari Scan',
-        description: 'Nhóm dịch truyện học đường và đời thường.',
-        comicCount: 24,
-        memberCount: 1240,
-        followerCount: 2310
-    },
-    {
-        groupId: 'demo-group-3',
-        name: 'Manga Việt Group',
-        description: 'Nhóm cộng tác dịch nhiều thể loại truyện mới.',
-        comicCount: 31,
-        memberCount: 1750,
-        followerCount: 2680
-    }
-];
-
 async function searchManga(titleOrOptions = '', limit = 20, offset = 0) {
     const options = typeof titleOrOptions === 'object' && titleOrOptions !== null
         ? titleOrOptions
@@ -98,7 +71,7 @@ async function getMangaChapters(mangaId, {limit = 100, offset = 0, language = DE
         ? String(language).trim()
         : DEFAULT_TRANSLATED_LANGUAGE;
 
-    params.set('limit', clampNumber(limit, 1, 100, 100));
+    params.set('limit', clampNumber(limit, 1, MANGADEX_MAX_LIMIT, 100));
     params.set('offset', clampNumber(offset, 0, 10000, 0));
     params.append('translatedLanguage[]', selectedLanguage);
     params.set('order[chapter]', 'asc');
@@ -135,18 +108,25 @@ async function getChapterPages(chapterId) {
     }
 }
 
-async function getGroups({limit = 20, offset = 0} = {}) {
+async function getGroups({limit = 50, offset = 0, name = ''} = {}) {
     const params = new URLSearchParams();
-    params.set('limit', clampNumber(limit, 1, 50, 20));
+    params.set('limit', clampNumber(limit, 1, MANGADEX_MAX_LIMIT, 50));
     params.set('offset', clampNumber(offset, 0, 10000, 0));
+
+    if (name && String(name).trim()) {
+        params.set('name', String(name).trim());
+    }
 
     try {
         const response = await mangadexClient.get('/group', {params});
-        const groups = (response.data.data || []).map(mapGroupSummary);
-        return groups.length > 0 ? groups : DEMO_GROUPS;
+        return (response.data.data || []).map(mapGroupSummary);
     } catch (error) {
-        return DEMO_GROUPS;
+        throw normalizeMangaDexError(error, 'Không thể lấy danh sách nhóm dịch từ MangaDex');
     }
+}
+
+async function searchGroups(name, {limit = 50, offset = 0} = {}) {
+    return getGroups({name, limit, offset});
 }
 
 async function getGroupDetail(groupId) {
@@ -161,17 +141,8 @@ async function getGroupDetail(groupId) {
         }
         return mapGroupSummary(response.data.data);
     } catch (error) {
-        const fallback = DEMO_GROUPS.find((group) => group.groupId === groupId || String(group.id) === groupId);
-        if (fallback) return fallback;
         if (error.statusCode) throw error;
-        return {
-            groupId,
-            name: 'Nhóm dịch demo',
-            description: 'Dữ liệu nhóm dịch demo khi MangaDex group API không sẵn sàng.',
-            comicCount: 0,
-            memberCount: 0,
-            followerCount: 0
-        };
+        throw normalizeMangaDexError(error, 'Không thể lấy chi tiết nhóm dịch từ MangaDex');
     }
 }
 
@@ -220,16 +191,18 @@ function mapChapterSummary(item, fallbackMangaId = '') {
     };
 }
 
-function mapGroupSummary(item, index = 0) {
+function mapGroupSummary(item) {
     const attributes = item.attributes || {};
     return {
         groupId: item.id,
-        name: attributes.name || 'Nhóm dịch',
-        description: attributes.description || 'Nhóm dịch trên MangaDex',
-        comicCount: 10 + index * 2,
-        memberCount: 120 + index * 45,
-        followerCount: 300 + index * 80,
-        rank: index + 1
+        name: attributes.name || '',
+        website: attributes.website || '',
+        description: attributes.description || '',
+        memberCount: 0,
+        mangaCount: 0,
+        comicCount: 0,
+        followerCount: 0,
+        rank: 0
     };
 }
 
@@ -276,7 +249,7 @@ function normalizeMangaDexError(error, fallbackMessage) {
     }
 
     if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT') {
-        return createHttpError(504, 'MangaDex API timeout');
+        return createHttpError(504, 'Hết thời gian chờ MangaDex API');
     }
 
     if (error.request || ['ENOTFOUND', 'ECONNRESET', 'ECONNREFUSED', 'EAI_AGAIN'].includes(error.code)) {
@@ -302,5 +275,6 @@ module.exports = {
     getMangaChapters,
     getChapterPages,
     getGroups,
+    searchGroups,
     getGroupDetail
 };

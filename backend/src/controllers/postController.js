@@ -25,7 +25,7 @@ function getPost(req, res, next) {
         if (!data) {
             return res.status(404).json({
                 success: false,
-                message: 'Post not found'
+                message: 'Không tìm thấy bài viết'
             });
         }
 
@@ -45,7 +45,7 @@ function createPost(req, res, next) {
         res.status(201).json({
             success: true,
             data,
-            message: 'Post created'
+            message: 'Đã tạo bài viết'
         });
     } catch (error) {
         next(error);
@@ -59,7 +59,7 @@ function updatePost(req, res, next) {
         res.json({
             success: true,
             data,
-            message: 'Post updated'
+            message: 'Đã cập nhật bài viết'
         });
     } catch (error) {
         next(error);
@@ -73,14 +73,14 @@ function deletePost(req, res, next) {
         if (!deleted) {
             return res.status(404).json({
                 success: false,
-                message: 'Post not found'
+                message: 'Không tìm thấy bài viết'
             });
         }
 
         res.json({
             success: true,
             data: null,
-            message: 'Post deleted'
+            message: 'Đã xóa bài viết'
         });
     } catch (error) {
         next(error);
