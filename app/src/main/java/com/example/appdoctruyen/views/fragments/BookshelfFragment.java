@@ -18,6 +18,7 @@ import com.example.appdoctruyen.data.firebase.AuthManager;
 import com.example.appdoctruyen.data.firebase.BookshelfFirebaseHelper;
 import com.example.appdoctruyen.models.Comic;
 import com.example.appdoctruyen.views.activities.ComicDetailActivity;
+import com.example.appdoctruyen.views.activities.ComicReadingActivity;
 import com.example.appdoctruyen.views.adapters.BookshelfAdapter;
 
 import java.util.ArrayList;
@@ -84,11 +85,22 @@ public class BookshelfFragment extends Fragment {
     private void openComicDetail(Comic comic) {
         if (comic == null) return;
 
-        Intent intent = new Intent(requireContext(), ComicDetailActivity.class);
-        intent.putExtra("mangaId", resolveMangaId(comic));
-        intent.putExtra("comic_id", comic.getId());
-        intent.putExtra("comic_title", comic.getTitle());
-        startActivity(intent);
+        // Nếu đang ở Tab "Vừa xem" (Lịch sử đọc) -> Mở thẳng trang đọc
+        if (currentTab == 1 && comic.getChapterId() != null) {
+            Intent intent = new Intent(requireContext(), ComicReadingActivity.class);
+            intent.putExtra("mangaId", resolveMangaId(comic));
+            intent.putExtra("mangaTitle", comic.getTitle());
+            intent.putExtra("chapterId", comic.getChapterId());
+            intent.putExtra("chapterName", comic.getChapterName());
+            startActivity(intent);
+        } else {
+            // Mở trang chi tiết như bình thường
+            Intent intent = new Intent(requireContext(), ComicDetailActivity.class);
+            intent.putExtra("mangaId", resolveMangaId(comic));
+            intent.putExtra("comic_id", comic.getId());
+            intent.putExtra("comic_title", comic.getTitle());
+            startActivity(intent);
+        }
     }
 
 

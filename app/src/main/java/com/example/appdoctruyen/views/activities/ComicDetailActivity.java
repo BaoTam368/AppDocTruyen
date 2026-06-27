@@ -29,6 +29,7 @@ public class ComicDetailActivity extends AppCompatActivity {
     private MaterialButton btnReadChapter;
     private String mangaId;
     private String mangaTitle;
+    private String currentCoverUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,5 +144,17 @@ public class ComicDetailActivity extends AppCompatActivity {
             }
         }
         return firstChapter;
+    }
+
+    public String getMangaId() {
+        return mangaId;
+    }
+
+    public String getMangaTitle() {
+        return mangaTitle;
+    }
+
+    public String getCoverUrl() {
+        return currentCoverUrl;
     }
 }
