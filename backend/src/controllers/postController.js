@@ -92,7 +92,7 @@ function toggleLike(req, res, next) {
         const { userId } = req.body;
 
         if (!userId) {
-            return res.status(400).json({ success: false, message: 'Thiếu userId' });
+            return res.status(400).json({ success: false, message: 'Missing userId' });
         }
 
         const result = postService.toggleLikePost(postId, userId);
@@ -100,7 +100,7 @@ function toggleLike(req, res, next) {
             success: true,
             liked: result.liked,
             likeCount: result.likeCount,
-            message: result.liked ? 'Đã tăng 1 like' : 'Đã giảm 1 like'
+            message: result.liked ? 'Like added' : 'Like removed'
         });
     } catch (error) {
         next(error);

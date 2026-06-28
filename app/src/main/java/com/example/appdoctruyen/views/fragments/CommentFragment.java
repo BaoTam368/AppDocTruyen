@@ -77,13 +77,13 @@ public class CommentFragment extends Fragment {
         btnSendComment.setOnClickListener(v -> {
             String content = edtComment.getText().toString().trim();
             if (content.isEmpty()) {
-                edtComment.setError("Nhập nội dung bình luận");
+                edtComment.setError("Enter a comment");
                 return;
             }
 
             String currentUserId = authManager.getCurrentUserId();
             if (currentUserId == null) {
-                Toast.makeText(requireContext(), "Vui lòng đăng nhập để bình luận!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Please log in to comment!", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -96,7 +96,7 @@ public class CommentFragment extends Fragment {
 
                     addComment(newComment);
                     edtComment.setText("");
-                    Toast.makeText(requireContext(), "Đã gửi bình luận!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), "Comment sent!", Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
@@ -114,7 +114,9 @@ public class CommentFragment extends Fragment {
             @Override
             public void onSuccess(List<Comment> data) {
                 if (!isAdded() || getActivity() == null) return;
-                android.util.Log.d("TIME_DEBUG", "Thời gian nhận về từ Server: " + data.get(0).getTime());
+                if (data != null && !data.isEmpty()) {
+                    android.util.Log.d("TIME_DEBUG", "First comment time from server: " + data.get(0).getTime());
+                }
 
                 commentList.clear();
                 commentList.addAll(data);
@@ -125,7 +127,7 @@ public class CommentFragment extends Fragment {
             public void onError(String message) {
                 if (!isAdded()) return;
                 Log.e("COMMENT_FRAGMENT", "Lỗi tải bình luận: " + message);
-                Toast.makeText(requireContext(), "Không thể tải danh sách bình luận", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Unable to load comments", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -138,24 +140,24 @@ public class CommentFragment extends Fragment {
 
     private void showDeleteDialog(int commentId, int position) {
         new androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                .setTitle("Xóa bình luận")
-                .setMessage("Bạn có chắc chắn muốn xóa bình luận này không?")
-                .setPositiveButton("Xóa", (dialog, which) -> {
+                .setTitle("Delete comment")
+                .setMessage("Are you sure you want to delete this comment?")
+                .setPositiveButton("Delete", (dialog, which) -> {
                     repository.deleteComment(commentId, new MangaRepository.RepositoryCallback<Void>() {
                         @Override
                         public void onSuccess(Void data) {
                             commentList.remove(position);
                             commentAdapter.notifyItemRemoved(position);
-                            Toast.makeText(requireContext(), "Đã xóa bình luận", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(requireContext(), "Comment deleted", Toast.LENGTH_SHORT).show();
                         }
 
                         @Override
                         public void onError(String message) {
-                            Toast.makeText(requireContext(), "Lỗi: " + message, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(requireContext(), "Error: " + message, Toast.LENGTH_SHORT).show();
                         }
                     });
                 })
-                .setNegativeButton("Hủy", null)
+                .setNegativeButton("Cancel", null)
                 .show();
     }
 }

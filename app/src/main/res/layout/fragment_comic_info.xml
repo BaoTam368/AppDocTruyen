@@ -27,7 +27,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:text="Tên truyện"
+                android:text="Manga title"
                 android:textColor="@android:color/black"
                 android:textSize="20sp"
                 android:textStyle="bold"
@@ -60,7 +60,7 @@
                         android:background="@color/brand_blue"
                         android:paddingHorizontal="8dp"
                         android:paddingVertical="4dp"
-                        android:text="#Thể loại 1"
+                        android:text="#Genre 1"
                         android:textColor="@color/black"
                         android:textSize="12sp"/>
 
@@ -71,7 +71,7 @@
                         android:background="@color/brand_blue"
                         android:paddingHorizontal="8dp"
                         android:paddingVertical="4dp"
-                        android:text="#Thể loại 2"
+                        android:text="#Genre 2"
                         android:textColor="@color/black"
                         android:textSize="12sp"/>
             </LinearLayout>
@@ -102,7 +102,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
                     android:textColor="@color/text_secondary_light"
-                    android:text="Lượt thích"
+                    android:text="Likes"
                     android:textSize="14sp"/>
         </LinearLayout>
 
@@ -124,7 +124,7 @@
                     android:padding="4dp"
                     android:src="@drawable/ic_bookmark"
                     android:layout_marginEnd="16dp"
-                    android:contentDescription="Lưu vào tủ sách"/>
+                    android:contentDescription="Save to bookshelf"/>
 
             <ImageView
                     android:id="@+id/btnDownload"
@@ -133,7 +133,7 @@
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:padding="4dp"
                     android:src="@drawable/ic_download"
-                    android:contentDescription="Tải xuống"/>
+                    android:contentDescription="Download"/>
         </LinearLayout>
 
         <androidx.constraintlayout.widget.Barrier
@@ -158,7 +158,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
-                android:text="Tên nhóm dịch"
+                android:text="Translation team"
                 android:textColor="@color/text_primary_light"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -172,7 +172,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:text="Giới thiệu"
+                android:text="Introduction"
                 android:textColor="@color/text_primary_light"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -196,7 +196,7 @@
                 android:layout_marginTop="8dp"
                 android:maxLines="3"
                 android:ellipsize="end"
-                android:text="Nội dung giới thiệu"
+                android:text="Description"
                 android:textColor="@color/text_primary_light"
                 android:textSize="14sp"
                 android:lineSpacingMultiplier="1.2"
@@ -209,7 +209,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Đọc thêm"
+                android:text="Read more"
                 android:textColor="@color/brand_blue"
                 android:textStyle="bold"
                 android:padding="4dp"

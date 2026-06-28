@@ -34,7 +34,7 @@
             android:layout_height="48dp"
             android:layout_weight="1"
             android:background="@android:drawable/edit_text"
-            android:hint="Nhập bình luận..."
+            android:hint="Enter a comment..."
             android:paddingStart="12dp"
             android:paddingEnd="12dp"/>
 

@@ -39,7 +39,7 @@
                     android:id="@+id/username_post"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Sơn Tùng MTP"
+                    android:text="Skyline MTP"
                     android:textColor="#333333"
                     android:textSize="15sp"
                     android:textStyle="bold" />
@@ -49,7 +49,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="3dp"
-                    android:text="2 giờ trước"
+                    android:text="2 hours ago"
                     android:textColor="#7A7979"
                     android:textSize="13sp" />
             </LinearLayout>

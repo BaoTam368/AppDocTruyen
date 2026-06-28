@@ -3,6 +3,7 @@ const userController = require('../controllers/userController');
 
 const router = express.Router();
 
+router.post('/', userController.createOrUpdateUser);
 router.post('/sync', userController.createOrUpdateUser);
 router.get('/:userId', userController.getUser);
 router.put('/:userId', userController.updateUser);
