@@ -101,9 +101,12 @@ public interface MangaApiService {
 
     @DELETE("comments/{commentId}")
     Call<EmptyResponse> deleteComment(@Path("commentId") int commentId);
-
+    
+    //Đổi để sau này lấy tất cả và lấy 1 người dễ hơn
     @GET("posts")
-    Call<PostListResponse> getPosts();
+    Call<PostListResponse> getPosts(
+            @Query("userId") String userId
+    );
 
     @GET("posts/{postId}")
     Call<PostResponse> getPost(@Path("postId") int postId);
@@ -119,6 +122,13 @@ public interface MangaApiService {
 
     @DELETE("posts/{postId}")
     Call<EmptyResponse> deletePost(@Path("postId") int postId);
+
+    @POST("posts/{postId}/like")
+    Call<LikeResponse> toggleLikePost(
+            @Path("postId") int postId,
+            @Body LikeDto request
+    );
+
 }
 
 class MangaListResponse extends ApiResponse<List<MangaDto>> {
@@ -156,6 +166,8 @@ class MangaDto {
     List<String> tags;
     String contentRating;
     List<String> availableTranslatedLanguages;
+    int views;
+    int likes;
 }
 
 class ChapterDto {

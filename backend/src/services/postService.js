@@ -1,35 +1,32 @@
 const databaseService = require('./databaseService');
 const userService = require('./userService');
 
-function getPosts({ userId, mangaId, limit = 50, offset = 0 } = {}) {
+function getPosts({ userId, limit = 50, offset = 0 } = {}) {
     const database = databaseService.getDatabase();
     const filters = [];
     const params = [];
 
     if (userId) {
-        filters.push('user_id = ?');
+        filters.push('p.user_id = ?');
         params.push(userId);
-    }
-
-    if (mangaId) {
-        filters.push('manga_id = ?');
-        params.push(mangaId);
     }
 
     const whereClause = filters.length ? `WHERE ${filters.join(' AND ')}` : '';
     const stmt = database.prepare(`
-        SELECT
-            id,
-            user_id,
-            title,
-            content,
-            image_url,
-            manga_id,
-            created_at,
-            updated_at
-        FROM posts
+            SELECT
+                p.id,
+                p.user_id,
+                u.display_name,
+                u.avatar_url,
+                p.content,
+                p.image_url,
+                p.like_count,
+                p.created_at
+            FROM posts p
+            LEFT JOIN users u
+            ON p.user_id = u.user_id
         ${whereClause}
-        ORDER BY created_at DESC
+        ORDER BY p.created_at DESC
         LIMIT ? OFFSET ?
     `);
 
@@ -41,16 +38,18 @@ function getPostById(postId) {
     const database = databaseService.getDatabase();
     const stmt = database.prepare(`
         SELECT
-            id,
-            user_id,
-            title,
-            content,
-            image_url,
-            manga_id,
-            created_at,
-            updated_at
-        FROM posts
-        WHERE id = ?
+             p.id,
+             p.user_id,
+             u.display_name,
+             u.avatar_url,
+             p.content,
+             p.image_url,
+             p.like_count,
+             p.created_at
+        FROM posts p
+        LEFT JOIN users u
+        ON p.user_id = u.user_id
+        WHERE p.id = ?
     `);
 
     const row = stmt.get(postId);
@@ -59,10 +58,8 @@ function getPostById(postId) {
 
 function createPost(payload = {}) {
     const userId = normalizeText(payload.userId || payload.user_id || 'local_user');
-    const title = normalizeNullable(payload.title);
     const content = normalizeText(payload.content);
     const imageUrl = normalizeNullable(payload.imageUrl || payload.image_url);
-    const mangaId = normalizeNullable(payload.mangaId || payload.manga_id);
 
     if (!content) {
         throw createHttpError(400, 'Missing post content');
@@ -72,11 +69,13 @@ function createPost(payload = {}) {
 
     const database = databaseService.getDatabase();
     const stmt = database.prepare(`
-        INSERT INTO posts (user_id, title, content, image_url, manga_id, updated_at)
-        VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+
+            INSERT INTO posts
+            (user_id, content, image_url)
+            VALUES (?, ?, ?)
     `);
 
-    const result = stmt.run(userId, title, content, imageUrl, mangaId);
+    const result = stmt.run(userId, content, imageUrl);
     return getPostById(result.lastInsertRowid);
 }
 
@@ -86,18 +85,12 @@ function updatePost(postId, payload = {}) {
         throw createHttpError(404, 'Post not found');
     }
 
-    const title = hasOwn(payload, 'title') ? normalizeNullable(payload.title) : existing.title;
     const content = hasOwn(payload, 'content') ? normalizeText(payload.content) : existing.content;
     const imageUrl = hasOwn(payload, 'imageUrl')
         ? normalizeNullable(payload.imageUrl)
         : hasOwn(payload, 'image_url')
             ? normalizeNullable(payload.image_url)
             : existing.imageUrl;
-    const mangaId = hasOwn(payload, 'mangaId')
-        ? normalizeNullable(payload.mangaId)
-        : hasOwn(payload, 'manga_id')
-            ? normalizeNullable(payload.manga_id)
-            : existing.mangaId;
 
     if (!content) {
         throw createHttpError(400, 'Missing post content');
@@ -105,12 +98,16 @@ function updatePost(postId, payload = {}) {
 
     const database = databaseService.getDatabase();
     const stmt = database.prepare(`
+
         UPDATE posts
-        SET title = ?, content = ?, image_url = ?, manga_id = ?, updated_at = CURRENT_TIMESTAMP
+        SET
+            content = ?,
+            image_url = ?
         WHERE id = ?
+
     `);
 
-    stmt.run(title, content, imageUrl, mangaId, postId);
+    stmt.run( content, imageUrl, postId);
     return getPostById(postId);
 }
 
@@ -120,17 +117,28 @@ function deletePost(postId) {
     const result = stmt.run(postId);
     return result.changes > 0;
 }
-
 function mapPost(row) {
     return {
         id: row.id,
         userId: row.user_id,
-        title: row.title || '',
+        user_id: row.user_id,
+
+        display_name: row.display_name,
+        displayName: row.display_name,
+
+        avatarUrl: row.avatar_url,
+        avatar_url: row.avatar_url,
+
         content: row.content,
+
         imageUrl: row.image_url,
-        mangaId: row.manga_id,
+        image_url: row.image_url,
+
+        likeCount: row.like_count,
+        like_count: row.like_count,
+
         createdAt: row.created_at,
-        updatedAt: row.updated_at
+        created_at: row.created_at
     };
 }
 
@@ -159,10 +167,36 @@ function createHttpError(statusCode, message) {
     return error;
 }
 
+function toggleLikePost(postId, userId) {
+    const database = databaseService.getDatabase();
+
+    const checkLike = database.prepare('SELECT 1 FROM post_likes WHERE user_id = ? AND post_id = ?').get(userId, postId);
+
+    if (checkLike) {
+        database.prepare('DELETE FROM post_likes WHERE user_id = ? AND post_id = ?').run(userId, postId);
+        database.prepare('UPDATE posts SET like_count = MAX(0, like_count - 1) WHERE id = ?').run(postId);
+
+        return { liked: false, likeCount: getLikeCount(postId) };
+    } else {
+        database.prepare('INSERT INTO post_likes (user_id, post_id) VALUES (?, ?)').run(userId, postId);
+        database.prepare('UPDATE posts SET like_count = like_count + 1 WHERE id = ?').run(postId);
+
+        return { liked: true, likeCount: getLikeCount(postId) };
+    }
+}
+
+function getLikeCount(postId) {
+    const database = databaseService.getDatabase();
+    const row = database.prepare('SELECT like_count FROM posts WHERE id = ?').get(postId);
+    return row ? row.like_count : 0;
+}
+
 module.exports = {
     getPosts,
     getPostById,
     createPost,
     updatePost,
-    deletePost
+    deletePost,
+    toggleLikePost,
+    getLikeCount
 };

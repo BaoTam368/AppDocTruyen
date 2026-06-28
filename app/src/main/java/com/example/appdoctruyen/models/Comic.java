@@ -24,6 +24,8 @@ public class Comic {
     private Integer year;
     private String contentRating;
     private List<String> availableTranslatedLanguages;
+    private int views;
+    private int likes;
 
     public Comic(int id, String title, int coverImageResId, String coverUrl,
                  String latestChapter, String lastReadChapter, String author,
@@ -205,6 +207,22 @@ public class Comic {
 
     public List<String> getAvailableTranslatedLanguages() {
         return availableTranslatedLanguages;
+    }
+
+    public int getViews() {
+        return views;
+    }
+
+    public void setViews(int views) {
+        this.views = views;
+    }
+
+    public int getLikes() {
+        return likes;
+    }
+
+    public void setLikes(int likes) {
+        this.likes = likes;
     }
 
     public void setAvailableTranslatedLanguages(List<String> availableTranslatedLanguages) {

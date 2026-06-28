@@ -1,14 +1,13 @@
 package com.example.appdoctruyen.views.fragments;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,9 +16,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.appdoctruyen.R;
+import com.example.appdoctruyen.data.api.CreateCommentRequest;
+import com.example.appdoctruyen.data.api.MangaRepository;
+import com.example.appdoctruyen.data.firebase.AuthManager;
 import com.example.appdoctruyen.models.Comment;
 import com.example.appdoctruyen.views.adapters.CommentAdapter;
-import com.example.appdoctruyen.views.adapters.PostAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,91 +30,132 @@ public class CommentFragment extends Fragment {
     private RecyclerView rvComments;
     private List<Comment> commentList;
     private CommentAdapter commentAdapter;
-    private Spinner spinnerComic;
     private EditText edtComment;
     private ImageButton btnSendComment;
+
+    private MangaRepository repository;
+    private AuthManager authManager;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        repository = new MangaRepository();
+    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.list_world_comment, container, false);
+
         rvComments = view.findViewById(R.id.recyclerViewComment);
-        spinnerComic = view.findViewById(R.id.spinner_comic);
         edtComment = view.findViewById(R.id.edt_comment);
         btnSendComment = view.findViewById(R.id.btn_send_comment);
-        setupSpinner();
+
+        authManager = new AuthManager(requireContext());
+
         setupCommentList();
         setupSendButton();
-
-//        @SuppressLint({"MissingInflatedId", "LocalSuppress"})
-//        RecyclerView recyclerView = view.findViewById(R.id.recyclerViewComment);
-//        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-//        List<Comment> list = new ArrayList<>();
-//        list.add(new Comment("Hải Tú", "10 phút trước", "Tuyệt vời quá sếp ơi!!!", "https://i.pinimg.com/736x/87/9b/a9/879ba9d3f1cc4821a37c92b0c369fc48.jpg", "..."));
-//        list.add(new Comment("Mono", "30 phút trước", "Đỉnh của chóp anh trai ơi ", "https://i.pinimg.com/736x/d8/50/be/d850bede84c97ea84d93f7cb49c3bde7.jpg", "..."));
-//
-//        CommentAdapter adapter = new CommentAdapter(requireContext(), list);
-//        recyclerView.setAdapter(adapter);
+        loadComments();
 
         return view;
-    }
-
-    private void setupSendButton() {
-
-        btnSendComment.setOnClickListener(v -> {
-            String content = edtComment.getText().toString().trim();
-            if (content.isEmpty()) {
-                edtComment.setError("Enter comment content");
-                return;
-            }
-
-            String comicName = spinnerComic.getSelectedItem().toString();
-            Comment comment = new Comment("Linh Nguyen", "Just now", content, "https://i.pinimg.com/736x/87/9b/a9/879ba9d3f1cc4821a37c92b0c369fc48.jpg", comicName);
-            addComment(comment);
-            edtComment.setText("");
-        });
     }
 
     private void setupCommentList() {
         commentList = new ArrayList<>();
         rvComments.setLayoutManager(new LinearLayoutManager(requireContext()));
-        rvComments.setNestedScrollingEnabled(false);
 
         commentAdapter = new CommentAdapter(requireContext(), commentList, (comment, position) -> {
+            if (comment.getUserId() != null && comment.getUserId().equals(authManager.getCurrentUserId())) {
+                showDeleteDialog(comment.getId(), position);
+            }
         });
 
         rvComments.setAdapter(commentAdapter);
+    }
 
-        addComment(new Comment("Chen Dong", "10 minutes ago", "Renegade Immortal just got a new chapter, and it is really good!", "https://i.pinimg.com/736x/87/9b/a9/879ba9d3f1cc4821a37c92b0c369fc48.jpg", "..."));
-        addComment(new Comment("Xiao Ding", "20 minutes ago", "How many coins will later VIP chapters cost to unlock?", "https://i.pinimg.com/736x/87/9b/a9/879ba9d3f1cc4821a37c92b0c369fc48.jpg", "..."));
-        addComment(new Comment("I Eat Tomatoes", "30 minutes ago", "Great art and smooth translation. This team deserves five stars!", "https://i.pinimg.com/736x/87/9b/a9/879ba9d3f1cc4821a37c92b0c369fc48.jpg", "..."));
-        addComment(new Comment("Tang Jia San Shao", "120 minutes ago", "Does anyone know the exact release schedule for this series?", "https://i.pinimg.com/736x/87/9b/a9/879ba9d3f1cc4821a37c92b0c369fc48.jpg", "..."));
-        addComment(new Comment("Er Gen", "300 minutes ago", "I just topped up 50k and unlocked a long reading session.", "https://i.pinimg.com/736x/87/9b/a9/879ba9d3f1cc4821a37c92b0c369fc48.jpg", "..."));
+    private void setupSendButton() {
+        btnSendComment.setOnClickListener(v -> {
+            String content = edtComment.getText().toString().trim();
+            if (content.isEmpty()) {
+                edtComment.setError("Nhập nội dung bình luận");
+                return;
+            }
 
+            String currentUserId = authManager.getCurrentUserId();
+            if (currentUserId == null) {
+                Toast.makeText(requireContext(), "Vui lòng đăng nhập để bình luận!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            CreateCommentRequest request = new CreateCommentRequest(currentUserId, content);
+
+            repository.createComment(request, new MangaRepository.RepositoryCallback<Comment>() {
+                @Override
+                public void onSuccess(Comment newComment) {
+                    if (!isAdded() || getActivity() == null) return;
+
+                    addComment(newComment);
+                    edtComment.setText("");
+                    Toast.makeText(requireContext(), "Đã gửi bình luận!", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onError(String message) {
+                    if (!isAdded()) return;
+                    Log.e("COMMENT_FRAGMENT", "Lỗi tạo bình luận: " + message);
+                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
+    }
+
+    private void loadComments() {
+        repository.getComments(new MangaRepository.RepositoryCallback<List<Comment>>() {
+            @Override
+            public void onSuccess(List<Comment> data) {
+                if (!isAdded() || getActivity() == null) return;
+                android.util.Log.d("TIME_DEBUG", "Thời gian nhận về từ Server: " + data.get(0).getTime());
+
+                commentList.clear();
+                commentList.addAll(data);
+                commentAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onError(String message) {
+                if (!isAdded()) return;
+                Log.e("COMMENT_FRAGMENT", "Lỗi tải bình luận: " + message);
+                Toast.makeText(requireContext(), "Không thể tải danh sách bình luận", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public void addComment(Comment comment) {
         commentList.add(0, comment);
-
         commentAdapter.notifyItemInserted(0);
-
         rvComments.scrollToPosition(0);
     }
 
-    private void setupSpinner() {
+    private void showDeleteDialog(int commentId, int position) {
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Xóa bình luận")
+                .setMessage("Bạn có chắc chắn muốn xóa bình luận này không?")
+                .setPositiveButton("Xóa", (dialog, which) -> {
+                    repository.deleteComment(commentId, new MangaRepository.RepositoryCallback<Void>() {
+                        @Override
+                        public void onSuccess(Void data) {
+                            commentList.remove(position);
+                            commentAdapter.notifyItemRemoved(position);
+                            Toast.makeText(requireContext(), "Đã xóa bình luận", Toast.LENGTH_SHORT).show();
+                        }
 
-        List<String> comics = new ArrayList<>();
-
-        comics.add("Renegade Immortal");
-        comics.add("Battle Through the Heavens");
-        comics.add("A Will Eternal");
-        comics.add("A Record of a Mortal's Journey to Immortality");
-        comics.add("The Eternal Supreme");
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, comics);
-
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        spinnerComic.setAdapter(adapter);
+                        @Override
+                        public void onError(String message) {
+                            Toast.makeText(requireContext(), "Lỗi: " + message, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
     }
 }

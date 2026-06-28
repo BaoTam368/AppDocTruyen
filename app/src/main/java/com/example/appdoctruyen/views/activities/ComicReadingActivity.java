@@ -68,7 +68,7 @@ public class ComicReadingActivity extends AppCompatActivity {
         coverUrl = getIntent().getStringExtra("comic_cover");
 
         bookshelfDatabaseHelper = new BookshelfDatabaseHelper(this);
-        authManager = new AuthManager();
+        authManager = new AuthManager(this);
         String userId = getCurrentUserId();
         if (userId != null && !userId.equals("local_user")) {
             firebaseHelper = new BookshelfFirebaseHelper(userId);

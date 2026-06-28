@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const cors = require('cors');
 const express = require('express');
+const path = require('path');
 
 const chapterRoutes = require('./src/routes/chapterRoutes');
 const commentRoutes = require('./src/routes/commentRoutes');
@@ -16,6 +17,7 @@ const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.get('/api/health', (req, res) => {
     res.json({
@@ -40,6 +42,7 @@ app.use((req, res) => {
 });
 
 app.use((err, req, res, next) => {
+    console.error("LỖI :", err);
     const statusCode = err.statusCode || 500;
     res.status(statusCode).json({
         success: false,
@@ -50,3 +53,4 @@ app.use((err, req, res, next) => {
 app.listen(port, () => {
     console.log(`Node.js MangaDex service is running at http://localhost:${port}`);
 });
+
