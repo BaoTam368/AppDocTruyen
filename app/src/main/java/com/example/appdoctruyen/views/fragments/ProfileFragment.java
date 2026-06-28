@@ -3,6 +3,7 @@ package com.example.appdoctruyen.views.fragments;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,13 +22,16 @@ import com.example.appdoctruyen.views.activities.RechargeActivity;
 import com.example.appdoctruyen.views.activities.SearchActivity;
 import com.example.appdoctruyen.views.activities.UserDetailsActivity;
 import com.google.android.material.imageview.ShapeableImageView;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class ProfileFragment extends Fragment {
     LinearLayout btn_logout, btn_topup;
     ShapeableImageView iv_user_avatar;
     TextView tv_username, tv_user_title;
     private AuthManager authManager;
+
 
     @SuppressLint("MissingInflatedId")
     @Nullable
@@ -41,8 +45,8 @@ public class ProfileFragment extends Fragment {
         tv_username = view.findViewById(R.id.tv_username);
         tv_user_title = view.findViewById(R.id.tv_user_title);
         authManager = new AuthManager(requireContext());
-
         loadUserInfo();
+        loadUserProfile();
 
         btn_logout.setOnClickListener(v -> {
             authManager.logout();
@@ -87,6 +91,32 @@ public class ProfileFragment extends Fragment {
                         .error(R.drawable.placeholder_comic)
                         .into(iv_user_avatar);
             }
+        }
+    }
+    private void loadUserProfile() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            String uid = currentUser.getUid();
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("users").document(uid)
+                    .addSnapshotListener((documentSnapshot, error) -> {
+                        if (error != null) {
+                            Log.e("ProfileFragment", "Lỗi tải dữ liệu", error);
+                            return;
+                        }
+                        if (documentSnapshot != null && documentSnapshot.exists()) {
+                            String name = documentSnapshot.getString("username");
+
+                            if (name != null && !name.isEmpty()) {
+                                tv_username.setText(name);
+                            } else {
+                                String email = currentUser.getEmail();
+                                if (email != null && email.contains("@")) {
+                                    tv_username.setText(email.substring(0, email.indexOf("@")));
+                                }
+                            }
+                        }
+                    });
         }
     }
 }
