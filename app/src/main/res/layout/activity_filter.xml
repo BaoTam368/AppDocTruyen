@@ -76,7 +76,7 @@
                             android:background="@drawable/bg_tab_unselected"
                             android:paddingHorizontal="12dp"
                             android:paddingVertical="6dp"
-                            android:text="Tất cả"
+                            android:text="All"
                             android:textColor="@color/white"
                             android:textSize="13sp"/>
 
@@ -87,7 +87,7 @@
                             android:background="@drawable/bg_tab_unselected"
                             android:paddingHorizontal="12dp"
                             android:paddingVertical="6dp"
-                            android:text="Cập nhật"
+                            android:text="Updated"
                             android:textColor="@color/text_primary_light"
                             android:textSize="13sp"/>
 
@@ -98,7 +98,7 @@
                             android:background="@drawable/bg_tab_unselected"
                             android:paddingHorizontal="12dp"
                             android:paddingVertical="6dp"
-                            android:text="Đang ra"
+                            android:text="Ongoing"
                             android:textColor="@color/text_primary_light"
                             android:textSize="13sp"/>
                 </LinearLayout>
@@ -116,7 +116,7 @@
                             android:background="@drawable/bg_tab_unselected"
                             android:paddingHorizontal="12dp"
                             android:paddingVertical="6dp"
-                            android:text="Ngày"
+                            android:text="Date"
                             android:textColor="@color/text_primary_light"
                             android:textSize="13sp"/>
 
@@ -127,7 +127,7 @@
                             android:background="@drawable/bg_tab_unselected"
                             android:paddingHorizontal="12dp"
                             android:paddingVertical="6dp"
-                            android:text="Lượt xem"
+                            android:text="Views"
                             android:textColor="@color/text_primary_light"
                             android:textSize="13sp"/>
                 </LinearLayout>
@@ -160,7 +160,7 @@
                             android:background="@drawable/bg_tab_unselected"
                             android:paddingHorizontal="12dp"
                             android:paddingVertical="6dp"
-                            android:text="Truyện mới"
+                            android:text="New Manga"
                             android:textColor="@color/white"
                             android:textSize="13sp"/>
 
@@ -171,7 +171,7 @@
                             android:background="@drawable/bg_tab_unselected"
                             android:paddingHorizontal="12dp"
                             android:paddingVertical="6dp"
-                            android:text="Hoàn thành"
+                            android:text="Completed"
                             android:textColor="@color/text_primary_light"
                             android:textSize="13sp"/>
                 </LinearLayout>

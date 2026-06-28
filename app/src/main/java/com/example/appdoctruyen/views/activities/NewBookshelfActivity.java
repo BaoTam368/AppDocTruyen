@@ -35,7 +35,7 @@ public class NewBookshelfActivity extends AppCompatActivity {
 
         List<Comic> comicList = new ArrayList<>();
 
-        comicList.add(new Comic(1, "Võ Luyện Đỉnh Phong", R.drawable.placeholder_comic, null, "Chapter 2315", null, "Manhua", "19:08 28/12/2024", false, false));
+        comicList.add(new Comic(1, "Martial Peak", R.drawable.placeholder_comic, null, "Chapter 2315", null, "Manhua", "19:08 28/12/2024", false, false));
         comicList.add(new Comic(2, "One Piece", R.drawable.placeholder_comic, null, "Chapter 1150", null, "Manga", "20:15 20/06/2026", false, false));
 
         NewComicAdapter adapter = new NewComicAdapter(this, comicList, (comic, position) -> {

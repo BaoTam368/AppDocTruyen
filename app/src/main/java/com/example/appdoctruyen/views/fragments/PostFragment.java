@@ -78,7 +78,7 @@ public class PostFragment extends Fragment {
             String currentUserId = authManager.getCurrentUserId();
 
             if (currentUserId == null) {
-                Toast.makeText(requireContext(), "Vui lòng đăng nhập để thích bài viết!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Please log in to like posts!", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -94,7 +94,7 @@ public class PostFragment extends Fragment {
                 @Override
                 public void onError(String message) {
                     if (!isAdded()) return;
-                    Toast.makeText(requireContext(), "Lỗi tương tác: " + message, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), "Interaction error: " + message, Toast.LENGTH_SHORT).show();
                 }
             });
         });

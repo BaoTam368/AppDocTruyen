@@ -35,7 +35,7 @@ public class TopSearchTagAdapter extends RecyclerView.Adapter<TopSearchTagAdapte
         holder.tvTagName.setText(tag);
 
         holder.itemView.setOnClickListener(v -> {
-            Toast.makeText(v.getContext(), "Tìm kiếm: " + tag, Toast.LENGTH_SHORT).show();
+            Toast.makeText(v.getContext(), "Search: " + tag, Toast.LENGTH_SHORT).show();
         });
     }
 

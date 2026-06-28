@@ -27,8 +27,8 @@ public class GroupFragment extends Fragment {
         @SuppressLint({"MissingInflatedId", "LocalSuppress"}) RecyclerView recyclerView = view.findViewById(R.id.recyclerViewGroup);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         List<Group> list = new ArrayList<>();
-        list.add(new Group("Skyholic - Sơn Tùng M-TP", "...", "cap", "https://i.pinimg.com/originals/a0/0b/ce/a00bce1efb2fcd1b9d44359d95f0fc88.jpg", 1500, 450));
-        list.add(new Group("Cộng đồng Đạp xe Xuyên Việt", "...", "cap", "https://i.pinimg.com/originals/c9/4c/bb/c94cbbf16b3fcf58be79d50c95029e9f.jpg", 2000, 120));
+        list.add(new Group("Skyholic Scanlation", "...", "cap", "https://i.pinimg.com/originals/a0/0b/ce/a00bce1efb2fcd1b9d44359d95f0fc88.jpg", 1500, 450));
+        list.add(new Group("Crossroad Manga Community", "...", "cap", "https://i.pinimg.com/originals/c9/4c/bb/c94cbbf16b3fcf58be79d50c95029e9f.jpg", 2000, 120));
 
         GroupAdapter adapter = new GroupAdapter(requireContext(), list);
         recyclerView.setAdapter(adapter);

@@ -46,7 +46,7 @@ async function getLocalMangaDetail(req, res, next) {
         if (!manga) {
             return res.status(404).json({
                 success: false,
-                message: 'Không tìm thấy truyện trong database'
+                message: 'Manga not found in database'
             });
         }
 
@@ -81,7 +81,7 @@ async function syncFromMangaDex(req, res, next) {
         res.json({
             success: true,
             data: manga,
-            message: 'Đã đồng bộ truyện thành công'
+            message: 'Manga synced successfully'
         });
     } catch (error) {
         next(error);
@@ -95,7 +95,7 @@ async function syncPopular(req, res, next) {
         res.json({
             success: true,
             data: mangas,
-            message: `Đã đồng bộ ${mangas.length} truyện phổ biến`
+            message: `Synced ${mangas.length} popular manga`
         });
     } catch (error) {
         next(error);
@@ -108,7 +108,7 @@ async function searchAndSync(req, res, next) {
         if (!q) {
             return res.status(400).json({
                 success: false,
-                message: 'Thiếu từ khóa tìm kiếm'
+                message: 'Missing search keyword'
             });
         }
 
@@ -117,7 +117,7 @@ async function searchAndSync(req, res, next) {
         res.json({
             success: true,
             data: mangas,
-            message: `Đã tìm và đồng bộ ${mangas.length} truyện`
+            message: `Found and synced ${mangas.length} manga`
         });
     } catch (error) {
         next(error);

@@ -36,7 +36,7 @@ public class AuthManager {
                 syncUserToBackend(user);
                 callback.onSuccess(user);
             } else {
-                callback.onFailure(task.getException() != null ? task.getException().getLocalizedMessage() : "Đăng nhập thất bại");
+                callback.onFailure(task.getException() != null ? task.getException().getLocalizedMessage() : "Login failed");
             }
         });
     }
@@ -48,7 +48,7 @@ public class AuthManager {
                 syncUserToBackend(user);
                 callback.onSuccess(user);
             } else {
-                callback.onFailure(task.getException() != null ? task.getException().getLocalizedMessage() : "Đăng ký thất bại");
+                callback.onFailure(task.getException() != null ? task.getException().getLocalizedMessage() : "Registration failed");
             }
         });
     }
@@ -78,7 +78,7 @@ public class AuthManager {
                 syncUserToBackend(user);
                 callback.onSuccess(user);
             } else {
-                callback.onFailure(task.getException() != null ? task.getException().getLocalizedMessage() : "Đăng nhập Google thất bại");
+                callback.onFailure(task.getException() != null ? task.getException().getLocalizedMessage() : "Google login failed");
             }
         });
     }
@@ -91,7 +91,7 @@ public class AuthManager {
                 syncUserToBackend(user);
                 callback.onSuccess(user);
             } else {
-                callback.onFailure(task.getException() != null ? task.getException().getLocalizedMessage() : "Đăng nhập Facebook thất bại");
+                callback.onFailure(task.getException() != null ? task.getException().getLocalizedMessage() : "Facebook login failed");
             }
         });
     }

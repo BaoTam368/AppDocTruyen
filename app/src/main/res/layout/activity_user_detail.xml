@@ -72,7 +72,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="tu sĩ cấp cao"
+                    android:text="Advanced Cultivator"
                     android:textColor="@color/text_secondary_light"
                     android:textSize="12sp"
                     app:layout_constraintStart_toStartOf="@id/tv_username"
@@ -124,7 +124,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="24dp"
-                    android:text="tu sĩ cấp cao"
+                    android:text="Advanced Cultivator"
                     android:textColor="@color/text_secondary_light"
                     android:textSize="13sp"
                     app:layout_constraintStart_toEndOf="@id/tv_level_num"
@@ -206,7 +206,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="Chưa có bài viết"
+                android:text="No posts yet"
                 android:textColor="@color/text_primary_light"
                 android:textSize="15sp"/>
     </LinearLayout>

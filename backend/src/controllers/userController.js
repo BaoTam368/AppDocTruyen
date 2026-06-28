@@ -7,7 +7,7 @@ function createOrUpdateUser(req, res, next) {
         res.json({
             success: true,
             data,
-            message: 'Đã lưu người dùng'
+            message: 'User saved'
         });
     } catch (error) {
         next(error);
@@ -21,7 +21,7 @@ function getUser(req, res, next) {
         if (!data) {
             return res.status(404).json({
                 success: false,
-                message: 'Không tìm thấy người dùng'
+                message: 'User not found'
             });
         }
 
@@ -41,7 +41,7 @@ function updateUser(req, res, next) {
         res.json({
             success: true,
             data,
-            message: 'Đã cập nhật người dùng'
+            message: 'User updated'
         });
     } catch (error) {
         next(error);

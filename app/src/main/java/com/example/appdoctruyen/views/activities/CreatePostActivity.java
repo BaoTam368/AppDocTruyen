@@ -100,7 +100,7 @@ public class CreatePostActivity extends AppCompatActivity {
         String content = editCaption.getText().toString().trim();
 
         if (content.isEmpty()) {
-            Toast.makeText(this, "Vui lòng nhập nội dung!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please enter content!", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -110,7 +110,7 @@ public class CreatePostActivity extends AppCompatActivity {
             @Override
             public void onSuccess(Post data) {
 
-                Toast.makeText(CreatePostActivity.this, "Đăng bài thành công!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CreatePostActivity.this, "Post created successfully!", Toast.LENGTH_SHORT).show();
                 setResult(RESULT_OK);
                 finish();
             }

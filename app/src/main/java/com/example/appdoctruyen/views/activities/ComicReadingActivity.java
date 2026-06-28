@@ -122,7 +122,7 @@ public class ComicReadingActivity extends AppCompatActivity {
         // Nút chuyển sang chương tiếp theo
         btnNextChapter.setOnClickListener(v -> {
             if (chapterList == null || chapterList.isEmpty()) {
-                Toast.makeText(this, "Không có danh sách chapter", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "No chapter list available", Toast.LENGTH_SHORT).show();
                 return;
             }
             
@@ -133,7 +133,7 @@ public class ComicReadingActivity extends AppCompatActivity {
                 chapterName = nextChapter.getName();
                 loadChapterData(currentChapterIndex + 1);
             } else {
-                Toast.makeText(this, "Đã đến chapter cuối cùng", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "You have reached the last chapter", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -157,7 +157,7 @@ public class ComicReadingActivity extends AppCompatActivity {
             loadChapterPagesFromApi(chapterId);
             saveHistory();
         } else {
-            Toast.makeText(this, "Không có chapterId, hiển thị ảnh mẫu", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "No chapterId found. Showing sample images.", Toast.LENGTH_SHORT).show();
             loadMockPages(chapterNum);
             saveHistory();
         }
@@ -209,13 +209,13 @@ public class ComicReadingActivity extends AppCompatActivity {
     }
 
     private void loadChapterPagesFromApi(String chapterId) {
-        Toast.makeText(this, "Đang tải trang...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Loading pages...", Toast.LENGTH_SHORT).show();
         
         mangaRepository.getChapterPages(chapterId, new MangaRepository.RepositoryCallback<List<ComicPage>>() {
             @Override
             public void onSuccess(List<ComicPage> data) {
                 if (data == null || data.isEmpty()) {
-                    Toast.makeText(ComicReadingActivity.this, "Không có trang nào cho chapter này", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ComicReadingActivity.this, "No pages found for this chapter", Toast.LENGTH_SHORT).show();
                     loadMockPages(currentChapter);
                     return;
                 }
@@ -224,12 +224,12 @@ public class ComicReadingActivity extends AppCompatActivity {
                 pageList.addAll(data);
                 adapter.notifyDataSetChanged();
                 lvPages.scrollToPosition(0);
-                Toast.makeText(ComicReadingActivity.this, "Đã tải " + data.size() + " trang", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ComicReadingActivity.this, "Loaded " + data.size() + " pages", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onError(String message) {
-                Toast.makeText(ComicReadingActivity.this, "Lỗi tải trang: " + message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(ComicReadingActivity.this, "Page loading error: " + message, Toast.LENGTH_SHORT).show();
                 loadMockPages(currentChapter);
             }
         });
@@ -269,7 +269,7 @@ public class ComicReadingActivity extends AppCompatActivity {
 
             @Override
             public void onError(String message) {
-                Toast.makeText(ComicReadingActivity.this, "Lỗi tải danh sách chapter: " + message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(ComicReadingActivity.this, "Chapter list loading error: " + message, Toast.LENGTH_SHORT).show();
             }
         });
     }

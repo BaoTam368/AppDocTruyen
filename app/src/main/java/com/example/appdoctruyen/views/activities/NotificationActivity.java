@@ -37,10 +37,10 @@ public class NotificationActivity extends AppCompatActivity {
 
         List<Notification> notifications = new ArrayList<>();
 
-        notifications.add(new Notification("Bạn đã nhận được 500 xu vào tài khoản lúc 13:45 11-11-2024"));
-        notifications.add(new Notification("Truyện One Piece đã cập nhật Chapter 1100"));
-        notifications.add(new Notification("Truyện Solo Leveling đã cập nhật Chapter 179"));
-        notifications.add(new Notification("Tài khoản của bạn nhận được phần thưởng đăng nhập hằng ngày"));
+        notifications.add(new Notification("You received 500 coins in your account at 13:45 11-11-2024"));
+        notifications.add(new Notification("One Piece has been updated to Chapter 1100"));
+        notifications.add(new Notification("Solo Leveling has been updated to Chapter 179"));
+        notifications.add(new Notification("Your account received a daily login reward"));
 
         NotificationAdapter adapter = new NotificationAdapter(notifications);
         Log.d("TEST", "Size = " + notifications.size());

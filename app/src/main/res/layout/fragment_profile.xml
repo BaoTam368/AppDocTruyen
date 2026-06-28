@@ -22,7 +22,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Cá nhân"
+                android:text="Profile"
                 android:textColor="@color/white"
                 android:textSize="20sp"
                 android:textStyle="bold" />
@@ -63,7 +63,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="Hóa Thần"
+                    android:text="Deity Transformation"
                     android:textColor="#444444"
                     android:textSize="14sp" />
             </LinearLayout>
@@ -77,7 +77,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginBottom="8dp"
-            android:text="Cài Đặt"
+            android:text="Settings"
             android:textColor="#000000"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -131,7 +131,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:layout_weight="1"
-                    android:text="Chế độ nền tối"
+                    android:text="Dark mode"
                     android:textSize="15sp" />
 
                 <androidx.appcompat.widget.SwitchCompat
@@ -150,7 +150,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="8dp"
-            android:text="Chức Năng"
+            android:text="Features"
             android:textColor="#000000"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -217,7 +217,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:text="Nạp xu" />
+                    android:text="Top up coins" />
             </LinearLayout>
 
 <!--            <LinearLayout-->
@@ -305,7 +305,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:text="Điều khoản sử dụng" />
+                    android:text="Terms of use" />
             </LinearLayout>
 
             <LinearLayout
@@ -324,7 +324,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:text="Đăng xuất" />
+                    android:text="Log out" />
             </LinearLayout>
 
         </LinearLayout>

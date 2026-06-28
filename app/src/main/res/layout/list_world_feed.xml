@@ -28,7 +28,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="24dp"
-        android:contentDescription="Đăng bài mới"
+        android:contentDescription="Create new post"
         android:src="@android:drawable/ic_input_add"
         app:backgroundTint="#00ACC1"
         app:tint="#FFFFFF"

@@ -24,7 +24,7 @@ function getPost(req, res, next) {
         if (!data) {
             return res.status(404).json({
                 success: false,
-                message: 'Không tìm thấy bài viết'
+                message: 'Post not found'
             });
         }
 
@@ -44,7 +44,7 @@ function createPost(req, res, next) {
         res.status(201).json({
             success: true,
             data,
-            message: 'Đã tạo bài viết'
+            message: 'Post created'
         });
     } catch (error) {
         next(error);
@@ -58,7 +58,7 @@ function updatePost(req, res, next) {
         res.json({
             success: true,
             data,
-            message: 'Đã cập nhật bài viết'
+            message: 'Post updated'
         });
     } catch (error) {
         next(error);
@@ -72,14 +72,14 @@ function deletePost(req, res, next) {
         if (!deleted) {
             return res.status(404).json({
                 success: false,
-                message: 'Không tìm thấy bài viết'
+                message: 'Post not found'
             });
         }
 
         res.json({
             success: true,
             data: null,
-            message: 'Đã xóa bài viết'
+            message: 'Post deleted'
         });
     } catch (error) {
         next(error);
@@ -92,7 +92,7 @@ function toggleLike(req, res, next) {
         const { userId } = req.body;
 
         if (!userId) {
-            return res.status(400).json({ success: false, message: 'Thiếu userId' });
+            return res.status(400).json({ success: false, message: 'Missing userId' });
         }
 
         const result = postService.toggleLikePost(postId, userId);
@@ -100,7 +100,7 @@ function toggleLike(req, res, next) {
             success: true,
             liked: result.liked,
             likeCount: result.likeCount,
-            message: result.liked ? 'Đã tăng 1 like' : 'Đã giảm 1 like'
+            message: result.liked ? 'Like added' : 'Like removed'
         });
     } catch (error) {
         next(error);
