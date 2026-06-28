@@ -65,10 +65,10 @@ public class CreatePostActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String caption = editCaption.getText().toString().trim();
                 if (caption.isEmpty() && selectedImageUri == null) {
-                    Toast.makeText(CreatePostActivity.this, "Vui lòng nhập nội dung hoặc chọn ảnh!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CreatePostActivity.this, "Please enter content or select an image!", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                Toast.makeText(CreatePostActivity.this, "Đăng bài thành công!\nNội dung: " + caption, Toast.LENGTH_LONG).show();
+                Toast.makeText(CreatePostActivity.this, "Post created successfully!\nContent: " + caption, Toast.LENGTH_LONG).show();
                 finish();
             }
         });

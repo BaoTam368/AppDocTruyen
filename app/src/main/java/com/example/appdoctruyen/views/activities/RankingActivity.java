@@ -34,11 +34,11 @@ public class RankingActivity extends AppCompatActivity {
 
         List<User> users = new ArrayList<>();
 
-        users.add(new User(2, "Thạch Hầu A", R.drawable.avatar_default));
-        users.add(new User(3, "Thạch Hầu B", R.drawable.avatar_default));
-        users.add(new User(4, "Thạch Hầu C", R.drawable.avatar_default));
-        users.add(new User(5, "Thạch Hầu D", R.drawable.avatar_default));
-        users.add(new User(6, "Thạch Hầu E", R.drawable.avatar_default));
+        users.add(new User(2, "Top Reader A", R.drawable.avatar_default));
+        users.add(new User(3, "Top Reader B", R.drawable.avatar_default));
+        users.add(new User(4, "Top Reader C", R.drawable.avatar_default));
+        users.add(new User(5, "Top Reader D", R.drawable.avatar_default));
+        users.add(new User(6, "Top Reader E", R.drawable.avatar_default));
 
         RankingAdapter adapter = new RankingAdapter(users);
 

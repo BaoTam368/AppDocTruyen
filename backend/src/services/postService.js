@@ -65,7 +65,7 @@ function createPost(payload = {}) {
     const mangaId = normalizeNullable(payload.mangaId || payload.manga_id);
 
     if (!content) {
-        throw createHttpError(400, 'Thiếu nội dung bài viết');
+        throw createHttpError(400, 'Missing post content');
     }
 
     userService.createOrUpdateUser({ userId });
@@ -83,7 +83,7 @@ function createPost(payload = {}) {
 function updatePost(postId, payload = {}) {
     const existing = getPostById(postId);
     if (!existing) {
-        throw createHttpError(404, 'Không tìm thấy bài viết');
+        throw createHttpError(404, 'Post not found');
     }
 
     const title = hasOwn(payload, 'title') ? normalizeNullable(payload.title) : existing.title;
@@ -100,7 +100,7 @@ function updatePost(postId, payload = {}) {
             : existing.mangaId;
 
     if (!content) {
-        throw createHttpError(400, 'Thiếu nội dung bài viết');
+        throw createHttpError(400, 'Missing post content');
     }
 
     const database = databaseService.getDatabase();

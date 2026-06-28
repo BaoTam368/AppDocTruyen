@@ -30,20 +30,20 @@ public class MangaRepository {
                 if (response.isSuccessful() && body != null && body.success) {
                     callback.onSuccess(mapMangaList(body.data));
                 } else {
-                    callback.onError(readErrorMessage(body, "Không lấy được danh sách truyện"));
+                    callback.onError(readErrorMessage(body, "Unable to load manga list"));
                 }
             }
 
             @Override
             public void onFailure(Call<MangaListResponse> call, Throwable throwable) {
-                callback.onError("Không kết nối được Node.js backend");
+                callback.onError("Unable to connect to the Node.js backend");
             }
         });
     }
 
     public void getMangaDetail(String mangaId, final RepositoryCallback<Comic> callback) {
         if (isBlank(mangaId)) {
-            callback.onError("Thiếu mangaId");
+            callback.onError("Missing mangaId");
             return;
         }
 
@@ -63,30 +63,30 @@ public class MangaRepository {
                             Comic comic = mapManga(body.data);
                             callback.onSuccess(comic);
                         } else {
-                            callback.onError(body.message != null ? body.message : "Server Node.js báo thất bại");
+                            callback.onError(body.message != null ? body.message : "Node.js server reported a failure");
                         }
                     } else {
                         String errorStr = response.errorBody() != null ? response.errorBody().string() : "Rỗng";
                         android.util.Log.e("CHECK_API", "Lỗi HTTP hoặc Endpoint: " + errorStr);
-                        callback.onError("Lỗi HTTP: " + response.code());
+                        callback.onError("HTTP error: " + response.code());
                     }
                 } catch (Exception e) {
                     android.util.Log.e("CHECK_API", "Lỗi crash khi parse data: " + e.getMessage());
-                    callback.onError("Lỗi xử lý dữ liệu");
+                    callback.onError("Data processing error");
                 }
             }
 
             @Override
             public void onFailure(Call<MangaDetailResponse> call, Throwable throwable) {
                 android.util.Log.e("CHECK_API", "Thất bại mạng (onFailure): " + throwable.getMessage());
-                callback.onError("Không kết nối được Node.js backend");
+                callback.onError("Unable to connect to the Node.js backend");
             }
         });
     }
 
     public void getMangaChapters(String mangaId, RepositoryCallback<List<Chapter>> callback) {
         if (isBlank(mangaId)) {
-            callback.onError("Thiếu mangaId");
+            callback.onError("Missing mangaId");
             return;
         }
 
@@ -97,20 +97,20 @@ public class MangaRepository {
                 if (response.isSuccessful() && body != null && body.success) {
                     callback.onSuccess(mapChapterList(body.data));
                 } else {
-                    callback.onError(readErrorMessage(body, "Không lấy được danh sách chapter"));
+                    callback.onError(readErrorMessage(body, "Unable to load chapter list"));
                 }
             }
 
             @Override
             public void onFailure(Call<ChapterListResponse> call, Throwable throwable) {
-                callback.onError("Không kết nối được Node.js backend");
+                callback.onError("Unable to connect to the Node.js backend");
             }
         });
     }
 
     public void getChapterPages(String chapterId, RepositoryCallback<List<ComicPage>> callback) {
         if (isBlank(chapterId)) {
-            callback.onError("Thiếu chapterId");
+            callback.onError("Missing chapterId");
             return;
         }
 
@@ -121,13 +121,13 @@ public class MangaRepository {
                 if (response.isSuccessful() && body != null && body.success && body.data != null) {
                     callback.onSuccess(mapPageList(body.data.pages));
                 } else {
-                    callback.onError(readErrorMessage(body, "Không lấy được ảnh đọc truyện"));
+                    callback.onError(readErrorMessage(body, "Unable to load reader pages"));
                 }
             }
 
             @Override
             public void onFailure(Call<ChapterPagesResponse> call, Throwable throwable) {
-                callback.onError("Không kết nối được Node.js backend");
+                callback.onError("Unable to connect to the Node.js backend");
             }
         });
     }
@@ -144,13 +144,13 @@ public class MangaRepository {
                 if (response.isSuccessful() && body != null && body.success) {
                     callback.onSuccess(mapGroupList(body.data));
                 } else {
-                    callback.onError(readErrorMessage(body, "Không lấy được nhóm dịch"));
+                    callback.onError(readErrorMessage(body, "Unable to load translation teams"));
                 }
             }
 
             @Override
             public void onFailure(Call<GroupListResponse> call, Throwable throwable) {
-                callback.onError("Không kết nối được Node.js backend");
+                callback.onError("Unable to connect to the Node.js backend");
             }
         });
     }
@@ -163,20 +163,20 @@ public class MangaRepository {
                 if (response.isSuccessful() && body != null && body.success) {
                     callback.onSuccess(mapGroupList(body.data));
                 } else {
-                    callback.onError(readErrorMessage(body, "Không tìm thấy nhóm dịch"));
+                    callback.onError(readErrorMessage(body, "Translation team not found"));
                 }
             }
 
             @Override
             public void onFailure(Call<GroupListResponse> call, Throwable throwable) {
-                callback.onError("Không kết nối được Node.js backend");
+                callback.onError("Unable to connect to the Node.js backend");
             }
         });
     }
 
     public void getGroupDetail(String groupId, RepositoryCallback<TranslationGroup> callback) {
         if (isBlank(groupId)) {
-            callback.onError("Thiếu groupId");
+            callback.onError("Missing groupId");
             return;
         }
 
@@ -187,13 +187,13 @@ public class MangaRepository {
                 if (response.isSuccessful() && body != null && body.success && body.data != null) {
                     callback.onSuccess(mapGroup(body.data));
                 } else {
-                    callback.onError(readErrorMessage(body, "Không lấy được chi tiết nhóm dịch"));
+                    callback.onError(readErrorMessage(body, "Unable to load translation team details"));
                 }
             }
 
             @Override
             public void onFailure(Call<GroupDetailResponse> call, Throwable throwable) {
-                callback.onError("Không kết nối được Node.js backend");
+                callback.onError("Unable to connect to the Node.js backend");
             }
         });
     }
@@ -207,13 +207,13 @@ public class MangaRepository {
                 if (response.isSuccessful() && body != null && body.success) {
                     callback.onSuccess(mapMangaList(body.data));
                 } else {
-                    callback.onError(readErrorMessage(body, "Không lấy được danh sách truyện từ SQLite"));
+                    callback.onError(readErrorMessage(body, "Unable to load manga list from SQLite"));
                 }
             }
 
             @Override
             public void onFailure(Call<MangaListResponse> call, Throwable throwable) {
-                callback.onError("Không kết nối được Node.js backend");
+                callback.onError("Unable to connect to the Node.js backend");
             }
         });
     }
@@ -226,13 +226,13 @@ public class MangaRepository {
                 if (response.isSuccessful() && body != null && body.success) {
                     callback.onSuccess(mapMangaList(body.data));
                 } else {
-                    callback.onError(readErrorMessage(body, "Không tìm thấy truyện"));
+                    callback.onError(readErrorMessage(body, "Manga not found"));
                 }
             }
 
             @Override
             public void onFailure(Call<MangaListResponse> call, Throwable throwable) {
-                callback.onError("Không kết nối được Node.js backend");
+                callback.onError("Unable to connect to the Node.js backend");
             }
         });
     }
@@ -248,13 +248,13 @@ public class MangaRepository {
                 if (response.isSuccessful() && body != null && body.success) {
                     callback.onSuccess(mapMangaList(body.data));
                 } else {
-                    callback.onError(readErrorMessage(body, "Không đồng bộ được truyện phổ biến"));
+                    callback.onError(readErrorMessage(body, "Unable to sync popular manga"));
                 }
             }
 
             @Override
             public void onFailure(Call<MangaListResponse> call, Throwable throwable) {
-                callback.onError("Không kết nối được Node.js backend");
+                callback.onError("Unable to connect to the Node.js backend");
             }
         });
     }
@@ -325,7 +325,7 @@ public class MangaRepository {
             int comicCount = dto.comicCount > 0 ? dto.comicCount : dto.mangaCount;
             TranslationGroup group = new TranslationGroup(
                     numericIdFromString(dto.groupId),
-                    isBlank(dto.name) ? "Nhóm dịch" : dto.name,
+                    isBlank(dto.name) ? "Translation Team" : dto.name,
                     dto.description,
                     R.drawable.placeholder_group,
                     comicCount,
@@ -345,7 +345,7 @@ public class MangaRepository {
         int comicCount = dto.comicCount > 0 ? dto.comicCount : dto.mangaCount;
         TranslationGroup group = new TranslationGroup(
                 numericIdFromString(dto.groupId),
-                isBlank(dto.name) ? "Nhóm dịch" : dto.name,
+                isBlank(dto.name) ? "Translation Team" : dto.name,
                 dto.description,
                 R.drawable.placeholder_group,
                 comicCount,

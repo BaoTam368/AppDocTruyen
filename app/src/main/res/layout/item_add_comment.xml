@@ -8,7 +8,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Chọn truyện"
+        android:text="Choose manga"
         android:textStyle="bold"
         android:textSize="14sp" />
 
@@ -30,7 +30,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="Nhập bình luận..."
+            android:hint="Enter a comment..."
             android:minHeight="60dp"
             android:inputType="textMultiLine"
             android:gravity="top"
@@ -42,7 +42,7 @@
             android:layout_height="48dp"
             android:layout_marginStart="8dp"
             android:background="@android:color/transparent"
-            android:contentDescription="Gửi"
+            android:contentDescription="Send"
             android:src="@android:drawable/ic_menu_send" />
 
     </LinearLayout>

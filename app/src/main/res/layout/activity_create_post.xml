@@ -25,7 +25,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:text="Tạo bài viết"
+                android:text="Create Post"
                 android:textColor="#333333"
                 android:textSize="18sp"
                 android:textStyle="bold"/>
@@ -36,7 +36,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:text="ĐĂNG"
+                android:text="POST"
                 android:textColor="#00ACC1"
                 android:textSize="16sp"
                 android:textStyle="bold"/>
@@ -58,7 +58,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:text="Phạm Thanh An"
+                android:text="Alex Nguyen"
                 android:textColor="#333333"
                 android:textSize="16sp"
                 android:textStyle="bold"/>
@@ -73,7 +73,7 @@
             android:paddingBottom="15dp"
             android:gravity="top"
             android:background="@null"
-            android:hint="Bạn đang nghĩ gì?"
+            android:hint="What's on your mind?"
             android:textColor="#333333"
             android:textSize="16sp"/>
 
@@ -110,7 +110,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Thêm ảnh bài đăng"
+                    android:text="Add post image"
                     android:textColor="#00ACC1"
                     android:textStyle="bold"/>
         </LinearLayout>

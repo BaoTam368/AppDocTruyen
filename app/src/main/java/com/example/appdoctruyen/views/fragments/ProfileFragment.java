@@ -74,10 +74,10 @@ public class ProfileFragment extends Fragment {
             } else if (email != null && !email.isEmpty()) {
                 tv_username.setText(email);
             } else {
-                tv_username.setText("Người dùng");
+                tv_username.setText("User");
             }
 
-            tv_user_title.setText("Thành viên");
+            tv_user_title.setText("Member");
 
             if (user.getPhotoUrl() != null) {
                 Glide.with(this)

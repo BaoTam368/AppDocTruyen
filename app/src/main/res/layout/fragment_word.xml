@@ -23,7 +23,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Bài viết"
+                    android:text="Posts"
                     android:textAlignment="center"
                     android:padding="12dp"
                     android:textColor="@color/tab_unselected_text"
@@ -34,7 +34,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Bình luận"
+                    android:text="Comments"
                     android:textAlignment="center"
                     android:padding="12dp"
                     android:textColor="@color/tab_unselected_text"
@@ -59,6 +59,6 @@
             android:src="@android:drawable/ic_input_add"
             app:backgroundTint="#00ACC1"
             app:tint="#FFFFFF"
-            android:contentDescription="Đăng bài mới"/>
+            android:contentDescription="Create new post"/>
 
 </RelativeLayout>

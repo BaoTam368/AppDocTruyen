@@ -49,7 +49,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="5dp"
-                        android:text="Truyện này cuốn quáaaaa!!!!!"
+                        android:text="This manga is so good!"
                         android:textColor="#333333"
                         android:textSize="13sp"/>
 
@@ -58,7 +58,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="5dp"
-                        android:text="Truyện tranh: Vạn cổ chí tôn"
+                        android:text="Manga: The Eternal Supreme"
                         android:textColor="#037CF8"
                         android:textSize="13sp"
                         android:textStyle="bold|italic"/>
@@ -68,7 +68,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="5dp"
-                        android:text="32 phút trước"
+                        android:text="32 minutes ago"
                         android:textColor="#7A7979"
                         android:textSize="13sp"/>
                 <View

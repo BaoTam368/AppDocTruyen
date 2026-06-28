@@ -93,7 +93,7 @@ public class ComicChaptersFragment extends Fragment {
 
     private void loadChaptersFromApi() {
         if (mangaId == null || mangaId.isEmpty()) {
-            Toast.makeText(getContext(), "Thiếu mangaId", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Missing mangaId", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -102,13 +102,13 @@ public class ComicChaptersFragment extends Fragment {
             public void onSuccess(List<Chapter> data) {
                 chapterList.clear();
                 chapterList.addAll(data);
-                tvTotalChapters.setText("Tổng số " + chapterList.size() + " chương");
+                tvTotalChapters.setText("Total " + chapterList.size() + " chapters");
                 chapterAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onError(String message) {
-                Toast.makeText(getContext(), "Lỗi: " + message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Error: " + message, Toast.LENGTH_SHORT).show();
             }
         });
     }

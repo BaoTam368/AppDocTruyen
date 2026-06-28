@@ -5,7 +5,7 @@ function createOrUpdateUser(payload = {}) {
     const userId = normalizeText(payload.userId || payload.user_id || 'local_user');
 
     if (!userId) {
-        throw createHttpError(400, 'Thiếu userId');
+        throw createHttpError(400, 'Missing userId');
     }
 
     const stmt = database.prepare(`
@@ -49,7 +49,7 @@ function getUser(userId) {
 
 function updateUser(userId, payload = {}) {
     if (!getUser(userId)) {
-        throw createHttpError(404, 'Không tìm thấy người dùng');
+        throw createHttpError(404, 'User not found');
     }
 
     const database = databaseService.getDatabase();

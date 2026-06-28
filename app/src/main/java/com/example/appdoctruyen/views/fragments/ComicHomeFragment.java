@@ -185,7 +185,7 @@ public class ComicHomeFragment extends Fragment {
     private void openComicDetail(Comic comic) {
         if (comic == null || comic.getMangaId() == null || comic.getMangaId().trim().isEmpty()) {
             if (isAdded()) {
-                Toast.makeText(requireContext(), "Thiếu mangaId", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Missing mangaId", Toast.LENGTH_SHORT).show();
             }
             return;
         }
@@ -199,7 +199,7 @@ public class ComicHomeFragment extends Fragment {
 
     private void syncPopularMangas() {
         if (isSyncing) {
-            Toast.makeText(requireContext(), "Đang đồng bộ, vui lòng chờ...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "Syncing. Please wait...", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -208,7 +208,7 @@ public class ComicHomeFragment extends Fragment {
             ivRefresh.setEnabled(false);
             ivRefresh.setAlpha(0.5f);
         }
-        Toast.makeText(requireContext(), "Đang đồng bộ truyện từ MangaDex...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(requireContext(), "Syncing manga from MangaDex...", Toast.LENGTH_SHORT).show();
         mangaRepository.syncPopularMangas(200, new MangaRepository.RepositoryCallback<List<Comic>>() {
             @Override
             public void onSuccess(List<Comic> data) {
@@ -219,7 +219,7 @@ public class ComicHomeFragment extends Fragment {
                     ivRefresh.setAlpha(1f);
                 }
                 int syncedCount = data != null ? data.size() : 0;
-                Toast.makeText(requireContext(), "Đã đồng bộ " + syncedCount + " truyện!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Synced " + syncedCount + " manga!", Toast.LENGTH_SHORT).show();
                 setupFeaturedComics();
                 setupRecentlyUpdatedComics();
             }
@@ -232,7 +232,7 @@ public class ComicHomeFragment extends Fragment {
                     ivRefresh.setEnabled(true);
                     ivRefresh.setAlpha(1f);
                 }
-                Toast.makeText(requireContext(), "Lỗi: " + message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Error: " + message, Toast.LENGTH_SHORT).show();
             }
         });
     }

@@ -54,10 +54,10 @@ public class PostFragment extends Fragment {
     private void setupPostList() {
         postList = new ArrayList<>();
 
-        postList.add(new Post("Lục Thao", "10 phút trước", "Mọi người ơi cho mình hỏi bộ truyện Tiên Nghịch này main có mấy vợ thế? Nghe bảo kết thảm lắm phải không?", "https://picsum.photos", "https://picsum.photos", 15000, 3200));
-        postList.add(new Post("Hàn Lập", "2 giờ trước", "Nhóm dịch làm việc năng nổ quá, vừa ủng hộ nhóm 500 xu để dịch tiếp bộ Phàm Nhân Tu Tiên nhé, cố lên anh em!", "https://picsum.photos", "https://picsum.photos", 15000, 3200));
-        postList.add(new Post("Bạch Tiểu Thuần", " Hôm qua", "Góc thảo luận: Theo các đạo hữu thì hệ thống tu vi bên truyện Chấp Ma và Cầu Ma bên nào có sức mạnh bá đạo hơn?", "https://picsum.photos", "https://picsum.photos", 15000, 3200));
-        postList.add(new Post("Khương Tử Nha", "ngày trước", "Tuyển thành viên vào nhóm dịch truyện chữ sang truyện tranh, yêu cầu biết Photoshop cơ bản, ai quan tâm ib mình.", "https://picsum.photos", "https://picsum.photos", 15000, 32002));
+        postList.add(new Post("Alex Tran", "10 minutes ago", "Does anyone know how many love interests the main character has in Renegade Immortal? I heard the ending is rough.", "https://picsum.photos", "https://picsum.photos", 15000, 3200));
+        postList.add(new Post("Han Li", "2 hours ago", "The translation team is working hard. I just donated 500 coins to support more chapters of A Record of a Mortal's Journey to Immortality.", "https://picsum.photos", "https://picsum.photos", 15000, 3200));
+        postList.add(new Post("Bai Xiaochun", "Yesterday", "Discussion: which cultivation system feels stronger, Demon's Diary or Pursuit of the Truth?", "https://picsum.photos", "https://picsum.photos", 15000, 3200));
+        postList.add(new Post("Mason Jiang", "A day ago", "Recruiting members for a scanlation team. Basic Photoshop skill required. DM me if interested.", "https://picsum.photos", "https://picsum.photos", 15000, 32002));
 
         rvPosts.setLayoutManager(new LinearLayoutManager(requireContext()));
 

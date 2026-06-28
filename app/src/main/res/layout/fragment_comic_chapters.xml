@@ -15,7 +15,7 @@
             android:textColor="@color/black"
             android:textSize="16sp"
             android:textStyle="bold"
-            tools:text="Tổng số chương"/>
+            tools:text="Total chapters"/>
 
     <View
             android:layout_width="match_parent"

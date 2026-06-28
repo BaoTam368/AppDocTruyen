@@ -20,7 +20,7 @@ app.use(express.json());
 app.get('/api/health', (req, res) => {
     res.json({
         success: true,
-        message: 'Dịch vụ Node.js MangaDex đang chạy'
+        message: 'Node.js MangaDex service is running'
     });
 });
 
@@ -35,7 +35,7 @@ app.use('/api/posts', postRoutes);
 app.use((req, res) => {
     res.status(404).json({
         success: false,
-        message: 'Không tìm thấy endpoint'
+        message: 'Endpoint not found'
     });
 });
 
@@ -43,7 +43,7 @@ app.use((err, req, res, next) => {
     const statusCode = err.statusCode || 500;
     res.status(statusCode).json({
         success: false,
-        message: err.message || 'Server lỗi'
+        message: err.message || 'Server error'
     });
 });
 

@@ -64,9 +64,9 @@ public class ComicDetailActivity extends AppCompatActivity {
         // 3. Liên kết TabLayout với ViewPager2
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
             if (position == 0) {
-                tab.setText("Giới thiệu");
+                tab.setText("Introduction");
             } else {
-                tab.setText("Danh sách chương");
+                tab.setText("Chapter List");
             }
         }).attach();
 
@@ -94,10 +94,10 @@ public class ComicDetailActivity extends AppCompatActivity {
                         final Chapter targetChapter;
                         if (history != null && history.getChapterId() != null) {
                             targetChapter = findChapterById(chapters, history.getChapterId());
-                            btnReadChapter.setText("Đọc tiếp " + (history.getLastReadChapter() != null ? history.getLastReadChapter() : "chương cũ") + " \u2192");
+                            btnReadChapter.setText("Continue " + (history.getLastReadChapter() != null ? history.getLastReadChapter() : "previous chapter") + " \u2192");
                         } else {
                             targetChapter = findFirstChapter(chapters);
-                            btnReadChapter.setText("Đọc từ đầu (" + targetChapter.getName() + ") \u2192");
+                            btnReadChapter.setText("Read from start (" + targetChapter.getName() + ") \u2192");
                         }
 
                         btnReadChapter.setOnClickListener(v -> {

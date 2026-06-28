@@ -18,7 +18,7 @@ public class AuthManager {
                     if (task.isSuccessful()) {
                         callback.onSuccess(mAuth.getCurrentUser());
                     } else {
-                        callback.onFailure(task.getException() != null ? task.getException().getLocalizedMessage() : "Đăng nhập thất bại");
+                        callback.onFailure(task.getException() != null ? task.getException().getLocalizedMessage() : "Login failed");
                     }
                 });
     }
@@ -29,7 +29,7 @@ public class AuthManager {
                     if (task.isSuccessful()) {
                         callback.onSuccess(mAuth.getCurrentUser());
                     } else {
-                        callback.onFailure(task.getException() != null ? task.getException().getLocalizedMessage() : "Đăng ký thất bại");
+                        callback.onFailure(task.getException() != null ? task.getException().getLocalizedMessage() : "Registration failed");
                     }
                 });
     }
@@ -57,7 +57,7 @@ public class AuthManager {
                     if (task.isSuccessful()) {
                         callback.onSuccess(mAuth.getCurrentUser());
                     } else {
-                        callback.onFailure(task.getException() != null ? task.getException().getLocalizedMessage() : "Đăng nhập Google thất bại");
+                        callback.onFailure(task.getException() != null ? task.getException().getLocalizedMessage() : "Google login failed");
                     }
                 });
     }
@@ -69,7 +69,7 @@ public class AuthManager {
                     if (task.isSuccessful()) {
                         callback.onSuccess(mAuth.getCurrentUser());
                     } else {
-                        callback.onFailure(task.getException() != null ? task.getException().getLocalizedMessage() : "Đăng nhập Facebook thất bại");
+                        callback.onFailure(task.getException() != null ? task.getException().getLocalizedMessage() : "Facebook login failed");
                     }
                 });
     }
