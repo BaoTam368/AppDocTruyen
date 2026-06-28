@@ -3,8 +3,6 @@ const commentService = require('../services/commentService');
 function getComments(req, res, next) {
     try {
         const data = commentService.getComments({
-            mangaId: req.query.mangaId,
-            chapterId: req.query.chapterId,
             limit: req.query.limit,
             offset: req.query.offset
         });

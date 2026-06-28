@@ -1,15 +1,19 @@
 package com.example.appdoctruyen.views.adapters;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.bumptech.glide.Glide;
 import com.example.appdoctruyen.R;
 import com.example.appdoctruyen.models.Comic;
+
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,9 +21,9 @@ import java.util.List;
 
 public class BookshelfAdapter extends RecyclerView.Adapter<BookshelfAdapter.ComicViewHolder> {
 
-    private Context context;
+    private final Context context;
     private List<Comic> comicList;
-    private OnItemClickListener listener;
+    private final OnItemClickListener listener;
 
     public BookshelfAdapter(Context context, List<Comic> comicList, OnItemClickListener listener) {
         this.context = context;
@@ -50,7 +54,6 @@ public class BookshelfAdapter extends RecyclerView.Adapter<BookshelfAdapter.Comi
             return;
         }
 
-        // Bind thông tin truyện lên từng item trong danh sách tủ sách
         holder.tvComicTitle.setText(isBlank(comic.getTitle())
                 ? context.getString(R.string.comic_title_placeholder)
                 : comic.getTitle());
@@ -70,24 +73,17 @@ public class BookshelfAdapter extends RecyclerView.Adapter<BookshelfAdapter.Comi
                     R.string.bookshelf_last_read_format,
                     lastReadChapter
             ));
-        } else if (comic.getLatestChapter() != null && !comic.getLatestChapter().isEmpty()) {
+        } else if (!isBlank(comic.getLatestChapter())) {
             holder.tvComicChapter.setText(comic.getLatestChapter());
         } else {
             holder.tvComicChapter.setText("");
         }
 
-        // Ưu tiên tải ảnh bìa từ URL, nếu không có thì dùng ảnh placeholder local
-        if (comic.getCoverUrl() != null && !comic.getCoverUrl().isEmpty()) {
-            Glide.with(context)
-                    .load(comic.getCoverUrl())
-                    .placeholder(R.drawable.placeholder_comic)
-                    .error(R.drawable.placeholder_comic)
-                    .into(holder.imgComicCover);
-        } else if (comic.getCoverImageResId() != 0) {
-            holder.imgComicCover.setImageResource(comic.getCoverImageResId());
-        } else {
-            holder.imgComicCover.setImageResource(R.drawable.placeholder_comic);
-        }
+        Glide.with(holder.itemView.getContext())
+                .load(comic.getCoverUrl())
+                .placeholder(R.drawable.placeholder_comic)
+                .error(R.drawable.placeholder_comic)
+                .into(holder.imgComicCover);
 
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {

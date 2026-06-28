@@ -90,7 +90,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Trạng thái"
+                android:text="Status"
                 android:textStyle="bold"/>
 
             <LinearLayout
@@ -103,7 +103,7 @@
                     android:layout_margin="4dp"
                     android:padding="8dp"
                     android:background="@drawable/bg_tab_unselected"
-                    android:text="Tất cả"/>
+                    android:text="All"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -111,7 +111,7 @@
                     android:layout_margin="4dp"
                     android:padding="8dp"
                     android:background="@drawable/bg_tab_unselected"
-                    android:text="Cập nhật"/>
+                    android:text="Updated"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -119,7 +119,7 @@
                     android:layout_margin="4dp"
                     android:padding="8dp"
                     android:background="@drawable/bg_tab_unselected"
-                    android:text="Đang ra"/>
+                    android:text="Ongoing"/>
             </LinearLayout>
 
 
@@ -127,7 +127,7 @@
                 android:layout_marginTop="12dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Sắp xếp"
+                android:text="Sort"
                 android:textStyle="bold"/>
 
             <LinearLayout
@@ -140,7 +140,7 @@
                     android:layout_margin="4dp"
                     android:padding="8dp"
                     android:background="@drawable/bg_tab_unselected"
-                    android:text="Truyện mới"/>
+                    android:text="New Manga"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -148,7 +148,7 @@
                     android:layout_margin="4dp"
                     android:padding="8dp"
                     android:background="@drawable/bg_tab_unselected"
-                    android:text="Hoàn thành"/>
+                    android:text="Completed"/>
             </LinearLayout>
 
 
@@ -161,7 +161,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Thể loại"
+                android:text="Genres"
                 android:textStyle="bold"/>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -178,7 +178,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:backgroundTint="@color/brand_blue"
-                android:text="Áp dụng"
+                android:text="Apply"
                 android:textAllCaps="false"/>
 
         </LinearLayout>
@@ -212,7 +212,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:text="Kết quả:"
+        android:text="Results:"
         android:textStyle="bold"/>
 
 

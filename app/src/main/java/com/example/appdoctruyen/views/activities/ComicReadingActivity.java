@@ -19,6 +19,10 @@ import com.example.appdoctruyen.views.adapters.ComicPageAdapter;
 import com.example.appdoctruyen.models.Chapter;
 import com.example.appdoctruyen.views.adapters.ChapterAdapter;
 import com.example.appdoctruyen.data.api.MangaRepository;
+import com.example.appdoctruyen.models.Comic;
+import com.example.appdoctruyen.data.database.BookshelfDatabaseHelper;
+import com.example.appdoctruyen.data.firebase.AuthManager;
+import com.example.appdoctruyen.data.firebase.BookshelfFirebaseHelper;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.util.ArrayList;
@@ -43,6 +47,12 @@ public class ComicReadingActivity extends AppCompatActivity {
     
     private List<Chapter> chapterList;
     private int currentChapterIndex = 0;
+    
+    private BookshelfDatabaseHelper bookshelfDatabaseHelper;
+    private AuthManager authManager;
+    private BookshelfFirebaseHelper firebaseHelper;
+    
+    private String coverUrl = ""; // To store cover URL if available
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +65,14 @@ public class ComicReadingActivity extends AppCompatActivity {
         chapterId = getIntent().getStringExtra("chapterId");
         chapterName = getIntent().getStringExtra("chapterName");
         currentChapter = getIntent().getIntExtra("CHAPTER_NUM", 1);
+        coverUrl = getIntent().getStringExtra("comic_cover");
+
+        bookshelfDatabaseHelper = new BookshelfDatabaseHelper(this);
+        authManager = new AuthManager(this);
+        String userId = getCurrentUserId();
+        if (userId != null && !userId.equals("local_user")) {
+            firebaseHelper = new BookshelfFirebaseHelper(userId);
+        }
 
         mangaRepository = new MangaRepository();
         chapterList = new ArrayList<>();
@@ -62,6 +80,10 @@ public class ComicReadingActivity extends AppCompatActivity {
         // Tải danh sách chapters của manga
         if (mangaId != null && !mangaId.isEmpty()) {
             loadChapterList();
+            // Nếu không có cover URL từ intent, tự động lấy từ API
+            if (coverUrl == null || coverUrl.isEmpty()) {
+                loadMangaDetailForCover();
+            }
         }
 
         // 1. Ánh xạ View từ XML
@@ -100,7 +122,7 @@ public class ComicReadingActivity extends AppCompatActivity {
         // Nút chuyển sang chương tiếp theo
         btnNextChapter.setOnClickListener(v -> {
             if (chapterList == null || chapterList.isEmpty()) {
-                Toast.makeText(this, "Không có danh sách chapter", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "No chapter list available", Toast.LENGTH_SHORT).show();
                 return;
             }
             
@@ -111,7 +133,7 @@ public class ComicReadingActivity extends AppCompatActivity {
                 chapterName = nextChapter.getName();
                 loadChapterData(currentChapterIndex + 1);
             } else {
-                Toast.makeText(this, "Đã đến chapter cuối cùng", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "You have reached the last chapter", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -133,20 +155,67 @@ public class ComicReadingActivity extends AppCompatActivity {
         // Nếu có chapterId, gọi API lấy pages
         if (chapterId != null && !chapterId.isEmpty()) {
             loadChapterPagesFromApi(chapterId);
+            saveHistory();
         } else {
-            Toast.makeText(this, "Không có chapterId, hiển thị ảnh mẫu", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "No chapterId found. Showing sample images.", Toast.LENGTH_SHORT).show();
             loadMockPages(chapterNum);
+            saveHistory();
         }
     }
 
+    private void saveHistory() {
+        String userId = getCurrentUserId();
+        String title = mangaTitle != null ? mangaTitle : ("Manga " + mangaId);
+        String chName = chapterName != null ? chapterName : ("Chapter " + currentChapter);
+        // Dùng coverUrl nếu có, hoặc chuỗi rỗng để tránh null
+        String cover = (coverUrl != null && !coverUrl.isEmpty()) ? coverUrl : "";
+        
+        bookshelfDatabaseHelper.saveReadingHistory(userId, mangaId, chapterId, chName, title, cover);
+        if (firebaseHelper != null) {
+            firebaseHelper.saveReadingHistory(mangaId, chapterId, chName, title, cover);
+        }
+    }
+
+    /**
+     * Tự động lấy cover URL từ API khi không được truyền qua Intent.
+     * Sau khi lấy được, cập nhật lại lịch sử đọc với cover URL mới.
+     */
+    private void loadMangaDetailForCover() {
+        mangaRepository.getMangaDetail(mangaId, new MangaRepository.RepositoryCallback<Comic>() {
+            @Override
+            public void onSuccess(Comic data) {
+                if (data != null && data.getCoverUrl() != null && !data.getCoverUrl().isEmpty()) {
+                    coverUrl = data.getCoverUrl();
+                    // Cập nhật tiêu đề nếu chưa có
+                    if ((mangaTitle == null || mangaTitle.isEmpty()) && data.getTitle() != null) {
+                        mangaTitle = data.getTitle();
+                    }
+                    // Lưu lại lịch sử với cover URL đã có
+                    saveHistory();
+                }
+            }
+
+            @Override
+            public void onError(String message) {
+                // Bỏ qua lỗi - chỉ là không có ảnh bìa, không ảnh hưởng đến việc đọc truyện
+            }
+        });
+    }
+
+    private String getCurrentUserId() {
+        if (authManager == null) return "local_user";
+        String userId = authManager.getCurrentUserId();
+        return userId != null ? userId : "local_user";
+    }
+
     private void loadChapterPagesFromApi(String chapterId) {
-        Toast.makeText(this, "Đang tải trang...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Loading pages...", Toast.LENGTH_SHORT).show();
         
         mangaRepository.getChapterPages(chapterId, new MangaRepository.RepositoryCallback<List<ComicPage>>() {
             @Override
             public void onSuccess(List<ComicPage> data) {
                 if (data == null || data.isEmpty()) {
-                    Toast.makeText(ComicReadingActivity.this, "Không có trang nào cho chapter này", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ComicReadingActivity.this, "No pages found for this chapter", Toast.LENGTH_SHORT).show();
                     loadMockPages(currentChapter);
                     return;
                 }
@@ -155,12 +224,12 @@ public class ComicReadingActivity extends AppCompatActivity {
                 pageList.addAll(data);
                 adapter.notifyDataSetChanged();
                 lvPages.scrollToPosition(0);
-                Toast.makeText(ComicReadingActivity.this, "Đã tải " + data.size() + " trang", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ComicReadingActivity.this, "Loaded " + data.size() + " pages", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onError(String message) {
-                Toast.makeText(ComicReadingActivity.this, "Lỗi tải trang: " + message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(ComicReadingActivity.this, "Page loading error: " + message, Toast.LENGTH_SHORT).show();
                 loadMockPages(currentChapter);
             }
         });
@@ -200,7 +269,7 @@ public class ComicReadingActivity extends AppCompatActivity {
 
             @Override
             public void onError(String message) {
-                Toast.makeText(ComicReadingActivity.this, "Lỗi tải danh sách chapter: " + message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(ComicReadingActivity.this, "Chapter list loading error: " + message, Toast.LENGTH_SHORT).show();
             }
         });
     }

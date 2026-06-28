@@ -9,30 +9,27 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
 import com.example.appdoctruyen.R;
 import com.example.appdoctruyen.models.Post;
-import com.bumptech.glide.Glide;
+
 import java.util.List;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder> {
+
     private Context context;
     private List<Post> postList;
-    private OnItemClickListener listener;
+    private OnLikeClickListener likeClickListener;
 
-    public interface OnItemClickListener {
-        void onItemClick(Post post, int position);
+    public interface OnLikeClickListener {
+        void onLikeClick(Post post, int position, TextView tvLikeCount);
     }
-//    public PostAdapter(Context context, List<Post> postList) {
-//        this.context = context;
-//        this.postList = postList;
-//    }
-
-    public PostAdapter(Context context, List<Post> postList, OnItemClickListener listener) {
+    public PostAdapter(Context context, List<Post> postList, OnLikeClickListener likeClickListener) {
         this.context = context;
         this.postList = postList;
-        this.listener = listener;
+        this.likeClickListener = likeClickListener;
     }
-
 
     @NonNull
     @Override
@@ -43,58 +40,48 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull PostViewHolder holder, int position) {
+
         Post post = postList.get(position);
-
         if (post == null) return;
-        holder.tvUsername.setText(post.getUsername());
-        holder.tvTime.setText(post.getTime());
-        holder.tvCaption.setText(post.getCaption());
 
-        // Đổi số thành chuỗi để hiển thị
-        holder.tvNumFavourites.setText(String.valueOf(post.getNumLikes()));
-        holder.tvNumComments.setText(String.valueOf(post.getNumComments()));
+        holder.tvUsername.setText(post.getDisplayName() != null ? post.getDisplayName() : "Unknown");
+        holder.tvTime.setText(post.getCreatedAt() != null ? post.getCreatedAt() : "");
+        holder.tvCaption.setText(post.getContent() != null ? post.getContent() : "");
+        holder.tvNumFavourites.setText(String.valueOf(post.getLikeCount()));
 
-        // Load Avatar
-        Glide.with(context)
-                .load(post.getAvatarUrl())
-                .placeholder(android.R.drawable.ic_menu_myplaces) // Ảnh chờ
-                .into(holder.imgAvatar);
+        Glide.with(context).load(post.getAvatarUrl()).placeholder(android.R.drawable.ic_menu_myplaces).error(android.R.drawable.ic_menu_myplaces).into(holder.imgAvatar);
+        Glide.with(context).load(post.getImageUrl()).placeholder(android.R.drawable.ic_menu_gallery).error(android.R.drawable.ic_menu_gallery).into(holder.imgPost);
 
-        // Load Ảnh bài đăng
-        Glide.with(context)
-                .load(post.getImageUrl())
-                .placeholder(android.R.drawable.ic_menu_gallery)
-                .into(holder.imgPost);
+        holder.imgLike.setOnClickListener(v -> {
+            if (likeClickListener != null) {
+                likeClickListener.onLikeClick(post, position, holder.tvNumFavourites);
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        if (postList != null) {
-            return postList.size();
-        }
-        return 0;
+        return postList != null ? postList.size() : 0;
     }
 
-//    public interface OnItemClickListener {
-//        void onItemClick(Post post);
-//    }
-
     public static class PostViewHolder extends RecyclerView.ViewHolder {
-        ImageView imgAvatar, imgPost, iconFavourite, iconComment;
+
+        ImageView imgAvatar, imgPost, imgLike;
         TextView tvUsername, tvTime, tvCaption, tvNumFavourites, tvNumComments;
 
         public PostViewHolder(@NonNull View itemView) {
             super(itemView);
+
             imgAvatar = itemView.findViewById(R.id.avatar_post);
             imgPost = itemView.findViewById(R.id.image_post);
-            iconFavourite = itemView.findViewById(R.id.icon_favourite);
-            iconComment = itemView.findViewById(R.id.icon_comment);
 
             tvUsername = itemView.findViewById(R.id.username_post);
             tvTime = itemView.findViewById(R.id.time_post);
             tvCaption = itemView.findViewById(R.id.caption);
+
+            imgLike = itemView.findViewById(R.id.icon_favourite);
             tvNumFavourites = itemView.findViewById(R.id.num_favourites);
-            tvNumComments = itemView.findViewById(R.id.num_comment);
+
         }
     }
 }

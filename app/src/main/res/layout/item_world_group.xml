@@ -39,7 +39,7 @@
                         android:id="@+id/username_post_group"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Nhóm dịch vip pro no1"
+                        android:text="Top Scanlation Group"
                         android:textColor="#333333"
                         android:textSize="15sp"
                         android:textStyle="bold"/>

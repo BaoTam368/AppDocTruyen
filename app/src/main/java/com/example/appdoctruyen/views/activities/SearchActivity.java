@@ -130,20 +130,20 @@ public class SearchActivity extends AppCompatActivity {
 
         genres.add(new Genre("Manhua"));
         genres.add(new Genre("Manga"));
-        genres.add(new Genre("Cổ Đại"));
-        genres.add(new Genre("Xuyên Không"));
+        genres.add(new Genre("Historical"));
+        genres.add(new Genre("Isekai"));
         genres.add(new Genre("Manhwa"));
-        genres.add(new Genre("Ngôn Tình"));
-        genres.add(new Genre("Hệ Thống"));
-        genres.add(new Genre("Hành Động"));
-        genres.add(new Genre("Học Đường"));
-        genres.add(new Genre("Huyền Huyễn"));
-        genres.add(new Genre("Mạt Thế"));
-        genres.add(new Genre("Trùng Sinh"));
-        genres.add(new Genre("Tu Tiên"));
-        genres.add(new Genre("Hài Hước"));
-        genres.add(new Genre("Đô Thị"));
-        genres.add(new Genre("Kinh Dị"));
+        genres.add(new Genre("Romance"));
+        genres.add(new Genre("System"));
+        genres.add(new Genre("Action"));
+        genres.add(new Genre("School Life"));
+        genres.add(new Genre("Fantasy"));
+        genres.add(new Genre("Post-Apocalyptic"));
+        genres.add(new Genre("Reincarnation"));
+        genres.add(new Genre("Cultivation"));
+        genres.add(new Genre("Comedy"));
+        genres.add(new Genre("Urban"));
+        genres.add(new Genre("Horror"));
 
         GenreAdapter adapter = new GenreAdapter(genres);
 
@@ -161,6 +161,7 @@ public class SearchActivity extends AppCompatActivity {
         resultAdapter = new BookshelfAdapter(this, resultList, (comic, position) -> {
             Intent intent = new Intent(SearchActivity.this, ComicDetailActivity.class);
             intent.putExtra("comic_id", comic.getId());
+            intent.putExtra("mangaId", comic.getMangaId());
             intent.putExtra("comic_title", comic.getTitle());
             intent.putExtra("mangaId", comic.getMangaId());
             startActivity(intent);

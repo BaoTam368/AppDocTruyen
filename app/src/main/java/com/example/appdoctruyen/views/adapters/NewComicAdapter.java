@@ -45,7 +45,7 @@ public class NewComicAdapter extends RecyclerView.Adapter<NewComicAdapter.ViewHo
         holder.ivComic.setImageResource(comic.getCoverImageResId());
         holder.tvTitle.setText(comic.getTitle());
         holder.tvChapter.setText(comic.getLatestChapter());
-        holder.tvTime.setText("Cập nhật lúc: " + comic.getDescription());
+        holder.tvTime.setText("Updated at: " + comic.getDescription());
         holder.tvType.setText(comic.getAuthor());
 
         holder.itemView.setOnClickListener(v -> {
