@@ -1,5 +1,6 @@
 package com.example.appdoctruyen.views.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,6 +22,7 @@ import com.example.appdoctruyen.data.api.CreateCommentRequest;
 import com.example.appdoctruyen.data.api.MangaRepository;
 import com.example.appdoctruyen.data.firebase.AuthManager;
 import com.example.appdoctruyen.models.Comment;
+import com.example.appdoctruyen.views.activities.LoginActivity;
 import com.example.appdoctruyen.views.adapters.CommentAdapter;
 
 import java.util.ArrayList;
@@ -104,7 +106,8 @@ public class CommentFragment extends Fragment {
 
             String currentUserId = authManager.getCurrentUserId();
             if (currentUserId == null) {
-                Toast.makeText(requireContext(), "Please log in to comment", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Please log in to post a comment.", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(requireContext(), LoginActivity.class));
                 return;
             }
 

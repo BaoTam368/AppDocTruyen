@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -41,6 +42,11 @@ public class ProfileFragment extends Fragment {
         tv_username = view.findViewById(R.id.tv_username);
         tv_user_title = view.findViewById(R.id.tv_user_title);
         authManager = new AuthManager(requireContext());
+        if (!authManager.isLoggedIn()) {
+            Toast.makeText(requireContext(), "Please log in to view your profile.", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(requireContext(), LoginActivity.class));
+            return view;
+        }
 
         loadUserInfo();
 
@@ -52,11 +58,21 @@ public class ProfileFragment extends Fragment {
         });
 
         btn_topup.setOnClickListener(v -> {
+            if (!authManager.isLoggedIn()) {
+                Toast.makeText(requireContext(), "Please log in to use this feature.", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(requireContext(), LoginActivity.class));
+                return;
+            }
             Intent intent = new Intent(requireContext(), RechargeActivity.class);
             startActivity(intent);
         });
 
         iv_user_avatar.setOnClickListener(v -> {
+            if (!authManager.isLoggedIn()) {
+                Toast.makeText(requireContext(), "Please log in to view your profile.", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(requireContext(), LoginActivity.class));
+                return;
+            }
             Intent intent = new Intent(requireContext(), UserDetailsActivity.class);
             startActivity(intent);
         });

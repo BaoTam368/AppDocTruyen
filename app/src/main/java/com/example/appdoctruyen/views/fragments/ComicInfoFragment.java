@@ -22,6 +22,7 @@ import com.example.appdoctruyen.models.TranslationGroup;
 import com.example.appdoctruyen.views.activities.ComicDetailActivity;
 import com.example.appdoctruyen.views.activities.ComicReadingActivity;
 import com.example.appdoctruyen.views.activities.GroupDetailActivity;
+import com.example.appdoctruyen.views.activities.LoginActivity;
 import com.example.appdoctruyen.views.activities.MainActivity;
 import com.example.appdoctruyen.views.activities.NotificationActivity;
 import com.example.appdoctruyen.data.api.MangaRepository;
@@ -70,7 +71,7 @@ public class ComicInfoFragment extends Fragment {
         bookshelfDatabaseHelper = new BookshelfDatabaseHelper(requireContext().getApplicationContext());
         authManager = new AuthManager(requireContext());
         String userId = getCurrentUserId();
-        if (userId != null && !userId.equals("local_user")) {
+        if (!isBlank(userId)) {
             firebaseHelper = new BookshelfFirebaseHelper(userId);
         }
     }
@@ -110,8 +111,13 @@ public class ComicInfoFragment extends Fragment {
 
         btnBookmark.setOnClickListener(v -> {
             if (mangaId == null || mangaId.isEmpty()) return;
+            if (!requireLogin("Please log in to add this manga to your bookshelf.")) return;
             String userId = getCurrentUserId();
-            boolean isBookmarked = bookshelfDatabaseHelper.isBookmarked(userId, mangaId);
+        if (isBlank(userId)) {
+            btnBookmark.setColorFilter(getResources().getColor(R.color.text_secondary_light, null));
+            return;
+        }
+        boolean isBookmarked = bookshelfDatabaseHelper.isBookmarked(userId, mangaId);
             String title = (mangaInfo != null && mangaInfo.getTitle() != null) ? mangaInfo.getTitle() : mangaTitle;
             String cover = (mangaInfo != null && mangaInfo.getCoverUrl() != null) ? mangaInfo.getCoverUrl() : "";
 
@@ -133,8 +139,13 @@ public class ComicInfoFragment extends Fragment {
 
         btnDownload.setOnClickListener(v -> {
             if (mangaId == null || mangaId.isEmpty()) return;
+            if (!requireLogin("Please log in to use this feature.")) return;
             String userId = getCurrentUserId();
-            boolean isDownloaded = bookshelfDatabaseHelper.isDownloaded(userId, mangaId);
+        if (isBlank(userId)) {
+            btnDownload.setColorFilter(getResources().getColor(R.color.text_secondary_light, null));
+            return;
+        }
+        boolean isDownloaded = bookshelfDatabaseHelper.isDownloaded(userId, mangaId);
             String title = (mangaInfo != null && mangaInfo.getTitle() != null) ? mangaInfo.getTitle() : mangaTitle;
             String cover = (mangaInfo != null && mangaInfo.getCoverUrl() != null) ? mangaInfo.getCoverUrl() : "";
 
@@ -204,6 +215,10 @@ public class ComicInfoFragment extends Fragment {
     private void updateBookmarkUI() {
         if (bookshelfDatabaseHelper == null || mangaId == null || btnBookmark == null) return;
         String userId = getCurrentUserId();
+        if (isBlank(userId)) {
+            btnBookmark.setColorFilter(getResources().getColor(R.color.text_secondary_light, null));
+            return;
+        }
         boolean isBookmarked = bookshelfDatabaseHelper.isBookmarked(userId, mangaId);
         if (isBookmarked) {
             btnBookmark.setColorFilter(getResources().getColor(R.color.brand_blue, null));
@@ -215,6 +230,10 @@ public class ComicInfoFragment extends Fragment {
     private void updateDownloadUI() {
         if (bookshelfDatabaseHelper == null || mangaId == null || btnDownload == null) return;
         String userId = getCurrentUserId();
+        if (isBlank(userId)) {
+            btnDownload.setColorFilter(getResources().getColor(R.color.text_secondary_light, null));
+            return;
+        }
         boolean isDownloaded = bookshelfDatabaseHelper.isDownloaded(userId, mangaId);
         if (isDownloaded) {
             btnDownload.setColorFilter(getResources().getColor(R.color.brand_blue, null));
@@ -224,9 +243,24 @@ public class ComicInfoFragment extends Fragment {
     }
 
     private String getCurrentUserId() {
-        if (authManager == null) return "local_user";
-        String userId = authManager.getCurrentUserId();
-        return userId != null ? userId : "local_user";
+        if (authManager == null || !authManager.isLoggedIn()) return null;
+        return authManager.getCurrentUserId();
+    }
+
+    private boolean requireLogin(String message) {
+        if (authManager == null) {
+            authManager = new AuthManager(requireContext());
+        }
+        if (!authManager.isLoggedIn()) {
+            Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(requireContext(), LoginActivity.class));
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
     }
 
     private void loadMangaInfo() {
