@@ -13,6 +13,7 @@ import com.example.appdoctruyen.data.firebase.AuthManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,6 +25,7 @@ public class EditProfileActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private FirebaseUser currentUser;
     private AuthManager authManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,10 +50,11 @@ public class EditProfileActivity extends AppCompatActivity {
             if (currentUser != null) {
                 saveDataToFirebase();
             } else {
-                Toast.makeText(this, "Lỗi: Chưa đăng nhập!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Error: You are not logged in.", Toast.LENGTH_SHORT).show();
             }
         });
     }
+
     private void loadExistingData() {
         db.collection("users").document(currentUser.getUid())
                 .get()
@@ -67,7 +70,7 @@ public class EditProfileActivity extends AppCompatActivity {
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Không thể tải dữ liệu cũ: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Unable to load existing profile: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -77,7 +80,7 @@ public class EditProfileActivity extends AppCompatActivity {
         String newAddress = edtAddress.getText().toString().trim();
 
         if (newName.isEmpty()) {
-            Toast.makeText(this, "Tên hiển thị không được để trống!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Display name cannot be empty.", Toast.LENGTH_SHORT).show();
             return;
         }
         Map<String, Object> updates = new HashMap<>();
@@ -85,24 +88,19 @@ public class EditProfileActivity extends AppCompatActivity {
         updates.put("phone", newPhone);
         updates.put("address", newAddress);
 
-        // Đẩy lên Firestore
         db.collection("users").document(currentUser.getUid())
                 .update(updates)
                 .addOnSuccessListener(aVoid -> {
-
                     authManager.updateUserProfile(newName);
-
-                    Toast.makeText(this, "Cập nhật hồ sơ thành công!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Profile updated successfully.", Toast.LENGTH_SHORT).show();
                     finish();
                 })
                 .addOnFailureListener(e -> {
                     db.collection("users").document(currentUser.getUid())
                             .set(updates)
                             .addOnSuccessListener(aVoid -> {
-
                                 authManager.updateUserProfile(newName);
-
-                                Toast.makeText(this, "Tạo hồ sơ thành công!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(this, "Profile created successfully.", Toast.LENGTH_SHORT).show();
                                 finish();
                             });
                 });

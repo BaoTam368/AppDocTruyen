@@ -3,6 +3,7 @@ package com.example.appdoctruyen.views.fragments;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,10 +20,10 @@ import com.example.appdoctruyen.R;
 import com.example.appdoctruyen.data.firebase.AuthManager;
 import com.example.appdoctruyen.views.activities.LoginActivity;
 import com.example.appdoctruyen.views.activities.RechargeActivity;
-import com.example.appdoctruyen.views.activities.SearchActivity;
 import com.example.appdoctruyen.views.activities.UserDetailsActivity;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class ProfileFragment extends Fragment {
     LinearLayout btn_logout, btn_topup;
@@ -49,6 +50,7 @@ public class ProfileFragment extends Fragment {
         }
 
         loadUserInfo();
+        loadUserProfile();
 
         btn_logout.setOnClickListener(v -> {
             authManager.logout();
@@ -104,5 +106,28 @@ public class ProfileFragment extends Fragment {
                         .into(iv_user_avatar);
             }
         }
+    }
+
+    private void loadUserProfile() {
+        FirebaseUser currentUser = authManager.getCurrentUser();
+        if (currentUser == null) {
+            return;
+        }
+
+        FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(currentUser.getUid())
+                .addSnapshotListener((documentSnapshot, error) -> {
+                    if (error != null) {
+                        Log.e("ProfileFragment", "Unable to load profile data", error);
+                        return;
+                    }
+                    if (documentSnapshot != null && documentSnapshot.exists()) {
+                        String name = documentSnapshot.getString("username");
+                        if (name != null && !name.isEmpty()) {
+                            tv_username.setText(name);
+                        }
+                    }
+                });
     }
 }
