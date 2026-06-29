@@ -7,6 +7,8 @@
     <string name="tv_forgot_password">Forgot password?</string>
     <string name="text_or">OR</string>
     <string name="btn_register">Create new account</string>
+    <string name="btn_continue_as_guest">Continue as Guest</string>
+    <string name="guest_mode_hint">You can browse and read manga without an account.</string>
     <string name="hint_login_email">Enter email</string>
     <string name="hint_username">Enter username</string>
     <string name="hint_password">Enter password</string>
@@ -103,6 +105,8 @@
     <string name="bookshelf_empty_following">You are not following any manga yet</string>
     <string name="bookshelf_empty_history">You have not read any manga yet</string>
     <string name="bookshelf_empty_downloaded">You have not downloaded any manga yet</string>
+    <string name="bookshelf_login_required">Please log in to view your bookshelf.</string>
+    <string name="bookshelf_sync_hint">Your data will be synced after you log in.</string>
     <string name="bookshelf_last_read_format">Last read: %1$s</string>
     <string name="bookshelf_last_read_with_time_format">Last read: %1$s - %2$s</string>
     <string name="bookshelf_local_comment_title">Local Comments</string>

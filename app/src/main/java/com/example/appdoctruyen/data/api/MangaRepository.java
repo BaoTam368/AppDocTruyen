@@ -4,6 +4,7 @@ import com.example.appdoctruyen.R;
 import com.example.appdoctruyen.models.Chapter;
 import com.example.appdoctruyen.models.Comic;
 import com.example.appdoctruyen.models.ComicPage;
+import com.example.appdoctruyen.models.Cover;
 import com.example.appdoctruyen.models.Comment;
 import com.example.appdoctruyen.models.TranslationGroup;
 import com.example.appdoctruyen.models.Post;
@@ -81,6 +82,30 @@ public class MangaRepository {
             @Override
             public void onFailure(Call<MangaDetailResponse> call, Throwable throwable) {
                 android.util.Log.e("CHECK_API", "Thất bại mạng (onFailure): " + throwable.getMessage());
+                callback.onError("Unable to connect to the Node.js backend");
+            }
+        });
+    }
+
+    public void getMangaCovers(String mangaId, RepositoryCallback<List<Cover>> callback) {
+        if (isBlank(mangaId)) {
+            callback.onError("Missing mangaId");
+            return;
+        }
+
+        apiService.getMangaCovers(mangaId).enqueue(new Callback<CoverListResponse>() {
+            @Override
+            public void onResponse(Call<CoverListResponse> call, Response<CoverListResponse> response) {
+                CoverListResponse body = response.body();
+                if (response.isSuccessful() && body != null && body.success) {
+                    callback.onSuccess(mapCoverList(body.data));
+                } else {
+                    callback.onError(readErrorMessage(body, "Unable to load manga covers"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CoverListResponse> call, Throwable throwable) {
                 callback.onError("Unable to connect to the Node.js backend");
             }
         });
@@ -290,6 +315,30 @@ public class MangaRepository {
         return comics;
     }
 
+    private List<Cover> mapCoverList(List<CoverDto> dtoList) {
+        List<Cover> covers = new ArrayList<>();
+        if (dtoList == null) return covers;
+
+        for (CoverDto dto : dtoList) {
+            covers.add(mapCover(dto));
+        }
+        return covers;
+    }
+
+    private Cover mapCover(CoverDto dto) {
+        return new Cover(
+                dto.coverId,
+                dto.mangaId,
+                dto.fileName,
+                dto.coverUrl,
+                dto.thumbnailUrl,
+                dto.volume,
+                dto.locale,
+                dto.createdAt,
+                dto.updatedAt
+        );
+    }
+
     private List<Chapter> mapChapterList(List<ChapterDto> dtoList) {
         List<Chapter> chapters = new ArrayList<>();
         if (dtoList == null) return chapters;
@@ -371,6 +420,18 @@ public class MangaRepository {
 
     private boolean isBlank(String value) {
         return value == null || value.trim().isEmpty();
+    }
+
+    private String normalizeQueryParam(String value) {
+        return isBlank(value) ? null : value;
+    }
+
+    private String firstNonBlank(String... values) {
+        if (values == null) return "";
+        for (String value : values) {
+            if (!isBlank(value)) return value;
+        }
+        return "";
     }
 
     public interface RepositoryCallback<T> {
@@ -501,11 +562,20 @@ public class MangaRepository {
     }
 
     private Comment mapComment(CommentDto dto) {
-        return new Comment(dto.id, dto.userId, dto.displayName, dto.createdAt, dto.content, dto.avatarUrl);
+        String displayName = firstNonBlank(dto.displayName, dto.userId, "Unknown");
+        Comment comment = new Comment(dto.id, dto.userId, displayName, dto.createdAt, dto.content, dto.avatarUrl);
+        comment.setMangaId(dto.mangaId);
+        comment.setChapterId(dto.chapterId);
+        comment.setUpdatedAt(dto.updatedAt);
+        return comment;
     }
 
     public void getComments(final RepositoryCallback<List<Comment>> callback) {
-        apiService.getComments(null, null).enqueue(new Callback<CommentListResponse>() {
+        getComments(null, null, callback);
+    }
+
+    public void getComments(String mangaId, String chapterId, final RepositoryCallback<List<Comment>> callback) {
+        apiService.getComments(normalizeQueryParam(mangaId), normalizeQueryParam(chapterId)).enqueue(new Callback<CommentListResponse>() {
             @Override
             public void onResponse(Call<CommentListResponse> call, Response<CommentListResponse> response) {
                 CommentListResponse body = response.body();
@@ -523,7 +593,6 @@ public class MangaRepository {
             }
         });
     }
-
     public void createComment(CreateCommentRequest request, final RepositoryCallback<Comment> callback) {
         apiService.createComment(request).enqueue(new Callback<CommentResponse>() {
             @Override

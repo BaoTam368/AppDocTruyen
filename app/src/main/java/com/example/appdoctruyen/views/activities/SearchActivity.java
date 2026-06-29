@@ -20,39 +20,31 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.appdoctruyen.R;
+import com.example.appdoctruyen.data.api.MangaRepository;
 import com.example.appdoctruyen.models.Comic;
 import com.example.appdoctruyen.models.Genre;
 import com.example.appdoctruyen.views.adapters.BookshelfAdapter;
 import com.example.appdoctruyen.views.adapters.GenreAdapter;
 import com.example.appdoctruyen.views.adapters.TopSearchTagAdapter;
-import com.example.appdoctruyen.data.api.MangaRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SearchActivity extends AppCompatActivity {
     private ImageView btnBack, btnFilter;
-    private android.widget.LinearLayout layoutFilter;
+    private NestedScrollView layoutFilter;
     private EditText edtSearchInput;
     private ImageView ivClearSearch;
-
     private Button btnApplyFilter;
     private MangaRepository mangaRepository;
-
+    private RecyclerView rvTopSearchTags;
     private RecyclerView rvSearchResult;
     private RecyclerView rvGenresCheckbox;
-
     private List<Comic> resultList;
     private BookshelfAdapter resultAdapter;
     private GenreAdapter genreAdapter;
-
-    // Filter state
-    private String selectedSort = "title_asc"; // title_asc, title_desc
-
-    // Sort tab views
+    private String selectedSort = "title_asc";
     private TextView tvSortTitleAsc, tvSortTitleDesc;
-
-    // Debounce handler for search
     private final Handler searchHandler = new Handler();
     private Runnable searchRunnable;
     private static final long SEARCH_DELAY_MS = 500;
@@ -69,11 +61,10 @@ public class SearchActivity extends AppCompatActivity {
         btnApplyFilter = findViewById(R.id.btnApplyFilter);
         edtSearchInput = findViewById(R.id.edt_search_input);
         ivClearSearch = findViewById(R.id.iv_clear_search);
+        rvTopSearchTags = findViewById(R.id.rv_top_search_tags);
         rvSearchResult = findViewById(R.id.rv_search_result);
         rvGenresCheckbox = findViewById(R.id.rv_genres_checkbox);
         rvGenresCheckbox.setNestedScrollingEnabled(false);
-
-        // Sort tabs
         tvSortTitleAsc = findViewById(R.id.tvSortTitleAsc);
         tvSortTitleDesc = findViewById(R.id.tvSortTitleDesc);
 
@@ -104,7 +95,6 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {
                 String query = s.toString().trim();
-                // Debounce: cancel previous pending search
                 if (searchRunnable != null) {
                     searchHandler.removeCallbacks(searchRunnable);
                 }
@@ -124,6 +114,7 @@ public class SearchActivity extends AppCompatActivity {
 
         setupSearchResult();
         setupCheckbox();
+        setupTopSearchTags();
     }
 
     private void setupSortTabs() {
@@ -134,18 +125,45 @@ public class SearchActivity extends AppCompatActivity {
                 selectedSort = "title_desc";
             }
             updateSortTabUI();
+            applySearch();
         };
 
         if (tvSortTitleAsc != null) tvSortTitleAsc.setOnClickListener(sortListener);
         if (tvSortTitleDesc != null) tvSortTitleDesc.setOnClickListener(sortListener);
+        updateSortTabUI();
     }
 
     private void updateSortTabUI() {
         int selected = R.drawable.bg_tab_selected;
         int unselected = R.drawable.bg_tab_unselected;
 
-        if (tvSortTitleAsc != null) tvSortTitleAsc.setBackgroundResource("title_asc".equals(selectedSort) ? selected : unselected);
-        if (tvSortTitleDesc != null) tvSortTitleDesc.setBackgroundResource("title_desc".equals(selectedSort) ? selected : unselected);
+        if (tvSortTitleAsc != null) {
+            tvSortTitleAsc.setBackgroundResource("title_asc".equals(selectedSort) ? selected : unselected);
+        }
+        if (tvSortTitleDesc != null) {
+            tvSortTitleDesc.setBackgroundResource("title_desc".equals(selectedSort) ? selected : unselected);
+        }
+    }
+
+    private void setupTopSearchTags() {
+        List<String> data = new ArrayList<>();
+        data.add("One Piece");
+        data.add("Naruto");
+        data.add("Attack on Titan");
+        data.add("Demon Slayer");
+        data.add("Jujutsu Kaisen");
+        data.add("Solo Leveling");
+        data.add("Dragon Ball");
+        data.add("Bleach");
+        data.add("Black Clover");
+        data.add("Chainsaw Man");
+        TopSearchTagAdapter adapter = new TopSearchTagAdapter(data, tag -> {
+            edtSearchInput.setText(tag);
+            edtSearchInput.setSelection(edtSearchInput.getText().length());
+        });
+
+        rvTopSearchTags.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        rvTopSearchTags.setAdapter(adapter);
     }
 
     private void setupCheckbox() {
@@ -176,12 +194,11 @@ public class SearchActivity extends AppCompatActivity {
 
     private void applySearch() {
         String query = edtSearchInput.getText().toString().trim();
-        // Lấy genre đã chọn (nếu có)
         String selectedTag = "";
         if (genreAdapter != null) {
             List<String> selectedGenres = genreAdapter.getSelectedGenres();
             if (!selectedGenres.isEmpty()) {
-                selectedTag = selectedGenres.get(0); // Lấy genre đầu tiên được chọn
+                selectedTag = selectedGenres.get(0);
             }
         }
 
@@ -200,6 +217,7 @@ public class SearchActivity extends AppCompatActivity {
             intent.putExtra("comic_id", comic.getId());
             intent.putExtra("mangaId", comic.getMangaId());
             intent.putExtra("comic_title", comic.getTitle());
+            intent.putExtra("comic_cover", comic.getCoverUrl());
             startActivity(intent);
         });
 
@@ -214,17 +232,13 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void loadFilteredResults(String tag) {
-        // TODO: Gọi API với filter status và sort (backend hỗ trợ via query params)
-        // Dùng searchLocalMangas với status/sort (trả về từ local DB đã sync)
         mangaRepository.getLocalMangaList(20, 0, new MangaRepository.RepositoryCallback<List<Comic>>() {
             @Override
             public void onSuccess(List<Comic> data) {
                 resultList.clear();
                 if (data != null) {
                     for (Comic comic : data) {
-                        // Filter tag phía client
-                        if (!tag.isEmpty() && (comic.getTags() == null
-                                || !containsTag(comic.getTags(), tag))) {
+                        if (!tag.isEmpty() && (comic.getTags() == null || !containsTag(comic.getTags(), tag))) {
                             continue;
                         }
                         resultList.add(comic);
@@ -246,35 +260,18 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void searchMangaWithFilter(String query, String tag) {
-        // Gọi searchAndSync: tìm từ MangaDex và lưu vào local DB, trả kết quả ngay
         mangaRepository.searchAndSync(query, 20, 0, new MangaRepository.RepositoryCallback<List<Comic>>() {
             @Override
             public void onSuccess(List<Comic> data) {
-                resultList.clear();
-                if (data != null) {
-                    for (Comic comic : data) {
-                        // Filter tag
-                        if (!tag.isEmpty() && (comic.getTags() == null
-                                || !containsTag(comic.getTags(), tag))) {
-                            continue;
-                        }
-                        resultList.add(comic);
-                    }
-                    applySortToList(resultList);
-                }
-                resultAdapter.notifyDataSetChanged();
+                updateSearchResults(data, tag);
             }
 
             @Override
             public void onError(String message) {
-                // Nếu searchAndSync lỗi (mạng), fallback sang local search
                 mangaRepository.searchLocalMangas(query, 20, 0, new MangaRepository.RepositoryCallback<List<Comic>>() {
                     @Override
                     public void onSuccess(List<Comic> data) {
-                        resultList.clear();
-                        if (data != null) resultList.addAll(data);
-                        applySortToList(resultList);
-                        resultAdapter.notifyDataSetChanged();
+                        updateSearchResults(data, tag);
                     }
 
                     @Override
@@ -286,15 +283,22 @@ public class SearchActivity extends AppCompatActivity {
         });
     }
 
+    private void updateSearchResults(List<Comic> data, String tag) {
+        resultList.clear();
+        if (data != null) {
+            for (Comic comic : data) {
+                if (!tag.isEmpty() && (comic.getTags() == null || !containsTag(comic.getTags(), tag))) {
+                    continue;
+                }
+                resultList.add(comic);
+            }
+            applySortToList(resultList);
+        }
+        resultAdapter.notifyDataSetChanged();
+    }
+
     private void applySortToList(List<Comic> list) {
         switch (selectedSort) {
-            case "title_asc":
-                list.sort((a, b) -> {
-                    if (a.getTitle() == null) return 1;
-                    if (b.getTitle() == null) return -1;
-                    return a.getTitle().compareToIgnoreCase(b.getTitle());
-                });
-                break;
             case "title_desc":
                 list.sort((a, b) -> {
                     if (a.getTitle() == null) return 1;
@@ -302,23 +306,20 @@ public class SearchActivity extends AppCompatActivity {
                     return b.getTitle().compareToIgnoreCase(a.getTitle());
                 });
                 break;
-            case "year_desc":
-                list.sort((a, b) -> {
-                    int ya = a.getYear() != null ? a.getYear() : 0;
-                    int yb = b.getYear() != null ? b.getYear() : 0;
-                    return Integer.compare(yb, ya);
-                });
-                break;
-            case "latest":
+            case "title_asc":
             default:
-                // Giữ nguyên thứ tự từ server (đã sort by updated_at DESC)
+                list.sort((a, b) -> {
+                    if (a.getTitle() == null) return 1;
+                    if (b.getTitle() == null) return -1;
+                    return a.getTitle().compareToIgnoreCase(b.getTitle());
+                });
                 break;
         }
     }
 
     private boolean containsTag(List<String> tags, String tag) {
-        for (String t : tags) {
-            if (t != null && t.equalsIgnoreCase(tag)) return true;
+        for (String currentTag : tags) {
+            if (currentTag != null && currentTag.equalsIgnoreCase(tag)) return true;
         }
         return false;
     }

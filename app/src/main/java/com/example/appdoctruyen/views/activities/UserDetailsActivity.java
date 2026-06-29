@@ -49,7 +49,7 @@ public class UserDetailsActivity extends AppCompatActivity {
             db.collection("users").document(uid)
                     .addSnapshotListener((documentSnapshot, error) -> {
                         if (error != null) {
-                            Log.e("ProfileFragment", "Lỗi tải dữ liệu", error);
+                            Log.e("ProfileFragment", "Unable to load profile data", error);
                             return;
                         }
                         if (documentSnapshot != null && documentSnapshot.exists()) {

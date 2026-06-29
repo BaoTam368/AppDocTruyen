@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,10 +20,8 @@ import com.example.appdoctruyen.R;
 import com.example.appdoctruyen.data.firebase.AuthManager;
 import com.example.appdoctruyen.views.activities.LoginActivity;
 import com.example.appdoctruyen.views.activities.RechargeActivity;
-import com.example.appdoctruyen.views.activities.SearchActivity;
 import com.example.appdoctruyen.views.activities.UserDetailsActivity;
 import com.google.android.material.imageview.ShapeableImageView;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -31,7 +30,6 @@ public class ProfileFragment extends Fragment {
     ShapeableImageView iv_user_avatar;
     TextView tv_username, tv_user_title;
     private AuthManager authManager;
-
 
     @SuppressLint("MissingInflatedId")
     @Nullable
@@ -45,7 +43,13 @@ public class ProfileFragment extends Fragment {
         tv_username = view.findViewById(R.id.tv_username);
         tv_user_title = view.findViewById(R.id.tv_user_title);
         authManager = new AuthManager(requireContext());
-//        loadUserInfo();
+        if (!authManager.isLoggedIn()) {
+            Toast.makeText(requireContext(), "Please log in to view your profile.", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(requireContext(), LoginActivity.class));
+            return view;
+        }
+
+        loadUserInfo();
         loadUserProfile();
 
         btn_logout.setOnClickListener(v -> {
@@ -56,11 +60,21 @@ public class ProfileFragment extends Fragment {
         });
 
         btn_topup.setOnClickListener(v -> {
+            if (!authManager.isLoggedIn()) {
+                Toast.makeText(requireContext(), "Please log in to use this feature.", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(requireContext(), LoginActivity.class));
+                return;
+            }
             Intent intent = new Intent(requireContext(), RechargeActivity.class);
             startActivity(intent);
         });
 
         iv_user_avatar.setOnClickListener(v -> {
+            if (!authManager.isLoggedIn()) {
+                Toast.makeText(requireContext(), "Please log in to view your profile.", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(requireContext(), LoginActivity.class));
+                return;
+            }
             Intent intent = new Intent(requireContext(), UserDetailsActivity.class);
             startActivity(intent);
         });
@@ -93,30 +107,27 @@ public class ProfileFragment extends Fragment {
             }
         }
     }
-    private void loadUserProfile() {
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (currentUser != null) {
-            String uid = currentUser.getUid();
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
-            db.collection("users").document(uid)
-                    .addSnapshotListener((documentSnapshot, error) -> {
-                        if (error != null) {
-                            Log.e("ProfileFragment", "Lỗi tải dữ liệu", error);
-                            return;
-                        }
-                        if (documentSnapshot != null && documentSnapshot.exists()) {
-                            String name = documentSnapshot.getString("username");
 
-                            if (name != null && !name.isEmpty()) {
-                                tv_username.setText(name);
-                            } else {
-                                String email = currentUser.getEmail();
-                                if (email != null && email.contains("@")) {
-                                    tv_username.setText(email.substring(0, email.indexOf("@")));
-                                }
-                            }
-                        }
-                    });
+    private void loadUserProfile() {
+        FirebaseUser currentUser = authManager.getCurrentUser();
+        if (currentUser == null) {
+            return;
         }
+
+        FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(currentUser.getUid())
+                .addSnapshotListener((documentSnapshot, error) -> {
+                    if (error != null) {
+                        Log.e("ProfileFragment", "Unable to load profile data", error);
+                        return;
+                    }
+                    if (documentSnapshot != null && documentSnapshot.exists()) {
+                        String name = documentSnapshot.getString("username");
+                        if (name != null && !name.isEmpty()) {
+                            tv_username.setText(name);
+                        }
+                    }
+                });
     }
 }

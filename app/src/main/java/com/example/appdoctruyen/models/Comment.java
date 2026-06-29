@@ -3,8 +3,11 @@ package com.example.appdoctruyen.models;
 public class Comment  {
     private int id;
     private String userId;
+    private String mangaId;
+    private String chapterId;
     private String username;
     private String time;
+    private String updatedAt;
     private String content;
     private String avatarUrl;
 
@@ -33,6 +36,22 @@ public class Comment  {
         this.userId = userId;
     }
 
+    public String getMangaId() {
+        return mangaId;
+    }
+
+    public void setMangaId(String mangaId) {
+        this.mangaId = mangaId;
+    }
+
+    public String getChapterId() {
+        return chapterId;
+    }
+
+    public void setChapterId(String chapterId) {
+        this.chapterId = chapterId;
+    }
+
     public String getUsername() {
         return username;
     }
@@ -47,6 +66,14 @@ public class Comment  {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public String getContent() {

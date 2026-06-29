@@ -144,17 +144,43 @@
             android:id="@+id/img_twitter_login"  android:background="@drawable/x"/>
     </LinearLayout>
 
+    <TextView
+            android:id="@+id/tv_guest_hint"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:gravity="center"
+            android:text="@string/guest_mode_hint"
+            android:textColor="@color/text_secondary_light"
+            android:textSize="13sp"
+            app:layout_constraintTop_toBottomOf="@id/layout_social"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    <Button
+            android:id="@+id/btn_continue_guest"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="@color/bg_button_light"
+            android:text="@string/btn_continue_as_guest"
+            android:textColor="@color/text_primary_light"
+            android:textAllCaps="false"
+            app:layout_constraintTop_toBottomOf="@id/tv_guest_hint"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
     <Button
             android:id="@+id/btn_register"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="12dp"
             android:layout_marginBottom="24dp"
             android:backgroundTint="@color/bg_button_light"
             android:text="@string/btn_register"
             android:textColor="@color/text_primary_light"
             android:textAllCaps="false"
-            app:layout_constraintTop_toBottomOf="@id/layout_social"
+            app:layout_constraintTop_toBottomOf="@id/btn_continue_guest"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 

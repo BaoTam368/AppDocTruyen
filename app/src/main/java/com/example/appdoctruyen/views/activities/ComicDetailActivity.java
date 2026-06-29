@@ -8,13 +8,13 @@ import android.widget.ImageView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.example.appdoctruyen.views.adapters.ComicDetailAdapter;
 import com.example.appdoctruyen.R;
-import com.example.appdoctruyen.models.Chapter;
-import com.example.appdoctruyen.models.Comic;
 import com.example.appdoctruyen.data.api.MangaRepository;
 import com.example.appdoctruyen.data.database.BookshelfDatabaseHelper;
 import com.example.appdoctruyen.data.firebase.AuthManager;
+import com.example.appdoctruyen.models.Chapter;
+import com.example.appdoctruyen.models.Comic;
+import com.example.appdoctruyen.views.adapters.ComicDetailAdapter;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -29,14 +29,13 @@ public class ComicDetailActivity extends AppCompatActivity {
     private MaterialButton btnReadChapter;
     private String mangaId;
     private String mangaTitle;
-    private String currentCoverUrl;
+    private String currentCoverUrl = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comic_detail);
 
-        // Nhận mangaId và mangaTitle từ intent
         mangaId = getIntent().getStringExtra("mangaId");
         if (mangaId == null) {
             mangaId = getIntent().getStringExtra("manga_id");
@@ -51,37 +50,35 @@ public class ComicDetailActivity extends AppCompatActivity {
             }
         }
         mangaTitle = getIntent().getStringExtra("comic_title");
+        currentCoverUrl = getIntent().getStringExtra("comic_cover");
+        if (currentCoverUrl == null) currentCoverUrl = "";
 
-        // 1. Ánh xạ các View từ XML
         tabLayout = findViewById(R.id.tabLayout);
         viewPager = findViewById(R.id.viewPager);
         btnBack = findViewById(R.id.btnBack);
         btnReadChapter = findViewById(R.id.btnReadChapter);
 
-        // 2. Khởi tạo Adapter và gắn vào ViewPager2
         ComicDetailAdapter adapter = new ComicDetailAdapter(this, mangaId, mangaTitle);
         viewPager.setAdapter(adapter);
 
-        // 3. Liên kết TabLayout với ViewPager2
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
             if (position == 0) {
                 tab.setText("Introduction");
-            } else {
+            } else if (position == 1) {
                 tab.setText("Chapter List");
+            } else {
+                tab.setText("Comments");
             }
         }).attach();
 
-        // 4. Xử lý nút Back (đóng màn hình hiện tại)
         btnBack.setOnClickListener(v -> finish());
-
-        // 5. Xử lý nút đọc chương đầu hoặc chương tiếp theo
         setupReadButton();
     }
 
     private void setupReadButton() {
         MangaRepository mangaRepository = new MangaRepository();
         if (mangaId != null && !mangaId.isEmpty()) {
-            btnReadChapter.setVisibility(View.GONE); // Hide initially until loaded
+            btnReadChapter.setVisibility(View.GONE);
             mangaRepository.getMangaChapters(mangaId, new MangaRepository.RepositoryCallback<List<Chapter>>() {
                 @Override
                 public void onSuccess(List<Chapter> chapters) {
@@ -107,6 +104,7 @@ public class ComicDetailActivity extends AppCompatActivity {
                             intent.putExtra("mangaTitle", mangaTitle);
                             intent.putExtra("chapterId", targetChapter.getChapterId());
                             intent.putExtra("chapterName", targetChapter.getName());
+                            intent.putExtra("comic_cover", currentCoverUrl);
                             startActivity(intent);
                         });
                         btnReadChapter.setVisibility(View.VISIBLE);
@@ -138,7 +136,7 @@ public class ComicDetailActivity extends AppCompatActivity {
         Chapter firstChapter = chapters.get(0);
         for (Chapter ch : chapters) {
             String name = ch.getName().toLowerCase();
-            if (name.contains("chapter 1") || name.contains("chương 1") || name.equals("1")) {
+            if (name.contains("chapter 1") || name.contains("chapter 1") || name.equals("1")) {
                 firstChapter = ch;
                 break;
             }
@@ -156,5 +154,9 @@ public class ComicDetailActivity extends AppCompatActivity {
 
     public String getCoverUrl() {
         return currentCoverUrl;
+    }
+
+    public void setCoverUrl(String coverUrl) {
+        currentCoverUrl = coverUrl != null ? coverUrl : "";
     }
 }

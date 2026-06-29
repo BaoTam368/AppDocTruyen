@@ -67,6 +67,8 @@ public class LoginActivity extends AppCompatActivity {
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         Button btnLogin = findViewById(R.id.btn_login);
+        Button btnContinueGuest = findViewById(R.id.btn_continue_guest);
+        btnContinueGuest.setOnClickListener(v -> goToMainActivity());
 
 //        Click nút Đăng Nhập -> Mở màn hình chính (MainActivity)
         btnLogin.setOnClickListener(v -> {

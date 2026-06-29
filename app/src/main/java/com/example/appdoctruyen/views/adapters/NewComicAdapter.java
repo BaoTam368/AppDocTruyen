@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.appdoctruyen.R;
 import com.example.appdoctruyen.models.Comic;
 
@@ -40,22 +41,35 @@ public class NewComicAdapter extends RecyclerView.Adapter<NewComicAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-
         Comic comic = comicList.get(position);
-        holder.ivComic.setImageResource(comic.getCoverImageResId());
+
+        if (comic.getCoverUrl() != null && !comic.getCoverUrl().isEmpty()) {
+            Glide.with(holder.itemView.getContext())
+                    .load(comic.getCoverUrl())
+                    .placeholder(R.drawable.placeholder_comic)
+                    .error(R.drawable.placeholder_comic)
+                    .into(holder.ivComic);
+        } else if (comic.getCoverImageResId() != 0) {
+            holder.ivComic.setImageResource(comic.getCoverImageResId());
+        } else {
+            holder.ivComic.setImageResource(R.drawable.placeholder_comic);
+        }
+
         holder.tvTitle.setText(comic.getTitle());
         holder.tvChapter.setText(comic.getLatestChapter());
         holder.tvTime.setText("Updated at: " + comic.getDescription());
         holder.tvType.setText(comic.getAuthor());
 
         holder.itemView.setOnClickListener(v -> {
-            listener.onComicClick(comic, position);
+            if (listener != null) {
+                listener.onComicClick(comic, position);
+            }
         });
     }
 
     @Override
     public int getItemCount() {
-        return comicList.size();
+        return comicList != null ? comicList.size() : 0;
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {

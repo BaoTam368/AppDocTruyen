@@ -64,6 +64,14 @@ public class AuthManager {
         return mAuth.getCurrentUser() != null;
     }
 
+    public boolean isLoggedIn() {
+        return isUserLoggedIn();
+    }
+
+    public boolean isGuest() {
+        return !isLoggedIn();
+    }
+
     public FirebaseUser getCurrentUser() {
         return mAuth.getCurrentUser();
     }
