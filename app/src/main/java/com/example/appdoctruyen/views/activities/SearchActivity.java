@@ -3,14 +3,14 @@ package com.example.appdoctruyen.views.activities;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -32,19 +32,30 @@ import java.util.List;
 
 public class SearchActivity extends AppCompatActivity {
     private ImageView btnBack, btnFilter;
-    private NestedScrollView layoutFilter;
+    private android.widget.LinearLayout layoutFilter;
     private EditText edtSearchInput;
     private ImageView ivClearSearch;
 
     private Button btnApplyFilter;
     private MangaRepository mangaRepository;
 
-    private RecyclerView rvTopSearchTags;
     private RecyclerView rvSearchResult;
     private RecyclerView rvGenresCheckbox;
 
     private List<Comic> resultList;
     private BookshelfAdapter resultAdapter;
+    private GenreAdapter genreAdapter;
+
+    // Filter state
+    private String selectedSort = "title_asc"; // title_asc, title_desc
+
+    // Sort tab views
+    private TextView tvSortTitleAsc, tvSortTitleDesc;
+
+    // Debounce handler for search
+    private final Handler searchHandler = new Handler();
+    private Runnable searchRunnable;
+    private static final long SEARCH_DELAY_MS = 500;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -58,12 +69,17 @@ public class SearchActivity extends AppCompatActivity {
         btnApplyFilter = findViewById(R.id.btnApplyFilter);
         edtSearchInput = findViewById(R.id.edt_search_input);
         ivClearSearch = findViewById(R.id.iv_clear_search);
-        rvTopSearchTags = findViewById(R.id.rv_top_search_tags);
         rvSearchResult = findViewById(R.id.rv_search_result);
         rvGenresCheckbox = findViewById(R.id.rv_genres_checkbox);
         rvGenresCheckbox.setNestedScrollingEnabled(false);
 
+        // Sort tabs
+        tvSortTitleAsc = findViewById(R.id.tvSortTitleAsc);
+        tvSortTitleDesc = findViewById(R.id.tvSortTitleDesc);
+
         mangaRepository = new MangaRepository();
+
+        setupSortTabs();
 
         btnBack.setOnClickListener(v -> finish());
         btnFilter.setOnClickListener(v -> {
@@ -88,8 +104,13 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {
                 String query = s.toString().trim();
+                // Debounce: cancel previous pending search
+                if (searchRunnable != null) {
+                    searchHandler.removeCallbacks(searchRunnable);
+                }
                 if (query.length() >= 2) {
-                    searchManga(query);
+                    searchRunnable = () -> searchManga(query);
+                    searchHandler.postDelayed(searchRunnable, SEARCH_DELAY_MS);
                 } else if (query.isEmpty()) {
                     loadDefaultResults();
                 }
@@ -103,26 +124,28 @@ public class SearchActivity extends AppCompatActivity {
 
         setupSearchResult();
         setupCheckbox();
-        setupTopSearchTags();
-
     }
 
-    private void setupTopSearchTags() {
-        List<String> data = new ArrayList<>();
-        data.add("One Piece");
-        data.add("Naruto");
-        data.add("Attack on Titan");
-        data.add("Demon Slayer");
-        data.add("Jujutsu Kaisen");
-        data.add("Solo Leveling");
-        data.add("Dragon Ball");
-        data.add("Bleach");
-        data.add("Black Clover");
-        data.add("Chainsaw Man");
-        TopSearchTagAdapter adapter = new TopSearchTagAdapter(data);
+    private void setupSortTabs() {
+        View.OnClickListener sortListener = v -> {
+            if (v.getId() == R.id.tvSortTitleAsc) {
+                selectedSort = "title_asc";
+            } else if (v.getId() == R.id.tvSortTitleDesc) {
+                selectedSort = "title_desc";
+            }
+            updateSortTabUI();
+        };
 
-        rvTopSearchTags.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        rvTopSearchTags.setAdapter(adapter);
+        if (tvSortTitleAsc != null) tvSortTitleAsc.setOnClickListener(sortListener);
+        if (tvSortTitleDesc != null) tvSortTitleDesc.setOnClickListener(sortListener);
+    }
+
+    private void updateSortTabUI() {
+        int selected = R.drawable.bg_tab_selected;
+        int unselected = R.drawable.bg_tab_unselected;
+
+        if (tvSortTitleAsc != null) tvSortTitleAsc.setBackgroundResource("title_asc".equals(selectedSort) ? selected : unselected);
+        if (tvSortTitleDesc != null) tvSortTitleDesc.setBackgroundResource("title_desc".equals(selectedSort) ? selected : unselected);
     }
 
     private void setupCheckbox() {
@@ -145,14 +168,28 @@ public class SearchActivity extends AppCompatActivity {
         genres.add(new Genre("Urban"));
         genres.add(new Genre("Horror"));
 
-        GenreAdapter adapter = new GenreAdapter(genres);
+        genreAdapter = new GenreAdapter(genres);
 
         rvGenresCheckbox.setLayoutManager(new GridLayoutManager(this, 3));
-        rvGenresCheckbox.setAdapter(adapter);
-
+        rvGenresCheckbox.setAdapter(genreAdapter);
     }
 
     private void applySearch() {
+        String query = edtSearchInput.getText().toString().trim();
+        // Lấy genre đã chọn (nếu có)
+        String selectedTag = "";
+        if (genreAdapter != null) {
+            List<String> selectedGenres = genreAdapter.getSelectedGenres();
+            if (!selectedGenres.isEmpty()) {
+                selectedTag = selectedGenres.get(0); // Lấy genre đầu tiên được chọn
+            }
+        }
+
+        if (query.isEmpty()) {
+            loadFilteredResults(selectedTag);
+        } else {
+            searchMangaWithFilter(query, selectedTag);
+        }
     }
 
     private void setupSearchResult() {
@@ -163,7 +200,6 @@ public class SearchActivity extends AppCompatActivity {
             intent.putExtra("comic_id", comic.getId());
             intent.putExtra("mangaId", comic.getMangaId());
             intent.putExtra("comic_title", comic.getTitle());
-            intent.putExtra("mangaId", comic.getMangaId());
             startActivity(intent);
         });
 
@@ -174,11 +210,27 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void loadDefaultResults() {
+        loadFilteredResults("");
+    }
+
+    private void loadFilteredResults(String tag) {
+        // TODO: Gọi API với filter status và sort (backend hỗ trợ via query params)
+        // Dùng searchLocalMangas với status/sort (trả về từ local DB đã sync)
         mangaRepository.getLocalMangaList(20, 0, new MangaRepository.RepositoryCallback<List<Comic>>() {
             @Override
             public void onSuccess(List<Comic> data) {
                 resultList.clear();
-                resultList.addAll(data);
+                if (data != null) {
+                    for (Comic comic : data) {
+                        // Filter tag phía client
+                        if (!tag.isEmpty() && (comic.getTags() == null
+                                || !containsTag(comic.getTags(), tag))) {
+                            continue;
+                        }
+                        resultList.add(comic);
+                    }
+                    applySortToList(resultList);
+                }
                 resultAdapter.notifyDataSetChanged();
             }
 
@@ -190,20 +242,84 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void searchManga(String query) {
-        mangaRepository.searchLocalMangas(query, 20, 0, new MangaRepository.RepositoryCallback<List<Comic>>() {
+        searchMangaWithFilter(query, "");
+    }
+
+    private void searchMangaWithFilter(String query, String tag) {
+        // Gọi searchAndSync: tìm từ MangaDex và lưu vào local DB, trả kết quả ngay
+        mangaRepository.searchAndSync(query, 20, 0, new MangaRepository.RepositoryCallback<List<Comic>>() {
             @Override
             public void onSuccess(List<Comic> data) {
                 resultList.clear();
-                resultList.addAll(data);
+                if (data != null) {
+                    for (Comic comic : data) {
+                        // Filter tag
+                        if (!tag.isEmpty() && (comic.getTags() == null
+                                || !containsTag(comic.getTags(), tag))) {
+                            continue;
+                        }
+                        resultList.add(comic);
+                    }
+                    applySortToList(resultList);
+                }
                 resultAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onError(String message) {
-                Toast.makeText(SearchActivity.this, message, Toast.LENGTH_SHORT).show();
+                // Nếu searchAndSync lỗi (mạng), fallback sang local search
+                mangaRepository.searchLocalMangas(query, 20, 0, new MangaRepository.RepositoryCallback<List<Comic>>() {
+                    @Override
+                    public void onSuccess(List<Comic> data) {
+                        resultList.clear();
+                        if (data != null) resultList.addAll(data);
+                        applySortToList(resultList);
+                        resultAdapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onError(String fallbackMessage) {
+                        Toast.makeText(SearchActivity.this, fallbackMessage, Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
     }
 
+    private void applySortToList(List<Comic> list) {
+        switch (selectedSort) {
+            case "title_asc":
+                list.sort((a, b) -> {
+                    if (a.getTitle() == null) return 1;
+                    if (b.getTitle() == null) return -1;
+                    return a.getTitle().compareToIgnoreCase(b.getTitle());
+                });
+                break;
+            case "title_desc":
+                list.sort((a, b) -> {
+                    if (a.getTitle() == null) return 1;
+                    if (b.getTitle() == null) return -1;
+                    return b.getTitle().compareToIgnoreCase(a.getTitle());
+                });
+                break;
+            case "year_desc":
+                list.sort((a, b) -> {
+                    int ya = a.getYear() != null ? a.getYear() : 0;
+                    int yb = b.getYear() != null ? b.getYear() : 0;
+                    return Integer.compare(yb, ya);
+                });
+                break;
+            case "latest":
+            default:
+                // Giữ nguyên thứ tự từ server (đã sort by updated_at DESC)
+                break;
+        }
+    }
 
+    private boolean containsTag(List<String> tags, String tag) {
+        for (String t : tags) {
+            if (t != null && t.equalsIgnoreCase(tag)) return true;
+        }
+        return false;
+    }
 }
