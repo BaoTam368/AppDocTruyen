@@ -64,6 +64,13 @@ public interface MangaApiService {
             @Query("offset") int offset
     );
 
+    @GET("local-manga/search-sync")
+    Call<MangaListResponse> searchAndSync(
+            @Query("q") String query,
+            @Query("limit") int limit,
+            @Query("offset") int offset
+    );
+
     @POST("local-manga/{mangaId}/sync")
     Call<MangaDetailResponse> syncMangaFromMangaDex(@Path("mangaId") String mangaId);
 

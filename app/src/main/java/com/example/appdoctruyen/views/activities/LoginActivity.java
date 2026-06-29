@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -40,6 +41,7 @@ public class LoginActivity extends AppCompatActivity {
     private GoogleSignInClient mGoogleSignInClient;
     private CallbackManager mCallbackManager;
     OAuthProvider.Builder twitterProvider;
+    private TextView tvForgotPassword;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -50,6 +52,7 @@ public class LoginActivity extends AppCompatActivity {
         authManager = new AuthManager(this);
         edtUsername = findViewById(R.id.edt_username);
         edtPassword = findViewById(R.id.edt_password);
+        tvForgotPassword = findViewById(R.id.tv_forgot_password);
 
         mCallbackManager = CallbackManager.Factory.create();
         twitterProvider = OAuthProvider.newBuilder("twitter.com");
@@ -177,6 +180,11 @@ public class LoginActivity extends AppCompatActivity {
                             android.widget.Toast.makeText(LoginActivity.this, "X error: " + e.getMessage(), android.widget.Toast.LENGTH_LONG).show();
                         });
             }
+        });
+
+        tvForgotPassword.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
+            startActivity(intent);
         });
 
         Button btnRegister = findViewById(R.id.btn_register);

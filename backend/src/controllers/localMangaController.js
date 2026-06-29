@@ -3,8 +3,8 @@ const syncService = require('../services/syncService');
 
 async function getLocalMangaList(req, res, next) {
     try {
-        const { limit, offset } = req.query;
-        const data = databaseService.getAllMangas({ limit, offset });
+        const { limit, offset, status, tag, sort } = req.query;
+        const data = databaseService.getAllMangas({ limit, offset, status, tag, sort });
 
         res.json({
             success: true,
@@ -18,7 +18,7 @@ async function getLocalMangaList(req, res, next) {
 async function searchLocalMangas(req, res, next) {
     try {
         const q = req.query.q || req.query.title;
-        const { limit, offset } = req.query;
+        const { limit, offset, status, tag, sort } = req.query;
         
         if (!q) {
             return res.json({
@@ -27,7 +27,7 @@ async function searchLocalMangas(req, res, next) {
             });
         }
 
-        const data = databaseService.searchMangas(q, { limit, offset });
+        const data = databaseService.searchMangas(q, { limit, offset, status, tag, sort });
 
         res.json({
             success: true,

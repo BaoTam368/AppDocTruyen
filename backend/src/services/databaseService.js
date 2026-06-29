@@ -129,9 +129,31 @@ function saveChapter(chapter) {
     );
 }
 
-function getAllMangas({ limit = 20, offset = 0 } = {}) {
+function getAllMangas({ limit = 20, offset = 0, status = '', tag = '', sort = 'latest' } = {}) {
     const database = getDatabase();
     const paging = normalizePaging({ limit, offset });
+    
+    let whereClause = '';
+    const params = [];
+    const conditions = [];
+    
+    if (status && status.trim() && status.trim() !== 'all') {
+        conditions.push('status = ?');
+        params.push(status.trim());
+    }
+    
+    if (tag && tag.trim()) {
+        conditions.push('tags LIKE ?');
+        params.push(`%${tag.trim()}%`);
+    }
+    
+    if (conditions.length > 0) {
+        whereClause = 'WHERE ' + conditions.join(' AND ');
+    }
+    
+    const orderBy = buildOrderBy(sort);
+    params.push(paging.limit, paging.offset);
+    
     const stmt = database.prepare(`
         SELECT 
             id as mangaId,
@@ -145,11 +167,12 @@ function getAllMangas({ limit = 20, offset = 0 } = {}) {
             content_rating as contentRating,
             available_translated_languages as availableTranslatedLanguages
         FROM mangas
-        ORDER BY updated_at DESC
+        ${whereClause}
+        ORDER BY ${orderBy}
         LIMIT ? OFFSET ?
     `);
     
-    const mangas = stmt.all(paging.limit, paging.offset);
+    const mangas = stmt.all(...params);
     return mangas.map(manga => ({
         ...manga,
         tags: parseJsonArray(manga.tags),
@@ -157,9 +180,28 @@ function getAllMangas({ limit = 20, offset = 0 } = {}) {
     }));
 }
 
-function searchMangas(query, { limit = 20, offset = 0 } = {}) {
+function searchMangas(query, { limit = 20, offset = 0, status = '', tag = '', sort = 'latest' } = {}) {
     const database = getDatabase();
     const paging = normalizePaging({ limit, offset });
+    
+    let whereClause = 'WHERE (title LIKE ? OR description LIKE ?)';
+    const params = [];
+    const searchPattern = `%${query}%`;
+    params.push(searchPattern, searchPattern);
+    
+    if (status && status.trim() && status.trim() !== 'all') {
+        whereClause += ' AND status = ?';
+        params.push(status.trim());
+    }
+    
+    if (tag && tag.trim()) {
+        whereClause += ' AND tags LIKE ?';
+        params.push(`%${tag.trim()}%`);
+    }
+    
+    const orderBy = buildOrderBy(sort);
+    params.push(paging.limit, paging.offset);
+    
     const stmt = database.prepare(`
         SELECT 
             id as mangaId,
@@ -173,13 +215,12 @@ function searchMangas(query, { limit = 20, offset = 0 } = {}) {
             content_rating as contentRating,
             available_translated_languages as availableTranslatedLanguages
         FROM mangas
-        WHERE title LIKE ? OR description LIKE ?
-        ORDER BY updated_at DESC
+        ${whereClause}
+        ORDER BY ${orderBy}
         LIMIT ? OFFSET ?
     `);
     
-    const searchPattern = `%${query}%`;
-    const mangas = stmt.all(searchPattern, searchPattern, paging.limit, paging.offset);
+    const mangas = stmt.all(...params);
     return mangas.map(manga => ({
         ...manga,
         tags: parseJsonArray(manga.tags),
@@ -272,6 +313,17 @@ function parseJsonArray(value) {
         return Array.isArray(parsed) ? parsed : [];
     } catch (error) {
         return [];
+    }
+}
+
+function buildOrderBy(sort) {
+    switch (String(sort || '').toLowerCase()) {
+        case 'title_asc': return 'title ASC';
+        case 'title_desc': return 'title DESC';
+        case 'year_asc': return 'year ASC';
+        case 'year_desc': return 'year DESC';
+        case 'latest':
+        default: return 'updated_at DESC';
     }
 }
 

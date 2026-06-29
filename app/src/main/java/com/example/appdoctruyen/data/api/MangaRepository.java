@@ -264,6 +264,25 @@ public class MangaRepository {
         });
     }
 
+    public void searchAndSync(String query, int limit, int offset, RepositoryCallback<List<Comic>> callback) {
+        apiService.searchAndSync(query, limit, offset).enqueue(new Callback<MangaListResponse>() {
+            @Override
+            public void onResponse(Call<MangaListResponse> call, Response<MangaListResponse> response) {
+                MangaListResponse body = response.body();
+                if (response.isSuccessful() && body != null && body.success) {
+                    callback.onSuccess(mapMangaList(body.data));
+                } else {
+                    callback.onError(readErrorMessage(body, "Manga not found"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MangaListResponse> call, Throwable throwable) {
+                callback.onError("Unable to connect to the Node.js backend");
+            }
+        });
+    }
+
     public void syncPopularMangas(int count, RepositoryCallback<List<Comic>> callback) {
         int total = Math.max(count, 1);
         int limit = Math.min(total, 100);

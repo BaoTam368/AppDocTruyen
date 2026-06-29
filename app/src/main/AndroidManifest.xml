@@ -23,6 +23,11 @@
             android:screenOrientation="portrait" />
 
         <activity
+            android:name=".views.activities.ForgotPasswordActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"/>
+
+        <activity
             android:name=".views.activities.RegisterActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
@@ -91,6 +96,12 @@
             android:name=".views.activities.CreatePostActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".views.activities.EditProfileActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            tools:ignore="Instantiatable" />
 
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
         <meta-data android:name="com.facebook.sdk.ClientToken" android:value="@string/facebook_client_token"/>
