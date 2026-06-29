@@ -25,7 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="Chỉnh sửa hồ sơ"
+            android:text="Edit profile"
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -42,7 +42,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Thông tin cá nhân"
+            android:text="Information"
             android:textStyle="bold"
             android:layout_marginBottom="16dp"/>
 
@@ -50,7 +50,7 @@
             android:id="@+id/edt_edit_username"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:hint="Tên hiển thị"
+            android:hint="Display name"
             android:inputType="textPersonName"
             android:background="@color/bg_input_light"
             android:paddingHorizontal="16dp"
@@ -60,7 +60,7 @@
             android:id="@+id/edt_edit_phone"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:hint="Số điện thoại"
+            android:hint="Phone number"
             android:inputType="phone"
             android:background="@color/bg_input_light"
             android:paddingHorizontal="16dp"
@@ -70,7 +70,7 @@
             android:id="@+id/edt_edit_address"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:hint="Địa chỉ"
+            android:hint="Address"
             android:inputType="textPostalAddress"
             android:background="@color/bg_input_light"
             android:paddingHorizontal="16dp"
@@ -80,7 +80,7 @@
             android:id="@+id/btn_save_profile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Cập nhật"
+            android:text="Update"
             android:textColor="@color/white"
             android:backgroundTint="@color/brand_blue"/>
     </LinearLayout>

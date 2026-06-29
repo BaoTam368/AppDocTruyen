@@ -9,10 +9,10 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.appdoctruyen.R;
+import com.example.appdoctruyen.data.firebase.AuthManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +23,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
     private FirebaseUser currentUser;
-
+    private AuthManager authManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,7 +37,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
-
+        authManager = new AuthManager(this);
         btnBack.setOnClickListener(v -> finish());
 
         if (currentUser != null) {
@@ -86,12 +86,22 @@ public class EditProfileActivity extends AppCompatActivity {
         updates.put("address", newAddress);
 
         // Đẩy lên Firestore
-        db.collection("users").document(currentUser.getUid()).update(updates).addOnSuccessListener(aVoid -> {
+        db.collection("users").document(currentUser.getUid())
+                .update(updates)
+                .addOnSuccessListener(aVoid -> {
+
+                    authManager.updateUserProfile(newName);
+
                     Toast.makeText(this, "Cập nhật hồ sơ thành công!", Toast.LENGTH_SHORT).show();
                     finish();
                 })
                 .addOnFailureListener(e -> {
-                    db.collection("users").document(currentUser.getUid()).set(updates).addOnSuccessListener(aVoid -> {
+                    db.collection("users").document(currentUser.getUid())
+                            .set(updates)
+                            .addOnSuccessListener(aVoid -> {
+
+                                authManager.updateUserProfile(newName);
+
                                 Toast.makeText(this, "Tạo hồ sơ thành công!", Toast.LENGTH_SHORT).show();
                                 finish();
                             });

@@ -45,7 +45,7 @@ public class ProfileFragment extends Fragment {
         tv_username = view.findViewById(R.id.tv_username);
         tv_user_title = view.findViewById(R.id.tv_user_title);
         authManager = new AuthManager(requireContext());
-        loadUserInfo();
+//        loadUserInfo();
         loadUserProfile();
 
         btn_logout.setOnClickListener(v -> {
