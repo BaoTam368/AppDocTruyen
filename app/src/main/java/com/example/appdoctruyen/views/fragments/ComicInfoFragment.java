@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
 import com.example.appdoctruyen.R;
 import com.example.appdoctruyen.models.TranslationGroup;
+import com.example.appdoctruyen.views.activities.ComicDetailActivity;
 import com.example.appdoctruyen.views.activities.ComicReadingActivity;
 import com.example.appdoctruyen.views.activities.GroupDetailActivity;
 import com.example.appdoctruyen.views.activities.MainActivity;
@@ -255,16 +256,24 @@ public class ComicInfoFragment extends Fragment {
                     tvAuthorName.setText("MangaDex");
                 }
                 
-                // Load ảnh bìa (sử dụng placeholder nếu không có library)
-                if (imgCover != null && data.getCoverUrl() != null && !data.getCoverUrl().isEmpty()) {
-                    Glide.with(requireContext())
-                            .load(data.getCoverUrl())
-                            .placeholder(R.drawable.placeholder_comic)
-                            .error(R.drawable.placeholder_comic)
-                            .into(imgCover);
+                String coverUrl = data.getCoverUrl();
+                if (getActivity() instanceof ComicDetailActivity) {
+                    ((ComicDetailActivity) getActivity()).setCoverUrl(coverUrl);
                 }
-                
-                // Hiển thị tags nếu có
+
+                if (imgCover != null) {
+                    if (coverUrl != null && !coverUrl.isEmpty()) {
+                        android.util.Log.d("MANGA_COVER", "Loading coverUrl: " + coverUrl);
+                        Glide.with(requireContext())
+                                .load(coverUrl)
+                                .placeholder(R.drawable.placeholder_comic)
+                                .error(R.drawable.placeholder_comic)
+                                .into(imgCover);
+                    } else {
+                        android.util.Log.d("MANGA_COVER", "Empty coverUrl for mangaId: " + mangaId);
+                        imgCover.setImageResource(R.drawable.placeholder_comic);
+                    }
+                }                // Hiển thị tags nếu có
                 if (layoutTags != null && data.getTags() != null && !data.getTags().isEmpty()) {
                     layoutTags.removeAllViews();
                     for (String tag : data.getTags()) {

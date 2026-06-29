@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -27,19 +28,38 @@ import java.util.List;
 
 public class CommentFragment extends Fragment {
 
+    private static final String ARG_MANGA_ID = "mangaId";
+    private static final String ARG_CHAPTER_ID = "chapterId";
+
     private RecyclerView rvComments;
     private List<Comment> commentList;
     private CommentAdapter commentAdapter;
     private EditText edtComment;
     private ImageButton btnSendComment;
+    private TextView tvCommentState;
 
     private MangaRepository repository;
     private AuthManager authManager;
+    private String mangaId;
+    private String chapterId;
+
+    public static CommentFragment newInstance(String mangaId, String chapterId) {
+        CommentFragment fragment = new CommentFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_MANGA_ID, mangaId);
+        args.putString(ARG_CHAPTER_ID, chapterId);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         repository = new MangaRepository();
+        if (getArguments() != null) {
+            mangaId = getArguments().getString(ARG_MANGA_ID);
+            chapterId = getArguments().getString(ARG_CHAPTER_ID);
+        }
     }
 
     @Nullable
@@ -50,6 +70,7 @@ public class CommentFragment extends Fragment {
         rvComments = view.findViewById(R.id.recyclerViewComment);
         edtComment = view.findViewById(R.id.edt_comment);
         btnSendComment = view.findViewById(R.id.btn_send_comment);
+        tvCommentState = view.findViewById(R.id.tv_comment_state);
 
         authManager = new AuthManager(requireContext());
 
@@ -77,17 +98,17 @@ public class CommentFragment extends Fragment {
         btnSendComment.setOnClickListener(v -> {
             String content = edtComment.getText().toString().trim();
             if (content.isEmpty()) {
-                edtComment.setError("Enter a comment");
+                edtComment.setError("Write a comment");
                 return;
             }
 
             String currentUserId = authManager.getCurrentUserId();
             if (currentUserId == null) {
-                Toast.makeText(requireContext(), "Please log in to comment!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Please log in to comment", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            CreateCommentRequest request = new CreateCommentRequest(currentUserId, content);
+            CreateCommentRequest request = new CreateCommentRequest(mangaId, chapterId, currentUserId, content);
 
             repository.createComment(request, new MangaRepository.RepositoryCallback<Comment>() {
                 @Override
@@ -96,13 +117,13 @@ public class CommentFragment extends Fragment {
 
                     addComment(newComment);
                     edtComment.setText("");
-                    Toast.makeText(requireContext(), "Comment sent!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), "Comment posted", Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
                 public void onError(String message) {
                     if (!isAdded()) return;
-                    Log.e("COMMENT_FRAGMENT", "Lỗi tạo bình luận: " + message);
+                    Log.e("COMMENT_FRAGMENT", "Create comment failed: " + message);
                     Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
                 }
             });
@@ -110,23 +131,32 @@ public class CommentFragment extends Fragment {
     }
 
     private void loadComments() {
-        repository.getComments(new MangaRepository.RepositoryCallback<List<Comment>>() {
+        showState("Loading comments...");
+        repository.getComments(mangaId, chapterId, new MangaRepository.RepositoryCallback<List<Comment>>() {
             @Override
             public void onSuccess(List<Comment> data) {
                 if (!isAdded() || getActivity() == null) return;
-                if (data != null && !data.isEmpty()) {
-                    android.util.Log.d("TIME_DEBUG", "First comment time from server: " + data.get(0).getTime());
-                }
 
                 commentList.clear();
-                commentList.addAll(data);
+                if (data != null) {
+                    commentList.addAll(data);
+                }
                 commentAdapter.notifyDataSetChanged();
+
+                if (commentList.isEmpty()) {
+                    showState("No comments yet.");
+                } else {
+                    hideState();
+                }
             }
 
             @Override
             public void onError(String message) {
                 if (!isAdded()) return;
-                Log.e("COMMENT_FRAGMENT", "Lỗi tải bình luận: " + message);
+                Log.e("COMMENT_FRAGMENT", "Load comments failed: " + message);
+                commentList.clear();
+                commentAdapter.notifyDataSetChanged();
+                showState("Unable to load comments.");
                 Toast.makeText(requireContext(), "Unable to load comments", Toast.LENGTH_SHORT).show();
             }
         });
@@ -136,6 +166,7 @@ public class CommentFragment extends Fragment {
         commentList.add(0, comment);
         commentAdapter.notifyItemInserted(0);
         rvComments.scrollToPosition(0);
+        hideState();
     }
 
     private void showDeleteDialog(int commentId, int position) {
@@ -148,6 +179,9 @@ public class CommentFragment extends Fragment {
                         public void onSuccess(Void data) {
                             commentList.remove(position);
                             commentAdapter.notifyItemRemoved(position);
+                            if (commentList.isEmpty()) {
+                                showState("No comments yet.");
+                            }
                             Toast.makeText(requireContext(), "Comment deleted", Toast.LENGTH_SHORT).show();
                         }
 
@@ -159,5 +193,17 @@ public class CommentFragment extends Fragment {
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
+    }
+
+    private void showState(String message) {
+        if (tvCommentState == null) return;
+        tvCommentState.setText(message);
+        tvCommentState.setVisibility(View.VISIBLE);
+    }
+
+    private void hideState() {
+        if (tvCommentState != null) {
+            tvCommentState.setVisibility(View.GONE);
+        }
     }
 }

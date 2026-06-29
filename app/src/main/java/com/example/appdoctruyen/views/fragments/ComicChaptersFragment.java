@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.appdoctruyen.views.activities.ComicDetailActivity;
 import com.example.appdoctruyen.views.activities.ComicReadingActivity;
 import com.example.appdoctruyen.R;
 import com.example.appdoctruyen.models.Chapter;
@@ -84,7 +85,9 @@ public class ComicChaptersFragment extends Fragment {
             intent.putExtra("mangaTitle", mangaTitle);
             intent.putExtra("chapterId", clickedChapter.getChapterId());
             intent.putExtra("chapterName", clickedChapter.getName());
-
+            if (getActivity() instanceof ComicDetailActivity) {
+                intent.putExtra("comic_cover", ((ComicDetailActivity) getActivity()).getCoverUrl());
+            }
             startActivity(intent);
         });
 

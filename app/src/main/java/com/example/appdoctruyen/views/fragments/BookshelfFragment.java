@@ -87,6 +87,7 @@ public class BookshelfFragment extends Fragment {
         Intent intent = new Intent(requireContext(), ComicDetailActivity.class);
         intent.putExtra("mangaId", comic.getMangaId());
         intent.putExtra("comic_title", comic.getTitle());
+        intent.putExtra("comic_cover", comic.getCoverUrl());
         startActivity(intent);
     }
 

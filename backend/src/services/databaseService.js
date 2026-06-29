@@ -53,21 +53,22 @@ function initializeDatabase() {
 
         CREATE TABLE IF NOT EXISTS comments (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            manga_id TEXT,
+            chapter_id TEXT,
             user_id TEXT NOT NULL,
             content TEXT NOT NULL,
             created_at DATETIME DEFAULT (datetime('now', '+7 hours')),
+            updated_at DATETIME DEFAULT (datetime('now', '+7 hours')),
             FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
         );
 
         CREATE TABLE IF NOT EXISTS posts (
-
-              id INTEGER PRIMARY KEY AUTOINCREMENT,
-              user_id TEXT NOT NULL,
-              content TEXT NOT NULL,
-              image_url TEXT,
-              like_count INTEGER DEFAULT 0,
-              created_at DATETIME DEFAULT (datetime('now', '+7 hours')),
-
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id TEXT NOT NULL,
+            content TEXT NOT NULL,
+            image_url TEXT,
+            like_count INTEGER DEFAULT 0,
+            created_at DATETIME DEFAULT (datetime('now', '+7 hours')),
             FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
         );
 
@@ -86,6 +87,7 @@ function initializeDatabase() {
     `);
 
     ensureMangaMetadataColumns();
+    ensureCommentColumns();
 }
 
 function saveManga(manga) {
@@ -241,6 +243,18 @@ function closeDatabase() {
 function ensureMangaMetadataColumns() {
     ensureColumn('mangas', 'content_rating', 'TEXT');
     ensureColumn('mangas', 'available_translated_languages', 'TEXT');
+}
+
+function ensureCommentColumns() {
+    ensureColumn('comments', 'manga_id', 'TEXT');
+    ensureColumn('comments', 'chapter_id', 'TEXT');
+    ensureColumn('comments', 'updated_at', 'DATETIME');
+    db.exec("UPDATE comments SET updated_at = created_at WHERE updated_at IS NULL");
+    db.exec(`
+        CREATE INDEX IF NOT EXISTS idx_comments_manga_id ON comments(manga_id);
+        CREATE INDEX IF NOT EXISTS idx_comments_chapter_id ON comments(chapter_id);
+        CREATE INDEX IF NOT EXISTS idx_comments_manga_chapter ON comments(manga_id, chapter_id);
+    `);
 }
 
 function ensureColumn(tableName, columnName, definition) {

@@ -23,6 +23,9 @@ public interface MangaApiService {
     @GET("manga/{mangaId}")
     Call<MangaDetailResponse> getMangaDetail(@Path("mangaId") String mangaId);
 
+    @GET("manga/{mangaId}/covers")
+    Call<CoverListResponse> getMangaCovers(@Path("mangaId") String mangaId);
+
     @GET("manga/{mangaId}/chapters")
     Call<ChapterListResponse> getMangaChapters(@Path("mangaId") String mangaId);
 
@@ -48,7 +51,6 @@ public interface MangaApiService {
     @GET("groups/{groupId}")
     Call<GroupDetailResponse> getGroupDetail(@Path("groupId") String groupId);
 
-    // Local SQLite API endpoints
     @GET("local-manga")
     Call<MangaListResponse> getLocalMangaList(
             @Query("limit") int limit,
@@ -101,8 +103,7 @@ public interface MangaApiService {
 
     @DELETE("comments/{commentId}")
     Call<EmptyResponse> deleteComment(@Path("commentId") int commentId);
-    
-    //Đổi để sau này lấy tất cả và lấy 1 người dễ hơn
+
     @GET("posts")
     Call<PostListResponse> getPosts(
             @Query("userId") String userId
@@ -128,13 +129,15 @@ public interface MangaApiService {
             @Path("postId") int postId,
             @Body LikeDto request
     );
-
 }
 
 class MangaListResponse extends ApiResponse<List<MangaDto>> {
 }
 
 class MangaDetailResponse extends ApiResponse<MangaDto> {
+}
+
+class CoverListResponse extends ApiResponse<List<CoverDto>> {
 }
 
 class ChapterListResponse extends ApiResponse<List<ChapterDto>> {
@@ -168,6 +171,18 @@ class MangaDto {
     List<String> availableTranslatedLanguages;
     int views;
     int likes;
+}
+
+class CoverDto {
+    String coverId;
+    String mangaId;
+    String fileName;
+    String coverUrl;
+    String thumbnailUrl;
+    String volume;
+    String locale;
+    String createdAt;
+    String updatedAt;
 }
 
 class ChapterDto {
