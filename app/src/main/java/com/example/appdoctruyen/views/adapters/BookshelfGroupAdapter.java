@@ -47,8 +47,8 @@ public class BookshelfGroupAdapter extends RecyclerView.Adapter<BookshelfGroupAd
         TranslationGroup group = groupList.get(position);
         if (group == null) {
             holder.tvGroupName.setText(R.string.group_default_name);
-            holder.tvGroupComicCount.setText(context.getString(R.string.group_comic_count_format, 0));
-            holder.tvGroupMemberCount.setText(context.getString(R.string.group_members_count_format, 0));
+            holder.tvGroupComicCount.setText(R.string.group_stats_unavailable_short);
+            holder.tvGroupMemberCount.setText(R.string.group_stats_unavailable_short);
             holder.imgGroupAvatar.setImageResource(R.drawable.placeholder_group);
             holder.itemView.setOnClickListener(null);
             return;
@@ -57,14 +57,8 @@ public class BookshelfGroupAdapter extends RecyclerView.Adapter<BookshelfGroupAd
         holder.tvGroupName.setText(isBlank(group.getName())
                 ? context.getString(R.string.group_default_name)
                 : group.getName());
-        holder.tvGroupComicCount.setText(context.getString(
-                R.string.group_comic_count_format,
-                group.getComicCount()
-        ));
-        holder.tvGroupMemberCount.setText(context.getString(
-                R.string.group_members_count_format,
-                group.getMemberCount()
-        ));
+        holder.tvGroupComicCount.setText(formatCount(group.getComicCount(), R.string.group_comic_count_format));
+        holder.tvGroupMemberCount.setText(formatCount(group.getMemberCount(), R.string.group_members_count_format));
 
         Glide.with(holder.itemView.getContext())
                 .load(group.getAvatarUrl())
@@ -82,6 +76,12 @@ public class BookshelfGroupAdapter extends RecyclerView.Adapter<BookshelfGroupAd
     @Override
     public int getItemCount() {
         return groupList != null ? groupList.size() : 0;
+    }
+
+    private String formatCount(int value, int formatResId) {
+        return value > 0
+                ? context.getString(formatResId, value)
+                : context.getString(R.string.group_stats_unavailable_short);
     }
 
     private boolean isBlank(String value) {

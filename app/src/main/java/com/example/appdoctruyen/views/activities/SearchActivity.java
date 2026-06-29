@@ -35,7 +35,7 @@ public class SearchActivity extends AppCompatActivity {
     private NestedScrollView layoutFilter;
     private EditText edtSearchInput;
     private ImageView ivClearSearch;
-    private Button btnApplyFilter;
+    private Button btnApplyFilter, btnSearchRetry;
     private MangaRepository mangaRepository;
     private RecyclerView rvTopSearchTags;
     private RecyclerView rvSearchResult;
@@ -59,6 +59,7 @@ public class SearchActivity extends AppCompatActivity {
         btnFilter = findViewById(R.id.btnFilter);
         layoutFilter = findViewById(R.id.layoutFilter);
         btnApplyFilter = findViewById(R.id.btnApplyFilter);
+        btnSearchRetry = findViewById(R.id.btn_search_retry);
         edtSearchInput = findViewById(R.id.edt_search_input);
         ivClearSearch = findViewById(R.id.iv_clear_search);
         rvTopSearchTags = findViewById(R.id.rv_top_search_tags);
@@ -85,6 +86,9 @@ public class SearchActivity extends AppCompatActivity {
             applySearch();
             layoutFilter.setVisibility(View.GONE);
         });
+        if (btnSearchRetry != null) {
+            btnSearchRetry.setOnClickListener(v -> applySearch());
+        }
 
         edtSearchInput.addTextChangedListener(new TextWatcher() {
             @Override
@@ -104,6 +108,8 @@ public class SearchActivity extends AppCompatActivity {
                     searchHandler.postDelayed(searchRunnable, SEARCH_DELAY_MS);
                 } else if (query.isEmpty()) {
                     loadDefaultResults();
+                } else {
+                    clearSearchResults("Search manga...");
                 }
             }
         });
@@ -205,8 +211,10 @@ public class SearchActivity extends AppCompatActivity {
 
         if (query.isEmpty()) {
             loadFilteredResults(selectedTag);
-        } else {
+        } else if (query.length() >= 2) {
             searchMangaWithFilter(query, selectedTag);
+        } else {
+            clearSearchResults("Search manga...");
         }
     }
 
@@ -253,7 +261,7 @@ public class SearchActivity extends AppCompatActivity {
 
             @Override
             public void onError(String message) {
-                showSearchState("Unable to load manga. Please try again.");
+                showSearchState("Unable to load manga. Please try again.", true);
                 Toast.makeText(SearchActivity.this, message, Toast.LENGTH_SHORT).show();
             }
         });
@@ -283,7 +291,7 @@ public class SearchActivity extends AppCompatActivity {
                     public void onError(String fallbackMessage) {
                         resultList.clear();
                         resultAdapter.notifyDataSetChanged();
-                        showSearchState("No manga found. Try another keyword.");
+                        showSearchState("Unable to search manga. Please try again.", true);
                         Toast.makeText(SearchActivity.this, fallbackMessage, Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -334,15 +342,35 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
+    private void clearSearchResults(String message) {
+        if (resultList != null) {
+            resultList.clear();
+        }
+        if (resultAdapter != null) {
+            resultAdapter.notifyDataSetChanged();
+        }
+        showSearchState(message);
+    }
+
     private void showSearchState(String message) {
+        showSearchState(message, false);
+    }
+
+    private void showSearchState(String message, boolean showRetry) {
         if (tvSearchState == null) return;
         tvSearchState.setText(message);
         tvSearchState.setVisibility(View.VISIBLE);
+        if (btnSearchRetry != null) {
+            btnSearchRetry.setVisibility(showRetry ? View.VISIBLE : View.GONE);
+        }
     }
 
     private void hideSearchState() {
         if (tvSearchState != null) {
             tvSearchState.setVisibility(View.GONE);
+        }
+        if (btnSearchRetry != null) {
+            btnSearchRetry.setVisibility(View.GONE);
         }
     }
 
@@ -353,6 +381,7 @@ public class SearchActivity extends AppCompatActivity {
         }
         super.onDestroy();
     }
+
     private boolean containsTag(List<String> tags, String tag) {
         for (String currentTag : tags) {
             if (currentTag != null && currentTag.equalsIgnoreCase(tag)) return true;

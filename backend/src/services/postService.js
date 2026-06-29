@@ -57,9 +57,13 @@ function getPostById(postId) {
 }
 
 function createPost(payload = {}) {
-    const userId = normalizeText(payload.userId || payload.user_id || 'local_user');
+    const userId = normalizeText(payload.userId || payload.user_id);
     const content = normalizeText(payload.content);
     const imageUrl = normalizeNullable(payload.imageUrl || payload.image_url);
+
+    if (!userId) {
+        throw createHttpError(400, 'User is required.');
+    }
 
     if (!content) {
         throw createHttpError(400, 'Missing post content');

@@ -57,7 +57,6 @@ public class MainActivity extends AppCompatActivity {
             } else if (itemId == R.id.nav_translation_team) {
                 selectedFragment = new BookshelfGroupFragment();
             } else if (itemId == R.id.nav_profile) {
-                if (!requireLogin("Please log in to view your profile.")) return false;
                 selectedFragment = new ProfileFragment();
             }
 

@@ -110,7 +110,10 @@ public class ComicInfoFragment extends Fragment {
         });
 
         btnBookmark.setOnClickListener(v -> {
-            if (mangaId == null || mangaId.isEmpty()) return;
+            if (mangaId == null || mangaId.isEmpty()) {
+                Toast.makeText(requireContext(), "Unable to save this manga.", Toast.LENGTH_SHORT).show();
+                return;
+            }
             if (!requireLogin("Please log in to add this manga to your bookshelf.")) return;
             String userId = getCurrentUserId();
         if (isBlank(userId)) {
@@ -138,8 +141,11 @@ public class ComicInfoFragment extends Fragment {
         });
 
         btnDownload.setOnClickListener(v -> {
-            if (mangaId == null || mangaId.isEmpty()) return;
-            if (!requireLogin("Please log in to use this feature.")) return;
+            if (mangaId == null || mangaId.isEmpty()) {
+                Toast.makeText(requireContext(), "Unable to save this manga.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (!requireLogin("Please log in to save this manga.")) return;
             String userId = getCurrentUserId();
         if (isBlank(userId)) {
             btnDownload.setColorFilter(getResources().getColor(R.color.text_secondary_light, null));
@@ -154,10 +160,10 @@ public class ComicInfoFragment extends Fragment {
                 if (firebaseHelper != null) {
                     firebaseHelper.removeBookmark(mangaId);
                 }
-                Toast.makeText(getContext(), "Removed from downloads", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Removed from saved manga", Toast.LENGTH_SHORT).show();
                 updateDownloadUI();
             } else {
-                Toast.makeText(getContext(), "Downloading manga...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Saving manga...", Toast.LENGTH_SHORT).show();
                 mangaRepository.getMangaChapters(mangaId, new MangaRepository.RepositoryCallback<List<Chapter>>() {
                     @Override
                     public void onSuccess(List<Chapter> chapters) {
@@ -167,19 +173,19 @@ public class ComicInfoFragment extends Fragment {
                             String chapterId = targetChapter.getChapterId();
                             String chapterName = targetChapter.getName();
                             if (isBlank(chapterId)) {
-                                Toast.makeText(requireContext(), "This chapter is not available for download.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(requireContext(), "This chapter is not available to save.", Toast.LENGTH_SHORT).show();
                                 return;
                             }
                             
                             bookshelfDatabaseHelper.addDownloadedComic(userId, mangaId, chapterId, chapterName,
-                                    "/sdcard/Download/AppDocTruyen/" + mangaId + "/" + chapterId, title, cover);
+                                    "", title, cover);
                             if (firebaseHelper != null) {
                                 firebaseHelper.addDownloadedComic(mangaId, chapterId, chapterName,
-                                        "/sdcard/Download/AppDocTruyen/" + mangaId + "/" + chapterId, title, cover);
+                                        "", title, cover);
                             }
-                            Toast.makeText(getContext(), "Downloaded successfully (" + chapterName + ")", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Saved to Bookshelf (" + chapterName + ")", Toast.LENGTH_SHORT).show();
                         } else {
-                            Toast.makeText(getContext(), "No chapters available to download.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "No chapters available to save.", Toast.LENGTH_SHORT).show();
                         }
                         updateDownloadUI();
                     }
@@ -187,7 +193,7 @@ public class ComicInfoFragment extends Fragment {
                     @Override
                     public void onError(String message) {
                         if (!isAdded()) return;
-                        Toast.makeText(requireContext(), "Unable to prepare download. Please try again.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), "Unable to save this manga.", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
