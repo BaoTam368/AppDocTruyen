@@ -5,6 +5,7 @@ const router = express.Router();
 
 router.get('/', localMangaController.getLocalMangaList);
 router.get('/search', localMangaController.searchLocalMangas);
+router.get('/search-sync', localMangaController.searchAndSync);
 router.get('/:mangaId', localMangaController.getLocalMangaDetail);
 router.get('/:mangaId/chapters', localMangaController.getLocalMangaChapters);
 router.post('/:mangaId/sync', localMangaController.syncFromMangaDex);

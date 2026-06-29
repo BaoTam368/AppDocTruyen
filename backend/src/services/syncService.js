@@ -65,11 +65,13 @@ async function searchAndSync(query, options = {}) {
         const offset = clampNumber(options.offset, 0, 10000, 0);
         const mangas = await mangadexService.searchManga({ title: query, limit, offset });
         
+        // Chỉ lưu summary (không gọi getMangaDetail từng cái) để search nhanh hơn
         for (const manga of mangas) {
+            if (!manga.mangaId) continue;
             try {
-                await syncMangaFromMangaDex(manga.mangaId);
+                databaseService.saveManga(manga);
             } catch (error) {
-                console.error(`Failed to sync ${manga.title}:`, error.message);
+                console.error(`Failed to save summary for ${manga.title}:`, error.message);
             }
         }
         

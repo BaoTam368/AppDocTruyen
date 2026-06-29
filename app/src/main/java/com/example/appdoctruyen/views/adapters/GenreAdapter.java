@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.appdoctruyen.R;
 import com.example.appdoctruyen.models.Genre;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GenreAdapter extends RecyclerView.Adapter<GenreAdapter.ViewHolder> {
@@ -48,6 +49,16 @@ public class GenreAdapter extends RecyclerView.Adapter<GenreAdapter.ViewHolder> 
     @Override
     public int getItemCount() {
         return list.size();
+    }
+
+    public List<String> getSelectedGenres() {
+        List<String> selected = new ArrayList<>();
+        for (Genre genre : list) {
+            if (genre.isSelected()) {
+                selected.add(genre.getName());
+            }
+        }
+        return selected;
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
