@@ -44,6 +44,7 @@ public class ComicHomeFragment extends Fragment {
     private ImageView ivAvatar, ivNotification, ivRefresh;
     private LinearLayout layoutSearchBar, layoutCatNew;
     private MangaRepository mangaRepository;
+    private boolean isSyncing = false;
 //    private LinearLayout layoutCatGenres, layoutCatTopUser, layoutCatNew, layoutCatHot;
 
     @SuppressLint("MissingInflatedId")
@@ -133,8 +134,11 @@ public class ComicHomeFragment extends Fragment {
         mangaRepository.getLocalMangaList(10, 0, new MangaRepository.RepositoryCallback<List<Comic>>() {
             @Override
             public void onSuccess(List<Comic> data) {
+                if (!isAdded()) return;
                 featuredList.clear();
-                featuredList.addAll(data);
+                if (data != null) {
+                    featuredList.addAll(data);
+                }
                 featuredAdapter = new FeaturedComicAdapter(requireContext(), featuredList,
                         (comic, position) -> openComicDetail(comic));
                 rvFeaturedComics.setLayoutManager(
@@ -146,6 +150,7 @@ public class ComicHomeFragment extends Fragment {
 
             @Override
             public void onError(String message) {
+                if (!isAdded()) return;
                 Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
             }
         });
@@ -157,8 +162,11 @@ public class ComicHomeFragment extends Fragment {
         mangaRepository.getLocalMangaList(20, 0, new MangaRepository.RepositoryCallback<List<Comic>>() {
             @Override
             public void onSuccess(List<Comic> data) {
+                if (!isAdded()) return;
                 recentList.clear();
-                recentList.addAll(data);
+                if (data != null) {
+                    recentList.addAll(data);
+                }
                 recentAdapter = new BookshelfAdapter(requireContext(), recentList,
                         (comic, position) -> openComicDetail(comic));
                 rvRecentlyUpdated.setLayoutManager(new GridLayoutManager(requireContext(), 3));
@@ -168,12 +176,20 @@ public class ComicHomeFragment extends Fragment {
 
             @Override
             public void onError(String message) {
+                if (!isAdded()) return;
                 Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void openComicDetail(Comic comic) {
+        if (comic == null || comic.getMangaId() == null || comic.getMangaId().trim().isEmpty()) {
+            if (isAdded()) {
+                Toast.makeText(requireContext(), "Missing mangaId", Toast.LENGTH_SHORT).show();
+            }
+            return;
+        }
+
         Intent intent = new Intent(requireContext(), ComicDetailActivity.class);
         intent.putExtra("comic_id", comic.getMangaId());
         intent.putExtra("comic_title", comic.getTitle());
@@ -182,18 +198,41 @@ public class ComicHomeFragment extends Fragment {
     }
 
     private void syncPopularMangas() {
-        Toast.makeText(requireContext(), "Đang đồng bộ truyện từ MangaDex...", Toast.LENGTH_SHORT).show();
+        if (isSyncing) {
+            Toast.makeText(requireContext(), "Syncing. Please wait...", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        isSyncing = true;
+        if (ivRefresh != null) {
+            ivRefresh.setEnabled(false);
+            ivRefresh.setAlpha(0.5f);
+        }
+        Toast.makeText(requireContext(), "Syncing manga from MangaDex...", Toast.LENGTH_SHORT).show();
         mangaRepository.syncPopularMangas(200, new MangaRepository.RepositoryCallback<List<Comic>>() {
             @Override
             public void onSuccess(List<Comic> data) {
-                Toast.makeText(requireContext(), "Đã đồng bộ " + data.size() + " truyện!", Toast.LENGTH_SHORT).show();
+                isSyncing = false;
+                if (!isAdded()) return;
+                if (ivRefresh != null) {
+                    ivRefresh.setEnabled(true);
+                    ivRefresh.setAlpha(1f);
+                }
+                int syncedCount = data != null ? data.size() : 0;
+                Toast.makeText(requireContext(), "Synced " + syncedCount + " manga!", Toast.LENGTH_SHORT).show();
                 setupFeaturedComics();
                 setupRecentlyUpdatedComics();
             }
 
             @Override
             public void onError(String message) {
-                Toast.makeText(requireContext(), "Lỗi: " + message, Toast.LENGTH_SHORT).show();
+                isSyncing = false;
+                if (!isAdded()) return;
+                if (ivRefresh != null) {
+                    ivRefresh.setEnabled(true);
+                    ivRefresh.setAlpha(1f);
+                }
+                Toast.makeText(requireContext(), "Error: " + message, Toast.LENGTH_SHORT).show();
             }
         });
     }

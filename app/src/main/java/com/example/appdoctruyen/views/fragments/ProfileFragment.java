@@ -40,7 +40,7 @@ public class ProfileFragment extends Fragment {
         iv_user_avatar = view.findViewById(R.id.iv_user_avatar);
         tv_username = view.findViewById(R.id.tv_username);
         tv_user_title = view.findViewById(R.id.tv_user_title);
-        authManager = new AuthManager();
+        authManager = new AuthManager(requireContext());
 
         loadUserInfo();
 
@@ -74,10 +74,10 @@ public class ProfileFragment extends Fragment {
             } else if (email != null && !email.isEmpty()) {
                 tv_username.setText(email);
             } else {
-                tv_username.setText("Người dùng");
+                tv_username.setText("User");
             }
 
-            tv_user_title.setText("Thành viên");
+            tv_user_title.setText("Member");
 
             if (user.getPhotoUrl() != null) {
                 Glide.with(this)

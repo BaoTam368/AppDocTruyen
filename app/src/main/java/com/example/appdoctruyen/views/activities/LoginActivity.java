@@ -47,7 +47,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        authManager = new AuthManager();
+        authManager = new AuthManager(this);
         edtUsername = findViewById(R.id.edt_username);
         edtPassword = findViewById(R.id.edt_password);
 
@@ -72,21 +72,21 @@ public class LoginActivity extends AppCompatActivity {
 
             // Validate email field
             if (email.isEmpty()) {
-                edtUsername.setError("Vui lòng nhập email");
+                edtUsername.setError("Please enter your email");
                 edtUsername.requestFocus();
                 return;
             }
 
             // Validate email format
             if (!isValidEmail(email)) {
-                edtUsername.setError("Email không hợp lệ");
+                edtUsername.setError("Invalid email");
                 edtUsername.requestFocus();
                 return;
             }
 
             // Validate password field
             if (password.isEmpty()) {
-                edtPassword.setError("Vui lòng nhập mật khẩu");
+                edtPassword.setError("Please enter your password");
                 edtPassword.requestFocus();
                 return;
             }
@@ -94,7 +94,7 @@ public class LoginActivity extends AppCompatActivity {
             authManager.login(email, password, new AuthCallback() {
                 @Override
                 public void onSuccess(FirebaseUser user) {
-                    Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", android.widget.Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "Login successful!", android.widget.Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
@@ -104,7 +104,7 @@ public class LoginActivity extends AppCompatActivity {
                 @SuppressLint("MissingInflatedId")
                 @Override
                 public void onFailure(String errorMessage) {
-                    Toast.makeText(LoginActivity.this, "Lỗi: " + errorMessage, android.widget.Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoginActivity.this, "Error: " + errorMessage, android.widget.Toast.LENGTH_LONG).show();
                 }
             });
         });
@@ -125,25 +125,25 @@ public class LoginActivity extends AppCompatActivity {
                 authManager.loginWithFacebook(accessToken.getToken(), new AuthCallback() {
                     @Override
                     public void onSuccess(com.google.firebase.auth.FirebaseUser user) {
-                        android.widget.Toast.makeText(LoginActivity.this, "Đăng nhập Facebook thành công!", android.widget.Toast.LENGTH_SHORT).show();
+                        android.widget.Toast.makeText(LoginActivity.this, "Facebook login successful!", android.widget.Toast.LENGTH_SHORT).show();
                         goToMainActivity();
                     }
 
                     @Override
                     public void onFailure(String errorMessage) {
-                        android.widget.Toast.makeText(LoginActivity.this, "Lỗi Firebase: " + errorMessage, android.widget.Toast.LENGTH_LONG).show();
+                        android.widget.Toast.makeText(LoginActivity.this, "Firebase error: " + errorMessage, android.widget.Toast.LENGTH_LONG).show();
                     }
                 });
             }
 
             @Override
             public void onCancel() {
-                android.widget.Toast.makeText(LoginActivity.this, "Đã hủy đăng nhập Facebook", android.widget.Toast.LENGTH_SHORT).show();
+                android.widget.Toast.makeText(LoginActivity.this, "Facebook login canceled", android.widget.Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onError(FacebookException error) {
-                android.widget.Toast.makeText(LoginActivity.this, "Lỗi Facebook: " + error.getMessage(), android.widget.Toast.LENGTH_LONG).show();
+                android.widget.Toast.makeText(LoginActivity.this, "Facebook error: " + error.getMessage(), android.widget.Toast.LENGTH_LONG).show();
             }
         });
 
@@ -159,20 +159,20 @@ public class LoginActivity extends AppCompatActivity {
 
             if (pendingResultTask != null) {
                 pendingResultTask.addOnSuccessListener(authResult -> {
-                            android.widget.Toast.makeText(LoginActivity.this, "Đăng nhập X thành công!", android.widget.Toast.LENGTH_SHORT).show();
+                            android.widget.Toast.makeText(LoginActivity.this, "X login successful!", android.widget.Toast.LENGTH_SHORT).show();
                             goToMainActivity();
                         })
                         .addOnFailureListener(e -> {
-                            android.widget.Toast.makeText(LoginActivity.this, "Lỗi X: " + e.getMessage(), android.widget.Toast.LENGTH_LONG).show();
+                            android.widget.Toast.makeText(LoginActivity.this, "X error: " + e.getMessage(), android.widget.Toast.LENGTH_LONG).show();
                         });
             } else {
                 mAuth.startActivityForSignInWithProvider(LoginActivity.this, twitterProvider.build())
                         .addOnSuccessListener(authResult -> {
-                            android.widget.Toast.makeText(LoginActivity.this, "Đăng nhập X thành công!", android.widget.Toast.LENGTH_SHORT).show();
+                            android.widget.Toast.makeText(LoginActivity.this, "X login successful!", android.widget.Toast.LENGTH_SHORT).show();
                             goToMainActivity();
                         })
                         .addOnFailureListener(e -> {
-                            android.widget.Toast.makeText(LoginActivity.this, "Lỗi X: " + e.getMessage(), android.widget.Toast.LENGTH_LONG).show();
+                            android.widget.Toast.makeText(LoginActivity.this, "X error: " + e.getMessage(), android.widget.Toast.LENGTH_LONG).show();
                         });
             }
         });
@@ -198,18 +198,18 @@ public class LoginActivity extends AppCompatActivity {
                             authManager.loginWithGoogle(account.getIdToken(), new AuthCallback() {
                                 @Override
                                 public void onSuccess(FirebaseUser user) {
-                                    android.widget.Toast.makeText(LoginActivity.this, "Đăng nhập Google thành công!", android.widget.Toast.LENGTH_SHORT).show();
+                                    android.widget.Toast.makeText(LoginActivity.this, "Google login successful!", android.widget.Toast.LENGTH_SHORT).show();
                                     goToMainActivity();
                                 }
 
                                 @Override
                                 public void onFailure(String errorMessage) {
-                                    android.widget.Toast.makeText(LoginActivity.this, "Lỗi: " + errorMessage, android.widget.Toast.LENGTH_LONG).show();
+                                    android.widget.Toast.makeText(LoginActivity.this, "Error: " + errorMessage, android.widget.Toast.LENGTH_LONG).show();
                                 }
                             });
                         }
                     } catch (ApiException e) {
-                        android.widget.Toast.makeText(this, "Lỗi kết nối Google: " + e.getMessage(), android.widget.Toast.LENGTH_SHORT).show();
+                        android.widget.Toast.makeText(this, "Google connection error: " + e.getMessage(), android.widget.Toast.LENGTH_SHORT).show();
                     }
                 }
             }

@@ -84,3 +84,6 @@ desktop.ini
 # AI
 .agents
 skills-lock.json
+backend/*.db
+backend/*.db-shm
+backend/*.db-wal

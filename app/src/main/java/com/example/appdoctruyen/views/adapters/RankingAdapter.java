@@ -35,9 +35,9 @@ public class RankingAdapter extends RecyclerView.Adapter<RankingAdapter.ViewHold
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
         User user = list.get(position);
-        holder.tvRank.setText(String.valueOf(user.getRank()));
-        holder.tvName.setText(user.getName());
-        holder.ivAvatar.setImageResource(user.getAvatar());
+//        holder.tvRank.setText(String.valueOf(user.getRank()));
+//        holder.tvName.setText(user.getName());
+//        holder.ivAvatar.setImageResource(user.getAvatar());
     }
 
     @Override

@@ -29,6 +29,7 @@ public class ComicDetailActivity extends AppCompatActivity {
     private MaterialButton btnReadChapter;
     private String mangaId;
     private String mangaTitle;
+    private String currentCoverUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,9 +65,9 @@ public class ComicDetailActivity extends AppCompatActivity {
         // 3. Liên kết TabLayout với ViewPager2
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
             if (position == 0) {
-                tab.setText("Giới thiệu");
+                tab.setText("Introduction");
             } else {
-                tab.setText("Danh sách chương");
+                tab.setText("Chapter List");
             }
         }).attach();
 
@@ -86,7 +87,7 @@ public class ComicDetailActivity extends AppCompatActivity {
                 public void onSuccess(List<Chapter> chapters) {
                     if (chapters != null && !chapters.isEmpty() && !isFinishing()) {
                         BookshelfDatabaseHelper dbHelper = new BookshelfDatabaseHelper(ComicDetailActivity.this);
-                        AuthManager authManager = new AuthManager();
+                        AuthManager authManager = new AuthManager(ComicDetailActivity.this);
                         String userId = authManager.getCurrentUserId();
                         if (userId == null) userId = "local_user";
 
@@ -94,10 +95,10 @@ public class ComicDetailActivity extends AppCompatActivity {
                         final Chapter targetChapter;
                         if (history != null && history.getChapterId() != null) {
                             targetChapter = findChapterById(chapters, history.getChapterId());
-                            btnReadChapter.setText("Đọc tiếp " + (history.getLastReadChapter() != null ? history.getLastReadChapter() : "chương cũ") + " \u2192");
+                            btnReadChapter.setText("Continue " + (history.getLastReadChapter() != null ? history.getLastReadChapter() : "previous chapter") + " \u2192");
                         } else {
                             targetChapter = findFirstChapter(chapters);
-                            btnReadChapter.setText("Đọc từ đầu (" + targetChapter.getName() + ") \u2192");
+                            btnReadChapter.setText("Read from start (" + targetChapter.getName() + ") \u2192");
                         }
 
                         btnReadChapter.setOnClickListener(v -> {
@@ -134,7 +135,7 @@ public class ComicDetailActivity extends AppCompatActivity {
     }
 
     private Chapter findFirstChapter(List<Chapter> chapters) {
-        Chapter firstChapter = chapters.get(chapters.size() - 1);
+        Chapter firstChapter = chapters.get(0);
         for (Chapter ch : chapters) {
             String name = ch.getName().toLowerCase();
             if (name.contains("chapter 1") || name.contains("chương 1") || name.equals("1")) {
@@ -143,5 +144,17 @@ public class ComicDetailActivity extends AppCompatActivity {
             }
         }
         return firstChapter;
+    }
+
+    public String getMangaId() {
+        return mangaId;
+    }
+
+    public String getMangaTitle() {
+        return mangaTitle;
+    }
+
+    public String getCoverUrl() {
+        return currentCoverUrl;
     }
 }

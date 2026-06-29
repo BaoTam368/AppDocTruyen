@@ -54,32 +54,35 @@ function initializeDatabase() {
         CREATE TABLE IF NOT EXISTS comments (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id TEXT NOT NULL,
-            manga_id TEXT NOT NULL,
-            chapter_id TEXT,
             content TEXT NOT NULL,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            created_at DATETIME DEFAULT (datetime('now', '+7 hours')),
             FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
         );
 
         CREATE TABLE IF NOT EXISTS posts (
+
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              user_id TEXT NOT NULL,
+              content TEXT NOT NULL,
+              image_url TEXT,
+              like_count INTEGER DEFAULT 0,
+              created_at DATETIME DEFAULT (datetime('now', '+7 hours')),
+
+            FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+        );
+
+        CREATE TABLE IF NOT EXISTS post_likes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id TEXT NOT NULL,
-            title TEXT,
-            content TEXT NOT NULL,
-            image_url TEXT,
-            manga_id TEXT,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+            post_id INTEGER NOT NULL,
+            FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+            FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+            UNIQUE(user_id, post_id)
         );
 
         CREATE INDEX IF NOT EXISTS idx_mangas_title ON mangas(title);
         CREATE INDEX IF NOT EXISTS idx_chapters_manga_id ON chapters(manga_id);
-        CREATE INDEX IF NOT EXISTS idx_comments_manga_id ON comments(manga_id);
-        CREATE INDEX IF NOT EXISTS idx_comments_chapter_id ON comments(chapter_id);
         CREATE INDEX IF NOT EXISTS idx_posts_user_id ON posts(user_id);
-        CREATE INDEX IF NOT EXISTS idx_posts_manga_id ON posts(manga_id);
     `);
 
     ensureMangaMetadataColumns();

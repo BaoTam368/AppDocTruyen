@@ -1,137 +1,137 @@
 <resources>
     <string name="app_name">AppDocTruyen</string>
-    <string name="title_app_motto">ĐỌC TRUYỆN VIP</string>
+    <string name="title_app_motto">VIP Manga Reader</string>
 
 
-    <string name="btn_login">Đăng Nhập</string>
-    <string name="tv_forgot_password">Bạn quên mật khẩu ư?</string>
+    <string name="btn_login">Login</string>
+    <string name="tv_forgot_password">Forgot password?</string>
     <string name="text_or">OR</string>
-    <string name="btn_register">Tạo tài khoản mới</string>
-    <string name="hint_login_email">Nhập email</string>
-    <string name="hint_username">Nhập tên đăng nhập</string>
-    <string name="hint_password">Nhập mật khẩu</string>
+    <string name="btn_register">Create new account</string>
+    <string name="hint_login_email">Enter email</string>
+    <string name="hint_username">Enter username</string>
+    <string name="hint_password">Enter password</string>
 
-    <string name="title_register">Đăng Ký</string>
-    <string name="hint_email">Nhập email</string>
-    <string name="hint_confirm_password">Nhập lại mật khẩu</string>
-
-
-    <string name="menu_bookshelf">Tủ Sách</string>
-    <string name="menu_stories">Truyện</string>
-    <string name="menu_world">Thế Giới</string>
-    <string name="menu_translation_team">Nhóm Dịch</string>
-    <string name="menu_profile">Tôi</string>
-
-    <string name="tab_following">Theo Dõi</string>
-    <string name="tab_recent">Vừa Xem</string>
-    <string name="tab_downloaded">Đã Tải</string>
-
-    <string name="text_no_downloaded_stories">Không có truyện đã tải</string>
+    <string name="title_register">Register</string>
+    <string name="hint_email">Enter email</string>
+    <string name="hint_confirm_password">Confirm password</string>
 
 
-    <string name="hint_search_comic">Tìm kiếm truyện....</string>
+    <string name="menu_bookshelf">Bookshelf</string>
+    <string name="menu_stories">Manga</string>
+    <string name="menu_world">Community</string>
+    <string name="menu_translation_team">Translation Teams</string>
+    <string name="menu_profile">Profile</string>
 
-    <string name="cat_genres">Thể loại</string>
-    <string name="cat_top_user">Top User</string>
-    <string name="cat_new_comics">Truyện mới</string>
+    <string name="tab_following">Following</string>
+    <string name="tab_recent">Recently Read</string>
+    <string name="tab_downloaded">Downloaded</string>
+
+    <string name="text_no_downloaded_stories">No downloaded manga</string>
+
+
+    <string name="hint_search_comic">Search manga...</string>
+
+    <string name="cat_genres">Genres</string>
+    <string name="cat_top_user">Top Users</string>
+    <string name="cat_new_comics">New Manga</string>
     <string name="cat_hot">HOT</string>
 
 
-    <string name="title_recently_updated">Mới cập nhật</string>
+    <string name="title_recently_updated">Recently Updated</string>
 
 
-    <string name="title_search_activity">Tìm Kiếm Truyện Tranh</string>
-    <string name="title_top_search">Top tìm kiếm:</string>
-    <string name="title_search_result">Kết quả tìm kiếm</string>
-    <string name="title_filter_by_genre">Lọc theo thể loại</string>
-    <string name="btn_apply_filter">Áp dụng</string>
+    <string name="title_search_activity">Search Manga</string>
+    <string name="title_top_search">Top searches:</string>
+    <string name="title_search_result">Search Results</string>
+    <string name="title_filter_by_genre">Filter by genre</string>
+    <string name="btn_apply_filter">Apply</string>
 
 
-    <string name="title_chapter_list">Danh sách chương</string>
+    <string name="title_chapter_list">Chapter List</string>
 
 
-    <string name="title_filter_activity">Thể Loại</string>
-    <string name="lbl_status">Trạng Thái:</string>
-    <string name="lbl_sort">Xếp Theo:</string>
-    <string name="lbl_genres">Thể Loại:</string>
+    <string name="title_filter_activity">Genres</string>
+    <string name="lbl_status">Status:</string>
+    <string name="lbl_sort">Sort By:</string>
+    <string name="lbl_genres">Genres:</string>
     <string name="btn_ok">OK</string>
 
 
-    <string name="title_top_user_activity">Danh Sách Top User</string>
-    <string name="title_leaderboard_rank">BẢNG XẾP HẠNG CƯỜNG GIẢ</string>
+    <string name="title_top_user_activity">Top Users</string>
+    <string name="title_leaderboard_rank">Leaderboard</string>
 
 
-    <string name="title_notification_activity">Thông Báo Của Bạn</string>
+    <string name="title_notification_activity">Your Notifications</string>
 
-    <string name="lbl_user_level_mock">Cấp</string>
+    <string name="lbl_user_level_mock">Level</string>
     <string name="title_user_fragment">User</string>
-    <string name="stat_xu">Xu</string>
-    <string name="stat_following">Theo dõi</string>
-    <string name="stat_comments">Bình luận</string>
-    <string name="stat_likes">Đã thích</string>
+    <string name="stat_xu">Coins</string>
+    <string name="stat_following">Following</string>
+    <string name="stat_comments">Comments</string>
+    <string name="stat_likes">Liked</string>
 
-    <string name="lbl_posts">Bài Viết</string>
+    <string name="lbl_posts">Posts</string>
 
-    <string name="lbl_choose_payment_method">Vui lòng chọn phương thức:</string>
-    <string name="method_phone_card">Nạp Qua Thẻ Cào Điện Thoại</string>
-    <string name="method_banking">Nạp Qua Ngân Hàng</string>
-    <string name="method_momo">Nạp Qua Ví Momo</string>
-    <string name="method_earn_coins">Làm Nhiệm Vụ Kiếm Xu</string>
+    <string name="lbl_choose_payment_method">Please choose a method:</string>
+    <string name="method_phone_card">Top Up with Phone Card</string>
+    <string name="method_banking">Top Up by Bank Transfer</string>
+    <string name="method_momo">Top Up with Momo Wallet</string>
+    <string name="method_earn_coins">Earn Coins by Completing Tasks</string>
 
-    <string name="lbl_notice_title">Chú Ý</string>
-    <string name="note_rate_highlight">10 Xu = 1000đ</string>
-    <string name="note_rate_rest">nạp 10k tương ứng với 100 xu.</string>
-    <string name="note_vip_info">Xu dùng để mở chap VIP trên app, cần dùng 2 Xu để mở khóa 1 chap VIP.</string>
-    <string name="note_ads_info">Bạn có thể xem quảng cáo sẽ nhận 5-10 xu tùy vào độ dài quảng cáo.</string>
+    <string name="lbl_notice_title">Notice</string>
+    <string name="note_rate_highlight">10 Coins = 1,000 VND</string>
+    <string name="note_rate_rest">Top up 10k to receive 100 coins.</string>
+    <string name="note_vip_info">Coins are used to unlock VIP chapters in the app. It takes 2 coins to unlock 1 VIP chapter.</string>
+    <string name="note_ads_info">You can watch ads to receive 5-10 coins depending on ad length.</string>
 
-    <string name="lbl_section_settings">Cài Đặt</string>
-    <string name="option_auto_vip">Mở chương VIP tự động</string>
-    <string name="option_dark_mode">Chế độ nền tối</string>
+    <string name="lbl_section_settings">Settings</string>
+    <string name="option_auto_vip">Auto-unlock VIP chapters</string>
+    <string name="option_dark_mode">Dark mode</string>
 
 
-    <string name="lbl_section_functions">Chức Năng</string>
-    <string name="func_watch_ads">Xem quảng cáo nhận xu</string>
-    <string name="func_notifications">Thông báo của bạn</string>
-    <string name="func_top_up">Nạp xu</string>
-    <string name="func_join_team">Đăng ký nhóm dịch</string>
-    <string name="func_change_info">Đổi thông tin tài khoản</string>
-    <string name="func_support">Hỗ trợ người dùng</string>
-    <string name="func_terms">Điều khoản sử dụng</string>
-    <string name="func_logout">Đăng xuất</string>
-    <string name="bookshelf_empty_following">Không có truyện theo dõi</string>
-    <string name="bookshelf_empty_history">Không có lịch sử đọc</string>
-    <string name="bookshelf_empty_downloaded">Không có truyện đã tải</string>
-    <string name="bookshelf_last_read_format">Vừa đọc: %1$s</string>
-    <string name="bookshelf_last_read_with_time_format">Vừa đọc: %1$s - %2$s</string>
-    <string name="bookshelf_local_comment_title">Bình luận local</string>
-    <string name="bookshelf_no_local_comment">Chưa có bình luận</string>
+    <string name="lbl_section_functions">Features</string>
+    <string name="func_watch_ads">Watch ads to earn coins</string>
+    <string name="func_notifications">Your notifications</string>
+    <string name="func_top_up">Top up coins</string>
+    <string name="func_join_team">Register translation team</string>
+    <string name="func_change_info">Change account information</string>
+    <string name="func_support">User support</string>
+    <string name="func_terms">Terms of use</string>
+    <string name="func_logout">Log out</string>
+    <string name="bookshelf_empty_following">You are not following any manga yet</string>
+    <string name="bookshelf_empty_history">You have not read any manga yet</string>
+    <string name="bookshelf_empty_downloaded">You have not downloaded any manga yet</string>
+    <string name="bookshelf_last_read_format">Last read: %1$s</string>
+    <string name="bookshelf_last_read_with_time_format">Last read: %1$s - %2$s</string>
+    <string name="bookshelf_local_comment_title">Local Comments</string>
+    <string name="bookshelf_no_local_comment">No comments yet</string>
     <string name="chapter_placeholder">Chapter 1</string>
-    <string name="comic_title_placeholder">Tên truyện</string>
-    <string name="comic_cover_content_description">Ảnh bìa truyện</string>
+    <string name="comic_title_placeholder">Manga title</string>
+    <string name="comic_cover_content_description">Manga cover</string>
 
-    <string name="group_title">Nhóm Dịch</string>
-    <string name="group_tab_all">Tất Cả</string>
-    <string name="group_tab_famous">Nổi Tiếng</string>
-    <string name="group_tab_comic_count">Số Truyện</string>
-    <string name="group_empty">Không có nhóm dịch</string>
-    <string name="group_detail_title">Chi Tiết Nhóm Dịch</string>
-    <string name="group_default_name">Nhóm dịch</string>
-    <string name="group_default_description">Nhóm dịch truyện tranh</string>
-    <string name="group_name_placeholder">Tên nhóm</string>
-    <string name="group_description_placeholder">Mô tả nhóm dịch</string>
-    <string name="group_avatar_content_description">Ảnh nhóm dịch</string>
-    <string name="group_rank_avatar_content_description">Ảnh nhóm</string>
-    <string name="group_trophy_content_description">Xếp hạng cao</string>
-    <string name="action_back">Quay lại</string>
-    <string name="label_comic_count">Số truyện</string>
-    <string name="label_comic_count_short">Truyện</string>
-    <string name="label_members">Thành viên</string>
-    <string name="label_followers">Người theo dõi</string>
-    <string name="label_followers_short">Theo dõi</string>
-    <string name="group_comic_count_format">%1$d truyện</string>
-    <string name="group_members_count_format">%1$d thành viên</string>
-    <string name="group_followers_count_format">%1$d người theo dõi</string>
-    <string name="group_members_zero">0 thành viên</string>
+    <string name="group_title">Translation Teams</string>
+    <string name="group_tab_all">All</string>
+    <string name="group_tab_famous">Popular</string>
+    <string name="group_tab_comic_count">Manga Count</string>
+    <string name="group_empty">No translation teams</string>
+    <string name="group_detail_title">Translation Team Details</string>
+    <string name="group_default_name">Translation Team</string>
+    <string name="group_default_description">Manga translation team</string>
+    <string name="group_name_placeholder">Team name</string>
+    <string name="group_description_placeholder">Translation team description</string>
+    <string name="group_avatar_content_description">Translation team avatar</string>
+    <string name="group_rank_avatar_content_description">Team avatar</string>
+    <string name="group_trophy_content_description">Top ranking</string>
+    <string name="action_back">Back</string>
+    <string name="label_comic_count">Manga count</string>
+    <string name="label_comic_count_short">Manga</string>
+    <string name="label_members">Members</string>
+    <string name="label_followers">Followers</string>
+    <string name="label_followers_short">Following</string>
+    <string name="group_comic_count_format">%1$d manga</string>
+    <string name="group_members_count_format">%1$d members</string>
+    <string name="group_followers_count_format">%1$d followers</string>
+    <string name="group_members_zero">0 members</string>
     <string name="group_rank_number_placeholder">1</string>
     <string name="zero_count">0</string>
     <string name="facebook_app_id">1682621013065960</string>
