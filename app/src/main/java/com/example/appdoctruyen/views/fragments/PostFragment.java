@@ -133,7 +133,9 @@ public class PostFragment extends Fragment {
                 if (!isAdded() || getActivity() == null) return;
 
                 postList.clear();
-                postList.addAll(data);
+                if (data != null) {
+                    postList.addAll(data);
+                }
                 postAdapter.notifyDataSetChanged();
             }
 
