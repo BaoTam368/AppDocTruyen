@@ -1,5 +1,7 @@
 package com.example.appdoctruyen.data.api;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 
 import retrofit2.Call;
@@ -169,6 +171,7 @@ class MangaDto {
     String mangaId;
     String title;
     String description;
+    @SerializedName(value = "coverUrl", alternate = {"cover_url", "thumbnailUrl", "thumbnail_url"})
     String coverUrl;
     String latestChapter;
     String status;
@@ -184,7 +187,9 @@ class CoverDto {
     String coverId;
     String mangaId;
     String fileName;
+    @SerializedName(value = "coverUrl", alternate = {"cover_url"})
     String coverUrl;
+    @SerializedName(value = "thumbnailUrl", alternate = {"thumbnail_url"})
     String thumbnailUrl;
     String volume;
     String locale;

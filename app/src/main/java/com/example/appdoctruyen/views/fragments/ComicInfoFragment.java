@@ -17,6 +17,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.model.GlideUrl;
+import com.bumptech.glide.load.model.LazyHeaders;
 import com.example.appdoctruyen.R;
 import com.example.appdoctruyen.models.TranslationGroup;
 import com.example.appdoctruyen.views.activities.ComicDetailActivity;
@@ -34,6 +36,7 @@ import com.example.appdoctruyen.models.Comic;
 import java.util.List;
 
 public class ComicInfoFragment extends Fragment {
+    private static final String IMAGE_USER_AGENT = "AppDocTruyenAndroid/1.0";
     private static final String ARG_MANGA_ID = "mangaId";
     private static final String ARG_MANGA_TITLE = "mangaTitle";
     
@@ -299,7 +302,7 @@ public class ComicInfoFragment extends Fragment {
                     if (!coverUrl.isEmpty()) {
                         android.util.Log.d("MANGA_COVER", "Loading coverUrl: " + coverUrl);
                         Glide.with(requireContext())
-                                .load(coverUrl)
+                                .load(buildImageRequest(coverUrl))
                                 .placeholder(R.drawable.placeholder_comic)
                                 .error(R.drawable.placeholder_comic)
                                 .centerCrop()
@@ -334,6 +337,12 @@ public class ComicInfoFragment extends Fragment {
                 Toast.makeText(requireContext(), "Unable to load manga information", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private GlideUrl buildImageRequest(String coverUrl) {
+        return new GlideUrl(coverUrl, new LazyHeaders.Builder()
+                .addHeader("User-Agent", IMAGE_USER_AGENT)
+                .build());
     }
 
     private void openGroupDetail() {
