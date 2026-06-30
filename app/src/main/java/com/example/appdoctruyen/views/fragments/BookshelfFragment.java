@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -21,6 +22,7 @@ import com.example.appdoctruyen.data.firebase.BookshelfFirebaseHelper;
 import com.example.appdoctruyen.models.Comic;
 import com.example.appdoctruyen.views.activities.ComicDetailActivity;
 import com.example.appdoctruyen.views.activities.ComicReadingActivity;
+import com.example.appdoctruyen.views.activities.LoginActivity;
 import com.example.appdoctruyen.views.adapters.BookshelfAdapter;
 
 import java.util.ArrayList;
@@ -30,7 +32,9 @@ public class BookshelfFragment extends Fragment {
     private TextView tabFollowing, tabRecentlyRead, tabDownloaded;
     private LinearLayout tabContainer;
     private RecyclerView recyclerView;
+    private LinearLayout layoutBookshelfState;
     private TextView tvEmpty;
+    private Button btnLogin;
 
     private BookshelfAdapter adapter;
     private BookshelfDatabaseHelper bookshelfDatabaseHelper;
@@ -50,7 +54,9 @@ public class BookshelfFragment extends Fragment {
         tabDownloaded = view.findViewById(R.id.tabDownloaded);
         tabContainer = view.findViewById(R.id.tabContainerBookshelf);
         recyclerView = view.findViewById(R.id.recyclerViewBookshelf);
+        layoutBookshelfState = view.findViewById(R.id.layoutBookshelfState);
         tvEmpty = view.findViewById(R.id.tvEmptyBookshelf);
+        btnLogin = view.findViewById(R.id.btnBookshelfLogin);
         bookshelfDatabaseHelper = new BookshelfDatabaseHelper(requireContext().getApplicationContext());
         mangaRepository = new MangaRepository();
         authManager = new AuthManager(requireContext());
@@ -62,6 +68,9 @@ public class BookshelfFragment extends Fragment {
         recyclerView.setAdapter(adapter);
 
         setupTabListeners();
+        if (btnLogin != null) {
+            btnLogin.setOnClickListener(v -> startActivity(new Intent(requireContext(), LoginActivity.class)));
+        }
         if (!isLoggedIn()) {
             showLoginRequiredState();
             return view;
@@ -157,11 +166,17 @@ public class BookshelfFragment extends Fragment {
 
         if (safeData.isEmpty()) {
             recyclerView.setVisibility(View.GONE);
-            tvEmpty.setVisibility(View.VISIBLE);
-            tvEmpty.setText(emptyMessageResId);
+            if (layoutBookshelfState != null) layoutBookshelfState.setVisibility(View.VISIBLE);
+            if (tvEmpty != null) {
+                tvEmpty.setVisibility(View.VISIBLE);
+                tvEmpty.setText(emptyMessageResId);
+            }
+            if (btnLogin != null) btnLogin.setVisibility(View.GONE);
         } else {
             recyclerView.setVisibility(View.VISIBLE);
-            tvEmpty.setVisibility(View.GONE);
+            if (layoutBookshelfState != null) layoutBookshelfState.setVisibility(View.GONE);
+            if (tvEmpty != null) tvEmpty.setVisibility(View.GONE);
+            if (btnLogin != null) btnLogin.setVisibility(View.GONE);
         }
     }
 
@@ -301,10 +316,12 @@ public class BookshelfFragment extends Fragment {
         if (tabContainer != null) tabContainer.setVisibility(View.GONE);
         if (recyclerView != null) recyclerView.setVisibility(View.GONE);
         if (adapter != null) adapter.updateList(new ArrayList<>());
+        if (layoutBookshelfState != null) layoutBookshelfState.setVisibility(View.VISIBLE);
         if (tvEmpty != null) {
             tvEmpty.setVisibility(View.VISIBLE);
             tvEmpty.setText(R.string.bookshelf_login_required);
         }
+        if (btnLogin != null) btnLogin.setVisibility(View.VISIBLE);
     }
 
     private boolean isLoggedIn() {

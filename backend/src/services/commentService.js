@@ -49,12 +49,16 @@ function createComment(payload = {}) {
     const chapterId = normalizeNullable(payload.chapterId || payload.chapter_id);
     const content = normalizeText(payload.content);
 
+    if (!requestedUserId) {
+        throw createHttpError(400, 'User is required.');
+    }
+
     if (!content) {
         throw createHttpError(400, 'Missing comment content');
     }
 
     const user = userService.createOrUpdateUser({ userId: requestedUserId });
-    const userId = user && user.userId ? user.userId : 'local_user';
+    const userId = user && user.userId ? user.userId : requestedUserId;
 
     const database = databaseService.getDatabase();
     const stmt = database.prepare(`

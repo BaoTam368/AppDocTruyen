@@ -110,7 +110,10 @@ public class ComicInfoFragment extends Fragment {
         });
 
         btnBookmark.setOnClickListener(v -> {
-            if (mangaId == null || mangaId.isEmpty()) return;
+            if (mangaId == null || mangaId.isEmpty()) {
+                Toast.makeText(requireContext(), "Unable to save this manga.", Toast.LENGTH_SHORT).show();
+                return;
+            }
             if (!requireLogin("Please log in to add this manga to your bookshelf.")) return;
             String userId = getCurrentUserId();
         if (isBlank(userId)) {
@@ -138,8 +141,11 @@ public class ComicInfoFragment extends Fragment {
         });
 
         btnDownload.setOnClickListener(v -> {
-            if (mangaId == null || mangaId.isEmpty()) return;
-            if (!requireLogin("Please log in to use this feature.")) return;
+            if (mangaId == null || mangaId.isEmpty()) {
+                Toast.makeText(requireContext(), "Unable to save this manga.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (!requireLogin("Please log in to save this manga.")) return;
             String userId = getCurrentUserId();
         if (isBlank(userId)) {
             btnDownload.setColorFilter(getResources().getColor(R.color.text_secondary_light, null));
@@ -154,47 +160,40 @@ public class ComicInfoFragment extends Fragment {
                 if (firebaseHelper != null) {
                     firebaseHelper.removeBookmark(mangaId);
                 }
-                Toast.makeText(getContext(), "Removed from downloads", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Removed from saved manga", Toast.LENGTH_SHORT).show();
                 updateDownloadUI();
             } else {
-                Toast.makeText(getContext(), "Downloading manga...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Saving manga...", Toast.LENGTH_SHORT).show();
                 mangaRepository.getMangaChapters(mangaId, new MangaRepository.RepositoryCallback<List<Chapter>>() {
                     @Override
                     public void onSuccess(List<Chapter> chapters) {
+                        if (!isAdded() || bookshelfDatabaseHelper == null) return;
                         if (chapters != null && !chapters.isEmpty()) {
                             Chapter targetChapter = chapters.get(0);
                             String chapterId = targetChapter.getChapterId();
                             String chapterName = targetChapter.getName();
+                            if (isBlank(chapterId)) {
+                                Toast.makeText(requireContext(), "This chapter is not available to save.", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
                             
                             bookshelfDatabaseHelper.addDownloadedComic(userId, mangaId, chapterId, chapterName,
-                                    "/sdcard/Download/AppDocTruyen/" + mangaId + "/" + chapterId, title, cover);
+                                    "", title, cover);
                             if (firebaseHelper != null) {
                                 firebaseHelper.addDownloadedComic(mangaId, chapterId, chapterName,
-                                        "/sdcard/Download/AppDocTruyen/" + mangaId + "/" + chapterId, title, cover);
+                                        "", title, cover);
                             }
-                            Toast.makeText(getContext(), "Downloaded successfully (" + chapterName + ")", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Saved to Bookshelf (" + chapterName + ")", Toast.LENGTH_SHORT).show();
                         } else {
-                            bookshelfDatabaseHelper.addDownloadedComic(userId, mangaId, "placeholder", "Chapter 1",
-                                    "/sdcard/Download/AppDocTruyen/" + mangaId + "/placeholder", title, cover);
-                            if (firebaseHelper != null) {
-                                firebaseHelper.addDownloadedComic(mangaId, "placeholder", "Chapter 1",
-                                        "/sdcard/Download/AppDocTruyen/" + mangaId + "/placeholder", title, cover);
-                            }
-                            Toast.makeText(getContext(), "Downloaded successfully (Sample chapter)", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "No chapters available to save.", Toast.LENGTH_SHORT).show();
                         }
                         updateDownloadUI();
                     }
 
                     @Override
                     public void onError(String message) {
-                        bookshelfDatabaseHelper.addDownloadedComic(userId, mangaId, "placeholder", "Chapter 1",
-                                "/sdcard/Download/AppDocTruyen/" + mangaId + "/placeholder", title, cover);
-                        if (firebaseHelper != null) {
-                            firebaseHelper.addDownloadedComic(mangaId, "placeholder", "Chapter 1",
-                                    "/sdcard/Download/AppDocTruyen/" + mangaId + "/placeholder", title, cover);
-                        }
-                        Toast.makeText(getContext(), "Downloaded successfully (Offline)", Toast.LENGTH_SHORT).show();
-                        updateDownloadUI();
+                        if (!isAdded()) return;
+                        Toast.makeText(requireContext(), "Unable to save this manga.", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -267,6 +266,7 @@ public class ComicInfoFragment extends Fragment {
         mangaRepository.getMangaDetail(mangaId, new MangaRepository.RepositoryCallback<Comic>() {
             @Override
             public void onSuccess(Comic data) {
+                if (!isAdded() || getView() == null || data == null) return;
                 mangaInfo = data;
                 
                 // Cập nhật UI với thông tin manga
@@ -275,7 +275,7 @@ public class ComicInfoFragment extends Fragment {
                 }
 
                 if (tvDescription != null) {
-                    tvDescription.setText(data.getDescription());
+                    tvDescription.setText(isBlank(data.getDescription()) ? "No description available." : data.getDescription());
                     tvDescription.setMaxLines(Integer.MAX_VALUE); // Hiển thị toàn bộ
                 }
 
@@ -329,31 +329,14 @@ public class ComicInfoFragment extends Fragment {
 
             @Override
             public void onError(String message) {
-                Toast.makeText(getContext(), "Manga info loading error: " + message, Toast.LENGTH_SHORT).show();
+                if (!isAdded()) return;
+                Toast.makeText(requireContext(), "Unable to load manga information", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void openGroupDetail() {
-        TranslationGroup group = new TranslationGroup(
-                1,
-                "Huaxia Group",
-                R.drawable.placeholder_group,
-                25,
-                1200
-        );
-
-        group.setDescription("High-quality manga translation team");
-
-        Intent intent = new Intent(requireContext(), GroupDetailActivity.class);
-        intent.putExtra("group_id", group.getId());
-        intent.putExtra("group_name", group.getName());
-        intent.putExtra("group_description", group.getDescription());
-        intent.putExtra("group_comic_count", group.getComicCount());
-        intent.putExtra("group_member_count", group.getMemberCount());
-        intent.putExtra("group_follower_count", group.getFollowerCount());
-        intent.putExtra("group_avatar_res_id", group.getAvatarResId());
-
-        startActivity(intent);
+        if (!isAdded()) return;
+        Toast.makeText(requireContext(), "Translation team details are not available for this manga.", Toast.LENGTH_SHORT).show();
     }
 }

@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
             int itemId = item.getItemId();
 
             if (itemId == R.id.nav_bookshelf) {
-                if (!requireLogin("Please log in to view your bookshelf.")) return false;
                 selectedFragment = new BookshelfFragment();
             } else if (itemId == R.id.nav_stories) {
                 selectedFragment = new ComicHomeFragment();
@@ -58,7 +57,6 @@ public class MainActivity extends AppCompatActivity {
             } else if (itemId == R.id.nav_translation_team) {
                 selectedFragment = new BookshelfGroupFragment();
             } else if (itemId == R.id.nav_profile) {
-                if (!requireLogin("Please log in to view your profile.")) return false;
                 selectedFragment = new ProfileFragment();
             }
 

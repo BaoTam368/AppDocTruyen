@@ -34,14 +34,17 @@ public class ComicPageAdapter extends RecyclerView.Adapter<ComicPageAdapter.Page
     @Override
     public void onBindViewHolder(@NonNull PageViewHolder holder, int position) {
         ComicPage page = pageList.get(position);
-        Glide.with(context)
-                .load(page.getImageUrl())
+        String imageUrl = page != null ? page.getImageUrl() : null;
+        Glide.with(holder.itemView.getContext())
+                .load(imageUrl)
+                .placeholder(R.drawable.placeholder_comic)
+                .error(R.drawable.placeholder_comic)
                 .into(holder.imgPage);
     }
 
     @Override
     public int getItemCount() {
-        return pageList.size();
+        return pageList != null ? pageList.size() : 0;
     }
 
     public static class PageViewHolder extends RecyclerView.ViewHolder {

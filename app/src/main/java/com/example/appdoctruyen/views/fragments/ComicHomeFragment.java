@@ -6,8 +6,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -17,18 +19,15 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.appdoctruyen.views.activities.FilterActivity;
-import com.example.appdoctruyen.views.activities.MainActivity;
-import com.example.appdoctruyen.views.activities.NewBookshelfActivity;
-import com.example.appdoctruyen.views.activities.NotificationActivity;
-import com.example.appdoctruyen.views.activities.RankingActivity;
-import com.example.appdoctruyen.views.activities.SearchActivity;
-import com.example.appdoctruyen.views.adapters.FeaturedComicAdapter;
 import com.example.appdoctruyen.R;
+import com.example.appdoctruyen.data.api.MangaRepository;
 import com.example.appdoctruyen.models.Comic;
 import com.example.appdoctruyen.views.activities.ComicDetailActivity;
+import com.example.appdoctruyen.views.activities.MainActivity;
+import com.example.appdoctruyen.views.activities.NotificationActivity;
+import com.example.appdoctruyen.views.activities.SearchActivity;
 import com.example.appdoctruyen.views.adapters.BookshelfAdapter;
-import com.example.appdoctruyen.data.api.MangaRepository;
+import com.example.appdoctruyen.views.adapters.FeaturedComicAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,15 +36,17 @@ public class ComicHomeFragment extends Fragment {
 
     private RecyclerView rvFeaturedComics;
     private RecyclerView rvRecentlyUpdated;
-    private List<Comic> featuredList;
-    private List<Comic> recentList;
+    private final List<Comic> featuredList = new ArrayList<>();
+    private final List<Comic> recentList = new ArrayList<>();
     private FeaturedComicAdapter featuredAdapter;
     private BookshelfAdapter recentAdapter;
     private ImageView ivAvatar, ivNotification, ivRefresh;
-    private LinearLayout layoutSearchBar, layoutCatNew;
+    private LinearLayout layoutSearchBar, layoutHomeState;
+    private TextView tvHomeState;
+    private Button btnHomeRetry;
     private MangaRepository mangaRepository;
     private boolean isSyncing = false;
-//    private LinearLayout layoutCatGenres, layoutCatTopUser, layoutCatNew, layoutCatHot;
+    private boolean hasHomeData = false;
 
     @SuppressLint("MissingInflatedId")
     @Nullable
@@ -53,133 +54,152 @@ public class ComicHomeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.fragment_comic_home, container, false);
 
         rvFeaturedComics = view.findViewById(R.id.rv_featured_comics);
         rvRecentlyUpdated = view.findViewById(R.id.rv_recently_updated);
-
         ivAvatar = view.findViewById(R.id.iv_avatar);
         layoutSearchBar = view.findViewById(R.id.layout_search_bar);
         ivNotification = view.findViewById(R.id.iv_notification);
         ivRefresh = view.findViewById(R.id.iv_refresh);
-//        layoutCatNew = view.findViewById(R.id.layout_cat_new);
-
+        layoutHomeState = view.findViewById(R.id.layout_home_state);
+        tvHomeState = view.findViewById(R.id.tv_home_state);
+        btnHomeRetry = view.findViewById(R.id.btn_home_retry);
         mangaRepository = new MangaRepository();
 
-        // Auto-sync khi mở fragment
-        syncPopularMangas();
+        setupAdapters();
+        setupClickListeners();
+        loadHomeData();
 
-//        layoutCatGenres = view.findViewById(R.id.layout_cat_genres);
-//        layoutCatTopUser = view.findViewById(R.id.layout_cat_top_user);
-//        layoutCatNew = view.findViewById(R.id.layout_cat_new);
-//        layoutCatHot = view.findViewById(R.id.layout_cat_hot);
+        return view;
+    }
 
-        // Click Avatar
+    private void setupAdapters() {
+        featuredAdapter = new FeaturedComicAdapter(requireContext(), featuredList,
+                (comic, position) -> openComicDetail(comic));
+        rvFeaturedComics.setLayoutManager(
+                new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        );
+        rvFeaturedComics.setNestedScrollingEnabled(false);
+        rvFeaturedComics.setAdapter(featuredAdapter);
+
+        recentAdapter = new BookshelfAdapter(requireContext(), recentList,
+                (comic, position) -> openComicDetail(comic));
+        rvRecentlyUpdated.setLayoutManager(new GridLayoutManager(requireContext(), 3));
+        rvRecentlyUpdated.setNestedScrollingEnabled(false);
+        rvRecentlyUpdated.setAdapter(recentAdapter);
+    }
+
+    private void setupClickListeners() {
         ivAvatar.setOnClickListener(v -> {
             if (getActivity() instanceof MainActivity) {
                 ((MainActivity) getActivity()).navigateToProfileTab();
             }
         });
 
-        // Click ô Tìm Kiếm -> Mở SearchActivity [INDEX]
-        layoutSearchBar.setOnClickListener(v -> {
-            Intent intent = new Intent(requireContext(), SearchActivity.class);
-            startActivity(intent);
-        });
+        layoutSearchBar.setOnClickListener(v ->
+                startActivity(new Intent(requireContext(), SearchActivity.class)));
 
-        // Click Chuông thông báo
-        ivNotification.setOnClickListener(v -> {
-            Intent intent = new Intent(requireContext(), NotificationActivity.class);
-            startActivity(intent);
-        });
+        ivNotification.setOnClickListener(v ->
+                startActivity(new Intent(requireContext(), NotificationActivity.class)));
 
-        // Click nút Refresh để đồng bộ dữ liệu
-        ivRefresh.setOnClickListener(v -> {
-            syncPopularMangas();
-        });
+        ivRefresh.setOnClickListener(v -> refreshHomeMangas());
 
-//        // Click danh mục Thể Loại
-//        layoutCatGenres.setOnClickListener(v -> {
-//            Intent intent = new Intent(requireContext(), FilterActivity.class);
-//            startActivity(intent);
-//        });
-
-//        // Click danh mục Top User
-//        layoutCatTopUser.setOnClickListener(v -> {
-//            Intent intent = new Intent(requireContext(), RankingActivity.class);
-//            startActivity(intent);
-//        });
-//
-//        // Click danh mục Truyện Mới
-//        layoutCatNew.setOnClickListener(v -> {
-//            Intent intent = new Intent(requireContext(), NewBookshelfActivity.class);
-//            startActivity(intent);
-//        });
-
-//        // Click danh mục HOT
-//        layoutCatHot.setOnClickListener(v -> {
-//            Toast.makeText(requireContext(), "Xem danh sách Truyện HOT", Toast.LENGTH_SHORT).show();
-//        });
-
-        setupFeaturedComics();
-        setupRecentlyUpdatedComics();
-
-        return view;
-    }
-
-    private void setupFeaturedComics() {
-        featuredList = new ArrayList<>();
-
-        mangaRepository.getLocalMangaList(10, 0, new MangaRepository.RepositoryCallback<List<Comic>>() {
-            @Override
-            public void onSuccess(List<Comic> data) {
-                if (!isAdded()) return;
-                featuredList.clear();
-                if (data != null) {
-                    featuredList.addAll(data);
-                }
-                featuredAdapter = new FeaturedComicAdapter(requireContext(), featuredList,
-                        (comic, position) -> openComicDetail(comic));
-                rvFeaturedComics.setLayoutManager(
-                        new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-                );
-                rvFeaturedComics.setNestedScrollingEnabled(false);
-                rvFeaturedComics.setAdapter(featuredAdapter);
-            }
-
-            @Override
-            public void onError(String message) {
-                if (!isAdded()) return;
-                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+        btnHomeRetry.setOnClickListener(v -> {
+            if (hasHomeData) {
+                refreshHomeMangas();
+            } else {
+                loadHomeData();
             }
         });
     }
 
-    private void setupRecentlyUpdatedComics() {
-        recentList = new ArrayList<>();
+    private void loadHomeData() {
+        showHomeState("Loading cached manga...", false);
+        setRefreshEnabled(false);
 
         mangaRepository.getLocalMangaList(20, 0, new MangaRepository.RepositoryCallback<List<Comic>>() {
             @Override
             public void onSuccess(List<Comic> data) {
                 if (!isAdded()) return;
-                recentList.clear();
-                if (data != null) {
-                    recentList.addAll(data);
+                setRefreshEnabled(true);
+                List<Comic> safeData = data != null ? data : new ArrayList<>();
+                applyHomeData(safeData);
+                if (safeData.isEmpty()) {
+                    showHomeState("No manga available.", true);
+                } else {
+                    hideHomeState();
                 }
-                recentAdapter = new BookshelfAdapter(requireContext(), recentList,
-                        (comic, position) -> openComicDetail(comic));
-                rvRecentlyUpdated.setLayoutManager(new GridLayoutManager(requireContext(), 3));
-                rvRecentlyUpdated.setNestedScrollingEnabled(false);
-                rvRecentlyUpdated.setAdapter(recentAdapter);
             }
 
             @Override
             public void onError(String message) {
                 if (!isAdded()) return;
-                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+                setRefreshEnabled(true);
+                applyHomeData(new ArrayList<>());
+                showHomeState("Unable to load manga. Please try again.", true);
             }
         });
+    }
+
+    private void refreshHomeMangas() {
+        if (isSyncing) {
+            Toast.makeText(requireContext(), "Refreshing manga. Please wait...", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        isSyncing = true;
+        setRefreshEnabled(false);
+        showHomeState(hasHomeData ? "Refreshing manga..." : "Loading manga...", false);
+
+        mangaRepository.syncPopularMangas(200, new MangaRepository.RepositoryCallback<List<Comic>>() {
+            @Override
+            public void onSuccess(List<Comic> data) {
+                if (!isAdded()) return;
+                isSyncing = false;
+                setRefreshEnabled(true);
+                List<Comic> safeData = data != null ? data : new ArrayList<>();
+                applyHomeData(safeData);
+                if (safeData.isEmpty()) {
+                    showHomeState("No manga available.", true);
+                } else {
+                    hideHomeState();
+                    Toast.makeText(requireContext(), "Manga refreshed", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onError(String message) {
+                if (!isAdded()) return;
+                isSyncing = false;
+                setRefreshEnabled(true);
+                if (hasHomeData) {
+                    hideHomeState();
+                    Toast.makeText(requireContext(), "Unable to refresh. Showing cached data.", Toast.LENGTH_SHORT).show();
+                } else {
+                    showHomeState("Unable to load manga. Please try again.", true);
+                }
+            }
+        });
+    }
+
+    private void applyHomeData(List<Comic> data) {
+        featuredList.clear();
+        recentList.clear();
+
+        if (data != null) {
+            int featuredCount = Math.min(10, data.size());
+            for (int i = 0; i < featuredCount; i++) {
+                featuredList.add(data.get(i));
+            }
+            recentList.addAll(data);
+        }
+
+        hasHomeData = !recentList.isEmpty();
+        rvFeaturedComics.setVisibility(hasHomeData ? View.VISIBLE : View.GONE);
+        rvRecentlyUpdated.setVisibility(hasHomeData ? View.VISIBLE : View.GONE);
+        featuredAdapter.notifyDataSetChanged();
+        recentAdapter.notifyDataSetChanged();
     }
 
     private void openComicDetail(Comic comic) {
@@ -198,43 +218,23 @@ public class ComicHomeFragment extends Fragment {
         startActivity(intent);
     }
 
-    private void syncPopularMangas() {
-        if (isSyncing) {
-            Toast.makeText(requireContext(), "Syncing. Please wait...", Toast.LENGTH_SHORT).show();
-            return;
-        }
+    private void showHomeState(String message, boolean showRetry) {
+        if (layoutHomeState == null || tvHomeState == null || btnHomeRetry == null) return;
+        tvHomeState.setText(message);
+        layoutHomeState.setVisibility(View.VISIBLE);
+        btnHomeRetry.setVisibility(showRetry ? View.VISIBLE : View.GONE);
+    }
 
-        isSyncing = true;
+    private void hideHomeState() {
+        if (layoutHomeState != null) {
+            layoutHomeState.setVisibility(View.GONE);
+        }
+    }
+
+    private void setRefreshEnabled(boolean enabled) {
         if (ivRefresh != null) {
-            ivRefresh.setEnabled(false);
-            ivRefresh.setAlpha(0.5f);
+            ivRefresh.setEnabled(enabled);
+            ivRefresh.setAlpha(enabled ? 1f : 0.5f);
         }
-        Toast.makeText(requireContext(), "Syncing manga from MangaDex...", Toast.LENGTH_SHORT).show();
-        mangaRepository.syncPopularMangas(200, new MangaRepository.RepositoryCallback<List<Comic>>() {
-            @Override
-            public void onSuccess(List<Comic> data) {
-                isSyncing = false;
-                if (!isAdded()) return;
-                if (ivRefresh != null) {
-                    ivRefresh.setEnabled(true);
-                    ivRefresh.setAlpha(1f);
-                }
-                int syncedCount = data != null ? data.size() : 0;
-                Toast.makeText(requireContext(), "Synced " + syncedCount + " manga!", Toast.LENGTH_SHORT).show();
-                setupFeaturedComics();
-                setupRecentlyUpdatedComics();
-            }
-
-            @Override
-            public void onError(String message) {
-                isSyncing = false;
-                if (!isAdded()) return;
-                if (ivRefresh != null) {
-                    ivRefresh.setEnabled(true);
-                    ivRefresh.setAlpha(1f);
-                }
-                Toast.makeText(requireContext(), "Error: " + message, Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 }
