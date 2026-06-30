@@ -12,6 +12,7 @@ import com.example.appdoctruyen.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,7 +49,7 @@ public class EditProfileActivity extends AppCompatActivity {
             if (currentUser != null) {
                 saveDataToFirebase();
             } else {
-                Toast.makeText(this, "Lỗi: Chưa đăng nhập!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "You have to sign in", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -67,7 +68,7 @@ public class EditProfileActivity extends AppCompatActivity {
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Không thể tải dữ liệu cũ: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Cant load old data " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -77,7 +78,7 @@ public class EditProfileActivity extends AppCompatActivity {
         String newAddress = edtAddress.getText().toString().trim();
 
         if (newName.isEmpty()) {
-            Toast.makeText(this, "Tên hiển thị không được để trống!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "You have to fill in display name", Toast.LENGTH_SHORT).show();
             return;
         }
         Map<String, Object> updates = new HashMap<>();
@@ -86,15 +87,15 @@ public class EditProfileActivity extends AppCompatActivity {
         updates.put("address", newAddress);
 
         // Đẩy lên Firestore
-        db.collection("users").document(currentUser.getUid()).update(updates).addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "Cập nhật hồ sơ thành công!", Toast.LENGTH_SHORT).show();
+        db.collection("users").document(currentUser.getUid())
+                .set(updates, SetOptions.merge())
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Save successfully", Toast.LENGTH_SHORT).show();
                     finish();
                 })
                 .addOnFailureListener(e -> {
-                    db.collection("users").document(currentUser.getUid()).set(updates).addOnSuccessListener(aVoid -> {
-                                Toast.makeText(this, "Tạo hồ sơ thành công!", Toast.LENGTH_SHORT).show();
-                                finish();
-                            });
+                    // Bắt gọn lỗi nếu có để biết tại sao không lưu được
+                    Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 });
     }
 }

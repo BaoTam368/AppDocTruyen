@@ -15,8 +15,8 @@
     <string name="hint_email">Enter email</string>
     <string name="hint_confirm_password">Confirm password</string>
 
-    <string name="title_forgot_password">Quên mật khẩu</string>
-    <string name="title_send_request">Gửi yêu cầu</string>
+    <string name="title_forgot_password">Forgot password</string>
+    <string name="title_send_request">Send Request</string>
 
     <string name="menu_bookshelf">Bookshelf</string>
     <string name="menu_stories">Manga</string>
