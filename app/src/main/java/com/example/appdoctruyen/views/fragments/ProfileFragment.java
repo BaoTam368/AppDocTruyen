@@ -143,11 +143,10 @@ public class ProfileFragment extends Fragment {
             if (displayName != null && !displayName.isEmpty()) {
                 tv_username.setText(displayName);
             } else if (email != null && !email.isEmpty()) {
-                tv_username.setText(email);
+                tv_username.setText(email.substring(0, email.indexOf("@")));
             } else {
                 tv_username.setText("User");
             }
-
             tv_user_title.setText("Member");
 
             if (user.getPhotoUrl() != null) {
@@ -158,6 +157,20 @@ public class ProfileFragment extends Fragment {
                         .error(R.drawable.placeholder_comic)
                         .into(iv_user_avatar);
             }
+            FirebaseFirestore.getInstance()
+                    .collection("users").document(user.getUid())
+                    .addSnapshotListener((documentSnapshot, error) -> {
+                        if (error != null) {
+                            android.util.Log.e("ProfileFragment", "Cant load data", error);
+                            return;
+                        }
+                        if (documentSnapshot != null && documentSnapshot.exists()) {
+                            String firestoreName = documentSnapshot.getString("username");
+                            if (firestoreName != null && !firestoreName.isEmpty()) {
+                                tv_username.setText(firestoreName);
+                            }
+                        }
+                    });
         }
     }
 
