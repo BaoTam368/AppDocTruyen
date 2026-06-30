@@ -77,9 +77,10 @@ public class PostFragment extends Fragment {
         rvPosts.setNestedScrollingEnabled(false);
 
         postAdapter = new PostAdapter(requireContext(), postList, (post, position, tvLikeCount) -> {
-            String currentUserId = authManager.getCurrentUserId();
+            if (post == null) return;
+            String currentUserId = authManager != null ? authManager.getCurrentUserId() : null;
 
-            if (currentUserId == null) {
+            if (currentUserId == null || currentUserId.trim().isEmpty()) {
                 requireLogin("Please log in to use this feature.");
                 return;
             }
@@ -107,7 +108,7 @@ public class PostFragment extends Fragment {
         createPostLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    if (result.getResultCode() == requireActivity().RESULT_OK) {
+                    if (isAdded() && result.getResultCode() == android.app.Activity.RESULT_OK) {
                         loadPosts();
                     }
                 }
@@ -115,6 +116,7 @@ public class PostFragment extends Fragment {
     }
 
     private boolean requireLogin(String message) {
+        if (!isAdded()) return false;
         if (authManager == null) {
             authManager = new AuthManager(requireContext());
         }

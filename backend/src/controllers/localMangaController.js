@@ -8,7 +8,8 @@ async function getLocalMangaList(req, res, next) {
 
         res.json({
             success: true,
-            data
+            data,
+            message: data.length ? 'OK' : 'No cached manga available. Please sync first.'
         });
     } catch (error) {
         next(error);
@@ -20,18 +21,20 @@ async function searchLocalMangas(req, res, next) {
         const q = req.query.q || req.query.title;
         const { limit, offset, status, tag, sort } = req.query;
         
-        if (!q) {
+        if (!q || !String(q).trim()) {
             return res.json({
                 success: true,
-                data: []
+                data: [],
+                message: 'Search manga...'
             });
         }
 
-        const data = databaseService.searchMangas(q, { limit, offset, status, tag, sort });
+        const data = databaseService.searchMangas(String(q).trim(), { limit, offset, status, tag, sort });
 
         res.json({
             success: true,
-            data
+            data,
+            message: data.length ? 'OK' : 'No cached manga found.'
         });
     } catch (error) {
         next(error);
@@ -90,7 +93,7 @@ async function syncFromMangaDex(req, res, next) {
 
 async function syncPopular(req, res, next) {
     try {
-        const mangas = await syncService.syncPopularMangas(req.query);
+        const mangas = await syncService.syncPopularMangas({ ...req.query, ...req.body });
 
         res.json({
             success: true,
@@ -104,15 +107,15 @@ async function syncPopular(req, res, next) {
 
 async function searchAndSync(req, res, next) {
     try {
-        const { q } = req.query;
-        if (!q) {
+        const q = req.query.q || req.query.title;
+        if (!q || !String(q).trim()) {
             return res.status(400).json({
                 success: false,
                 message: 'Missing search keyword'
             });
         }
 
-        const mangas = await syncService.searchAndSync(q, req.query);
+        const mangas = await syncService.searchAndSync(String(q).trim(), req.query);
 
         res.json({
             success: true,

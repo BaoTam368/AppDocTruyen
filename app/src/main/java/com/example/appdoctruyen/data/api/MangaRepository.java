@@ -285,7 +285,7 @@ public class MangaRepository {
 
     public void syncPopularMangas(int count, RepositoryCallback<List<Comic>> callback) {
         int total = Math.max(count, 1);
-        int limit = Math.min(total, 100);
+        int limit = Math.min(total, 50);
         int pages = (int) Math.ceil((double) total / limit);
         apiService.syncPopularMangas(total, limit, pages).enqueue(new Callback<MangaListResponse>() {
             @Override
@@ -310,7 +310,9 @@ public class MangaRepository {
         if (dtoList == null) return comics;
 
         for (MangaDto dto : dtoList) {
-            comics.add(mapManga(dto));
+            if (dto != null && !isBlank(dto.mangaId)) {
+                comics.add(mapManga(dto));
+            }
         }
         return comics;
     }
@@ -344,6 +346,7 @@ public class MangaRepository {
         if (dtoList == null) return chapters;
 
         for (ChapterDto dto : dtoList) {
+            if (dto == null || isBlank(dto.chapterId)) continue;
             String chapterName = isBlank(dto.chapterName) ? "Chapter " + (isBlank(dto.chapterNumber) ? "" : dto.chapterNumber) : dto.chapterName;
             chapters.add(new Chapter(dto.chapterId, chapterName.trim(), dto.createdAt, true));
         }
@@ -381,6 +384,7 @@ public class MangaRepository {
         if (dtoList == null) return groups;
 
         for (GroupDto dto : dtoList) {
+            if (dto == null || isBlank(dto.groupId)) continue;
             int comicCount = dto.comicCount > 0 ? dto.comicCount : dto.mangaCount;
             TranslationGroup group = new TranslationGroup(numericIdFromString(dto.groupId), isBlank(dto.name) ? "Translation Team" : dto.name, dto.description, R.drawable.placeholder_group, comicCount, dto.memberCount, dto.followerCount);
             group.setGroupId(dto.groupId);

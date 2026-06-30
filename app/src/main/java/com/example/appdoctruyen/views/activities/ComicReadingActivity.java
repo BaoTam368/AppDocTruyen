@@ -70,7 +70,7 @@ public class ComicReadingActivity extends AppCompatActivity {
         bookshelfDatabaseHelper = new BookshelfDatabaseHelper(this);
         authManager = new AuthManager(this);
         String userId = getCurrentUserId();
-        if (userId != null && !userId.equals("local_user")) {
+        if (!isBlank(userId)) {
             firebaseHelper = new BookshelfFirebaseHelper(userId);
         }
 
@@ -78,10 +78,10 @@ public class ComicReadingActivity extends AppCompatActivity {
         chapterList = new ArrayList<>();
 
         // Tải danh sách chapters của manga
-        if (mangaId != null && !mangaId.isEmpty()) {
+        if (!isBlank(mangaId)) {
             loadChapterList();
             // Nếu không có cover URL từ intent, tự động lấy từ API
-            if (coverUrl == null || coverUrl.isEmpty()) {
+            if (isBlank(coverUrl)) {
                 loadMangaDetailForCover();
             }
         }
@@ -153,16 +153,17 @@ public class ComicReadingActivity extends AppCompatActivity {
         pageList.clear();
         adapter.notifyDataSetChanged();
 
-        if (chapterId != null && !chapterId.isEmpty()) {
+        if (!isBlank(chapterId)) {
             loadChapterPagesFromApi(chapterId);
             saveHistory();
         } else {
-            showReaderState("This chapter is missing a readable page source.");
+            showReaderState("No pages available.");
         }
     }
     private void saveHistory() {
         if (mangaId == null || mangaId.trim().isEmpty() || chapterId == null || chapterId.trim().isEmpty()) return;
         String userId = getCurrentUserId();
+        if (isBlank(userId)) return;
         String title = mangaTitle != null ? mangaTitle : ("Manga " + mangaId);
         String chName = chapterName != null ? chapterName : ("Chapter " + currentChapter);
         // Dùng coverUrl nếu có, hoặc chuỗi rỗng để tránh null
@@ -182,6 +183,7 @@ public class ComicReadingActivity extends AppCompatActivity {
         mangaRepository.getMangaDetail(mangaId, new MangaRepository.RepositoryCallback<Comic>() {
             @Override
             public void onSuccess(Comic data) {
+                if (isFinishing() || isDestroyed()) return;
                 if (data != null && data.getCoverUrl() != null && !data.getCoverUrl().isEmpty()) {
                     coverUrl = data.getCoverUrl();
                     // Cập nhật tiêu đề nếu chưa có
@@ -201,9 +203,9 @@ public class ComicReadingActivity extends AppCompatActivity {
     }
 
     private String getCurrentUserId() {
-        if (authManager == null) return "local_user";
+        if (authManager == null || !authManager.isLoggedIn()) return null;
         String userId = authManager.getCurrentUserId();
-        return userId != null ? userId : "local_user";
+        return isBlank(userId) ? null : userId;
     }
 
     private void showReaderState(String message) {
@@ -218,6 +220,10 @@ public class ComicReadingActivity extends AppCompatActivity {
         }
     }
     private void loadChapterPagesFromApi(String chapterId) {
+        if (isBlank(chapterId)) {
+            showReaderState("No pages available.");
+            return;
+        }
         showReaderState("Loading pages...");
 
         mangaRepository.getChapterPages(chapterId, new MangaRepository.RepositoryCallback<List<ComicPage>>() {
@@ -227,7 +233,7 @@ public class ComicReadingActivity extends AppCompatActivity {
                 pageList.clear();
                 if (data == null || data.isEmpty()) {
                     adapter.notifyDataSetChanged();
-                    showReaderState("No pages are available for this chapter.");
+                    showReaderState("No pages available.");
                     return;
                 }
 
@@ -242,7 +248,7 @@ public class ComicReadingActivity extends AppCompatActivity {
                 if (isFinishing() || isDestroyed()) return;
                 pageList.clear();
                 adapter.notifyDataSetChanged();
-                showReaderState("Unable to load pages. Tap reload to try again.");
+                showReaderState("Unable to load pages. Please try again.");
                 Toast.makeText(ComicReadingActivity.this, "Unable to load pages", Toast.LENGTH_SHORT).show();
             }
         });
@@ -251,13 +257,18 @@ public class ComicReadingActivity extends AppCompatActivity {
         mangaRepository.getMangaChapters(mangaId, new MangaRepository.RepositoryCallback<List<Chapter>>() {
             @Override
             public void onSuccess(List<Chapter> data) {
+                if (isFinishing() || isDestroyed()) return;
                 chapterList.clear();
                 if (data != null) {
-                    chapterList.addAll(data);
+                    for (Chapter chapter : data) {
+                        if (chapter != null && !isBlank(chapter.getChapterId())) {
+                            chapterList.add(chapter);
+                        }
+                    }
                 }
                 
                 // Tìm vị trí của chapter hiện tại
-                if (chapterId != null && !chapterId.isEmpty()) {
+                if (!isBlank(chapterId)) {
                     for (int i = 0; i < chapterList.size(); i++) {
                         if (chapterId.equals(chapterList.get(i).getChapterId())) {
                             currentChapterIndex = i;
@@ -269,6 +280,7 @@ public class ComicReadingActivity extends AppCompatActivity {
 
             @Override
             public void onError(String message) {
+                if (isFinishing() || isDestroyed()) return;
                 Toast.makeText(ComicReadingActivity.this, "Chapter list loading error: " + message, Toast.LENGTH_SHORT).show();
             }
         });
@@ -285,7 +297,7 @@ public class ComicReadingActivity extends AppCompatActivity {
 
         ListView lvBottomSheetChapters = bottomSheetView.findViewById(R.id.lvBottomSheetChapters);
 
-        // Sử dụng danh sách chapter thực tế nếu có,否则 dùng dữ liệu giả
+        // Show only real chapters returned by the API.
         List<Chapter> displayChapters = chapterList != null && !chapterList.isEmpty() 
                 ? chapterList 
                 : new ArrayList<>();
@@ -302,6 +314,10 @@ public class ComicReadingActivity extends AppCompatActivity {
         // Bắt sự kiện khi click chọn nhanh một chương bất kỳ trong BottomSheet
         lvBottomSheetChapters.setOnItemClickListener((parent, view, position, id) -> {
             Chapter selectedChapter = displayChapters.get(position);
+            if (selectedChapter == null || isBlank(selectedChapter.getChapterId())) {
+                Toast.makeText(this, "This chapter is not available for reading.", Toast.LENGTH_SHORT).show();
+                return;
+            }
             chapterId = selectedChapter.getChapterId();
             chapterName = selectedChapter.getName();
             currentChapterIndex = position;
@@ -311,5 +327,8 @@ public class ComicReadingActivity extends AppCompatActivity {
 
         bottomSheetDialog.setContentView(bottomSheetView);
         bottomSheetDialog.show(); // Hiển thị bảng lên màn hình
+    }
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
     }
 }

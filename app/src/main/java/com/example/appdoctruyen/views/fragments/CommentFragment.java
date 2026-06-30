@@ -88,7 +88,7 @@ public class CommentFragment extends Fragment {
         rvComments.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         commentAdapter = new CommentAdapter(requireContext(), commentList, (comment, position) -> {
-            if (comment.getUserId() != null && comment.getUserId().equals(authManager.getCurrentUserId())) {
+            if (comment != null && comment.getUserId() != null && comment.getUserId().equals(authManager.getCurrentUserId())) {
                 showDeleteDialog(comment.getId(), position);
             }
         });
@@ -104,8 +104,8 @@ public class CommentFragment extends Fragment {
                 return;
             }
 
-            String currentUserId = authManager.getCurrentUserId();
-            if (currentUserId == null) {
+            String currentUserId = authManager != null ? authManager.getCurrentUserId() : null;
+            if (isBlank(currentUserId)) {
                 Toast.makeText(requireContext(), "Please log in to post a comment.", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(requireContext(), LoginActivity.class));
                 return;
@@ -166,6 +166,7 @@ public class CommentFragment extends Fragment {
     }
 
     public void addComment(Comment comment) {
+        if (comment == null || commentList == null || commentAdapter == null) return;
         commentList.add(0, comment);
         commentAdapter.notifyItemInserted(0);
         rvComments.scrollToPosition(0);
@@ -180,6 +181,7 @@ public class CommentFragment extends Fragment {
                     repository.deleteComment(commentId, new MangaRepository.RepositoryCallback<Void>() {
                         @Override
                         public void onSuccess(Void data) {
+                            if (!isAdded() || position < 0 || position >= commentList.size()) return;
                             commentList.remove(position);
                             commentAdapter.notifyItemRemoved(position);
                             if (commentList.isEmpty()) {
@@ -190,6 +192,7 @@ public class CommentFragment extends Fragment {
 
                         @Override
                         public void onError(String message) {
+                            if (!isAdded()) return;
                             Toast.makeText(requireContext(), "Error: " + message, Toast.LENGTH_SHORT).show();
                         }
                     });
@@ -208,5 +211,8 @@ public class CommentFragment extends Fragment {
         if (tvCommentState != null) {
             tvCommentState.setVisibility(View.GONE);
         }
+    }
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
     }
 }

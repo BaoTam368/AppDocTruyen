@@ -172,6 +172,10 @@ function createHttpError(statusCode, message) {
 }
 
 function toggleLikePost(postId, userId) {
+    if (!normalizeText(userId)) {
+        throw createHttpError(400, 'User is required.');
+    }
+
     const database = databaseService.getDatabase();
 
     const checkLike = database.prepare('SELECT 1 FROM post_likes WHERE user_id = ? AND post_id = ?').get(userId, postId);

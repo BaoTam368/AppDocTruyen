@@ -54,7 +54,7 @@ public class GroupDetailActivity extends AppCompatActivity {
 
         // Nếu có groupId (UUID) → gọi API lấy data real-time
         String groupId = getIntent().getStringExtra("group_id");
-        if (groupId != null && !groupId.isEmpty()) {
+        if (!isBlank(groupId)) {
             loadGroupFromApi(groupId);
         }
 
@@ -65,9 +65,9 @@ public class GroupDetailActivity extends AppCompatActivity {
         mangaRepository.getGroupDetail(groupId, new MangaRepository.RepositoryCallback<TranslationGroup>() {
             @Override
             public void onSuccess(TranslationGroup group) {
-                if (isFinishing() || isDestroyed()) return;
+                if (isFinishing() || isDestroyed() || group == null) return;
                 // Cập nhật UI với data mới từ API
-                tvName.setText(group.getName());
+                tvName.setText(!isBlank(group.getName()) ? group.getName() : getString(R.string.group_default_name));
                 if (group.getDescription() != null && !group.getDescription().isEmpty()) {
                     tvDescription.setText(group.getDescription());
                 }

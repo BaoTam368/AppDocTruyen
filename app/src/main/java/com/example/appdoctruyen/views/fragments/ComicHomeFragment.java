@@ -115,7 +115,7 @@ public class ComicHomeFragment extends Fragment {
     }
 
     private void loadHomeData() {
-        showHomeState("Loading cached manga...", false);
+        showHomeState("Loading manga...", false);
         setRefreshEnabled(false);
 
         mangaRepository.getLocalMangaList(20, 0, new MangaRepository.RepositoryCallback<List<Comic>>() {
@@ -150,9 +150,9 @@ public class ComicHomeFragment extends Fragment {
 
         isSyncing = true;
         setRefreshEnabled(false);
-        showHomeState(hasHomeData ? "Refreshing manga..." : "Loading manga...", false);
+        showHomeState("Loading manga...", false);
 
-        mangaRepository.syncPopularMangas(200, new MangaRepository.RepositoryCallback<List<Comic>>() {
+        mangaRepository.getLocalMangaList(20, 0, new MangaRepository.RepositoryCallback<List<Comic>>() {
             @Override
             public void onSuccess(List<Comic> data) {
                 if (!isAdded()) return;
@@ -177,6 +177,7 @@ public class ComicHomeFragment extends Fragment {
                     hideHomeState();
                     Toast.makeText(requireContext(), "Unable to refresh. Showing cached data.", Toast.LENGTH_SHORT).show();
                 } else {
+                    applyHomeData(new ArrayList<>());
                     showHomeState("Unable to load manga. Please try again.", true);
                 }
             }

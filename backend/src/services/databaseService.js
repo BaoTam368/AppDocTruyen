@@ -27,6 +27,7 @@ function initializeDatabase() {
             latest_chapter TEXT,
             content_rating TEXT,
             available_translated_languages TEXT,
+            last_synced_at DATETIME,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
@@ -91,11 +92,27 @@ function initializeDatabase() {
 }
 
 function saveManga(manga) {
+    if (!manga || !manga.mangaId || !manga.title) {
+        return;
+    }
+
     const database = getDatabase();
     const stmt = database.prepare(`
-        INSERT OR REPLACE INTO mangas 
-        (id, title, description, cover_url, status, year, tags, latest_chapter, content_rating, available_translated_languages, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+        INSERT INTO mangas 
+        (id, title, description, cover_url, status, year, tags, latest_chapter, content_rating, available_translated_languages, last_synced_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        ON CONFLICT(id) DO UPDATE SET
+            title = excluded.title,
+            description = excluded.description,
+            cover_url = excluded.cover_url,
+            status = excluded.status,
+            year = excluded.year,
+            tags = excluded.tags,
+            latest_chapter = excluded.latest_chapter,
+            content_rating = excluded.content_rating,
+            available_translated_languages = excluded.available_translated_languages,
+            last_synced_at = CURRENT_TIMESTAMP,
+            updated_at = CURRENT_TIMESTAMP
     `);
     
     stmt.run(
@@ -165,7 +182,8 @@ function getAllMangas({ limit = 20, offset = 0, status = '', tag = '', sort = 'l
             tags,
             latest_chapter as latestChapter,
             content_rating as contentRating,
-            available_translated_languages as availableTranslatedLanguages
+            available_translated_languages as availableTranslatedLanguages,
+            last_synced_at as lastSyncedAt
         FROM mangas
         ${whereClause}
         ORDER BY ${orderBy}
@@ -213,7 +231,8 @@ function searchMangas(query, { limit = 20, offset = 0, status = '', tag = '', so
             tags,
             latest_chapter as latestChapter,
             content_rating as contentRating,
-            available_translated_languages as availableTranslatedLanguages
+            available_translated_languages as availableTranslatedLanguages,
+            last_synced_at as lastSyncedAt
         FROM mangas
         ${whereClause}
         ORDER BY ${orderBy}
@@ -241,7 +260,8 @@ function getMangaById(mangaId) {
             tags,
             latest_chapter as latestChapter,
             content_rating as contentRating,
-            available_translated_languages as availableTranslatedLanguages
+            available_translated_languages as availableTranslatedLanguages,
+            last_synced_at as lastSyncedAt
         FROM mangas
         WHERE id = ?
     `);
@@ -284,6 +304,7 @@ function closeDatabase() {
 function ensureMangaMetadataColumns() {
     ensureColumn('mangas', 'content_rating', 'TEXT');
     ensureColumn('mangas', 'available_translated_languages', 'TEXT');
+    ensureColumn('mangas', 'last_synced_at', 'DATETIME');
 }
 
 function ensureCommentColumns() {
@@ -340,6 +361,12 @@ function clampNumber(value, min, max, fallback) {
     return Math.max(min, Math.min(max, numberValue));
 }
 
+function getMangaCount() {
+    const database = getDatabase();
+    const row = database.prepare('SELECT COUNT(*) as count FROM mangas').get();
+    return row ? row.count : 0;
+}
+
 module.exports = {
     getDatabase,
     saveManga,
@@ -348,5 +375,6 @@ module.exports = {
     searchMangas,
     getMangaById,
     getMangaChapters,
+    getMangaCount,
     closeDatabase
 };

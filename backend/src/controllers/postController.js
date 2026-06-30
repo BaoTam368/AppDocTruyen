@@ -92,7 +92,7 @@ function toggleLike(req, res, next) {
         const { userId } = req.body;
 
         if (!userId) {
-            return res.status(400).json({ success: false, message: 'Missing userId' });
+            return res.status(400).json({ success: false, message: 'User is required.' });
         }
 
         const result = postService.toggleLikePost(postId, userId);

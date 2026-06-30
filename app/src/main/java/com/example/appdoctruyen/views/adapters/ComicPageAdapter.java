@@ -35,6 +35,10 @@ public class ComicPageAdapter extends RecyclerView.Adapter<ComicPageAdapter.Page
     public void onBindViewHolder(@NonNull PageViewHolder holder, int position) {
         ComicPage page = pageList.get(position);
         String imageUrl = page != null ? page.getImageUrl() : null;
+        if (imageUrl == null || imageUrl.trim().isEmpty()) {
+            holder.imgPage.setImageResource(R.drawable.placeholder_comic);
+            return;
+        }
         Glide.with(holder.itemView.getContext())
                 .load(imageUrl)
                 .placeholder(R.drawable.placeholder_comic)

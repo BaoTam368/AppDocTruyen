@@ -303,8 +303,18 @@ function normalizeMangaDexError(error, fallbackMessage) {
     if (error.response) {
         const apiError = error.response.data && error.response.data.errors && error.response.data.errors[0];
         const message = (apiError && (apiError.detail || apiError.title)) || fallbackMessage;
-        const statusCode = error.response.status === 404 ? 404 : 502;
-        return createHttpError(statusCode, message);
+        const status = error.response.status;
+        const statusCode = status === 404 ? 404 : (status === 429 ? 429 : 502);
+        const normalizedError = createHttpError(statusCode, message);
+
+        if (status === 429) {
+            const retryAfterSeconds = Number.parseInt(error.response.headers && error.response.headers['retry-after'], 10);
+            if (!Number.isNaN(retryAfterSeconds)) {
+                normalizedError.retryAfterMs = retryAfterSeconds * 1000;
+            }
+        }
+
+        return normalizedError;
     }
 
     if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT') {
