@@ -2,18 +2,19 @@ package com.example.appdoctruyen.views.activities;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.appdoctruyen.R;
 import com.example.appdoctruyen.data.api.MangaRepository;
 import com.example.appdoctruyen.models.TranslationGroup;
+import com.example.appdoctruyen.views.adapters.BookshelfGroupAdapter;
 
 public class GroupDetailActivity extends AppCompatActivity {
 
     private ImageView btnBack, imgAvatar;
+    private TextView tvInitials;
     private TextView tvName, tvDescription, tvComicCount, tvMemberCount, tvFollowerCount;
     private MangaRepository mangaRepository;
 
@@ -24,6 +25,7 @@ public class GroupDetailActivity extends AppCompatActivity {
 
         btnBack = findViewById(R.id.btnBackGroupDetail);
         imgAvatar = findViewById(R.id.imgGroupDetailAvatar);
+        tvInitials = findViewById(R.id.tvGroupDetailInitials);
         tvName = findViewById(R.id.tvGroupDetailName);
         tvDescription = findViewById(R.id.tvGroupDetailDescription);
         tvComicCount = findViewById(R.id.tvGroupDetailComicCount);
@@ -38,7 +40,7 @@ public class GroupDetailActivity extends AppCompatActivity {
         int comicCount = getIntent().getIntExtra("group_comic_count", 0);
         int memberCount = getIntent().getIntExtra("group_member_count", 0);
         int followerCount = getIntent().getIntExtra("group_follower_count", 0);
-        int avatarResId = getIntent().getIntExtra("group_avatar_res_id", 0);
+        String groupId = getIntent().getStringExtra("group_id");
 
         tvName.setText(!isBlank(name) ? name : getString(R.string.group_default_name));
         tvDescription.setText(!isBlank(description) ? description : getString(R.string.group_default_description));
@@ -46,14 +48,11 @@ public class GroupDetailActivity extends AppCompatActivity {
         tvMemberCount.setText(formatCount(memberCount));
         tvFollowerCount.setText(formatCount(followerCount));
 
-        if (avatarResId != 0) {
-            imgAvatar.setImageResource(avatarResId);
-        } else {
-            imgAvatar.setImageResource(R.drawable.placeholder_group);
-        }
+        // Initials avatar
+        BookshelfGroupAdapter.bindInitialsAvatar(imgAvatar, tvInitials,
+                !isBlank(name) ? name : "T", !isBlank(groupId) ? groupId : "default");
 
         // Nếu có groupId (UUID) → gọi API lấy data real-time
-        String groupId = getIntent().getStringExtra("group_id");
         if (!isBlank(groupId)) {
             loadGroupFromApi(groupId);
         }
@@ -74,6 +73,10 @@ public class GroupDetailActivity extends AppCompatActivity {
                 tvComicCount.setText(formatCount(group.getComicCount()));
                 tvMemberCount.setText(formatCount(group.getMemberCount()));
                 tvFollowerCount.setText(formatCount(group.getFollowerCount()));
+
+                // Update initials avatar with fresh data
+                BookshelfGroupAdapter.bindInitialsAvatar(imgAvatar, tvInitials,
+                        group.getName(), group.getGroupId());
             }
 
             @Override

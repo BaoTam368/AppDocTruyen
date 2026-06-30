@@ -3,6 +3,8 @@ package com.example.appdoctruyen.views.activities;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -36,6 +38,7 @@ import com.google.firebase.auth.OAuthProvider;
 import java.util.Arrays;
 
 public class LoginActivity extends AppCompatActivity {
+    private static final String TAG = "AuthDebug";
     private AuthManager authManager;
     private EditText edtUsername, edtPassword;
     private GoogleSignInClient mGoogleSignInClient;
@@ -99,17 +102,15 @@ public class LoginActivity extends AppCompatActivity {
             authManager.login(email, password, new AuthCallback() {
                 @Override
                 public void onSuccess(FirebaseUser user) {
-                    Toast.makeText(LoginActivity.this, "Login successful!", android.widget.Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                    finish();
+                    Log.d(TAG, "Email login SUCCESS, uid=" + user.getUid());
+                    Toast.makeText(LoginActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
+                    goToMainActivity();
                 }
 
-                @SuppressLint("MissingInflatedId")
                 @Override
                 public void onFailure(String errorMessage) {
-                    Toast.makeText(LoginActivity.this, "Error: " + errorMessage, android.widget.Toast.LENGTH_LONG).show();
+                    Log.e(TAG, "Email login FAILED: " + errorMessage);
+                    Toast.makeText(LoginActivity.this, "Error: " + errorMessage, Toast.LENGTH_LONG).show();
                 }
             });
         });
@@ -129,26 +130,30 @@ public class LoginActivity extends AppCompatActivity {
                 AccessToken accessToken = loginResult.getAccessToken();
                 authManager.loginWithFacebook(accessToken.getToken(), new AuthCallback() {
                     @Override
-                    public void onSuccess(com.google.firebase.auth.FirebaseUser user) {
-                        android.widget.Toast.makeText(LoginActivity.this, "Facebook login successful!", android.widget.Toast.LENGTH_SHORT).show();
+                    public void onSuccess(FirebaseUser user) {
+                        Log.d(TAG, "Facebook login SUCCESS, uid=" + user.getUid());
+                        Toast.makeText(LoginActivity.this, "Facebook login successful!", Toast.LENGTH_SHORT).show();
                         goToMainActivity();
                     }
 
                     @Override
                     public void onFailure(String errorMessage) {
-                        android.widget.Toast.makeText(LoginActivity.this, "Firebase error: " + errorMessage, android.widget.Toast.LENGTH_LONG).show();
+                        Log.e(TAG, "Facebook login FAILED: " + errorMessage);
+                        Toast.makeText(LoginActivity.this, "Firebase error: " + errorMessage, Toast.LENGTH_LONG).show();
                     }
                 });
             }
 
             @Override
             public void onCancel() {
-                android.widget.Toast.makeText(LoginActivity.this, "Facebook login canceled", android.widget.Toast.LENGTH_SHORT).show();
+                Log.w(TAG, "Facebook login CANCELLED by user");
+                Toast.makeText(LoginActivity.this, "Facebook login canceled", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onError(FacebookException error) {
-                android.widget.Toast.makeText(LoginActivity.this, "Facebook error: " + error.getMessage(), android.widget.Toast.LENGTH_LONG).show();
+                Log.e(TAG, "Facebook login ERROR: " + error.getMessage(), error);
+                Toast.makeText(LoginActivity.this, "Facebook error: " + error.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
 
@@ -164,20 +169,26 @@ public class LoginActivity extends AppCompatActivity {
 
             if (pendingResultTask != null) {
                 pendingResultTask.addOnSuccessListener(authResult -> {
-                            android.widget.Toast.makeText(LoginActivity.this, "X login successful!", android.widget.Toast.LENGTH_SHORT).show();
+                            Log.d(TAG, "X (Twitter) login SUCCESS (pending), uid=" + authResult.getUser().getUid());
+                            authManager.syncUserToBackend(authResult.getUser(), null);
+                            Toast.makeText(LoginActivity.this, "X login successful!", Toast.LENGTH_SHORT).show();
                             goToMainActivity();
                         })
                         .addOnFailureListener(e -> {
-                            android.widget.Toast.makeText(LoginActivity.this, "X error: " + e.getMessage(), android.widget.Toast.LENGTH_LONG).show();
+                            Log.e(TAG, "X (Twitter) login FAILED (pending): " + e.getMessage(), e);
+                            Toast.makeText(LoginActivity.this, "X error: " + e.getMessage(), Toast.LENGTH_LONG).show();
                         });
             } else {
                 mAuth.startActivityForSignInWithProvider(LoginActivity.this, twitterProvider.build())
                         .addOnSuccessListener(authResult -> {
-                            android.widget.Toast.makeText(LoginActivity.this, "X login successful!", android.widget.Toast.LENGTH_SHORT).show();
+                            Log.d(TAG, "X (Twitter) login SUCCESS, uid=" + authResult.getUser().getUid());
+                            authManager.syncUserToBackend(authResult.getUser(), null);
+                            Toast.makeText(LoginActivity.this, "X login successful!", Toast.LENGTH_SHORT).show();
                             goToMainActivity();
                         })
                         .addOnFailureListener(e -> {
-                            android.widget.Toast.makeText(LoginActivity.this, "X error: " + e.getMessage(), android.widget.Toast.LENGTH_LONG).show();
+                            Log.e(TAG, "X (Twitter) login FAILED: " + e.getMessage(), e);
+                            Toast.makeText(LoginActivity.this, "X error: " + e.getMessage(), Toast.LENGTH_LONG).show();
                         });
             }
         });
@@ -200,27 +211,48 @@ public class LoginActivity extends AppCompatActivity {
     private final ActivityResultLauncher<Intent> googleSignInLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
-                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                    Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
-                    try {
-                        GoogleSignInAccount account = task.getResult(ApiException.class);
-                        if (account != null && account.getIdToken() != null) {
-                            authManager.loginWithGoogle(account.getIdToken(), new AuthCallback() {
-                                @Override
-                                public void onSuccess(FirebaseUser user) {
-                                    android.widget.Toast.makeText(LoginActivity.this, "Google login successful!", android.widget.Toast.LENGTH_SHORT).show();
-                                    goToMainActivity();
-                                }
+                Log.d(TAG, "Google Sign-In result: resultCode=" + result.getResultCode());
 
-                                @Override
-                                public void onFailure(String errorMessage) {
-                                    android.widget.Toast.makeText(LoginActivity.this, "Error: " + errorMessage, android.widget.Toast.LENGTH_LONG).show();
-                                }
-                            });
-                        }
-                    } catch (ApiException e) {
-                        android.widget.Toast.makeText(this, "Google connection error: " + e.getMessage(), android.widget.Toast.LENGTH_SHORT).show();
+                if (result.getData() == null) {
+                    Log.e(TAG, "Google Sign-In: result data is null, resultCode=" + result.getResultCode());
+                    Toast.makeText(this, "Google Sign-In cancelled or failed (no data returned)", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
+                try {
+                    GoogleSignInAccount account = task.getResult(ApiException.class);
+                    if (account == null) {
+                        Log.e(TAG, "Google Sign-In: account is null after getResult");
+                        Toast.makeText(this, "Google Sign-In failed: account is null", Toast.LENGTH_LONG).show();
+                        return;
                     }
+
+                    String idToken = account.getIdToken();
+                    if (idToken == null) {
+                        Log.e(TAG, "Google Sign-In: idToken is null. Check requestIdToken() in GoogleSignInOptions.");
+                        Toast.makeText(this, "Google Sign-In failed: idToken is null", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+
+                    Log.d(TAG, "Google Sign-In: got idToken, calling loginWithGoogle...");
+                    authManager.loginWithGoogle(idToken, new AuthCallback() {
+                        @Override
+                        public void onSuccess(FirebaseUser user) {
+                            Log.d(TAG, "Google loginWithGoogle SUCCESS, uid=" + user.getUid());
+                            Toast.makeText(LoginActivity.this, "Google login successful!", Toast.LENGTH_SHORT).show();
+                            goToMainActivity();
+                        }
+
+                        @Override
+                        public void onFailure(String errorMessage) {
+                            Log.e(TAG, "Google loginWithGoogle FAILED: " + errorMessage);
+                            Toast.makeText(LoginActivity.this, "Google login error: " + errorMessage, Toast.LENGTH_LONG).show();
+                        }
+                    });
+                } catch (ApiException e) {
+                    Log.e(TAG, "Google Sign-In ApiException: statusCode=" + e.getStatusCode() + ", message=" + e.getMessage(), e);
+                    Toast.makeText(this, "Google Sign-In error (code " + e.getStatusCode() + "): " + e.getMessage(), Toast.LENGTH_LONG).show();
                 }
             }
     );
@@ -238,7 +270,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private boolean isValidEmail(String email) {
-        String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
-        return email.matches(emailPattern);
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 }

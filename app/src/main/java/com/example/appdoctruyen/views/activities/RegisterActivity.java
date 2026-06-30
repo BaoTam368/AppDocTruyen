@@ -2,6 +2,8 @@ package com.example.appdoctruyen.views.activities; // Sửa lại tên package c
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.util.Patterns;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -14,6 +16,7 @@ import com.example.appdoctruyen.data.firebase.AuthManager;
 import com.google.firebase.auth.FirebaseUser;
 
 public class RegisterActivity extends AppCompatActivity {
+    private static final String TAG = "AuthDebug";
     private AuthManager authManager;
     private EditText edtEmailPhone, edtUsername, edtPassword, edtConfirmPassword;
 
@@ -94,9 +97,10 @@ public class RegisterActivity extends AppCompatActivity {
                 return;
             }
 
-            authManager.register(email, password, new AuthCallback() {
+            authManager.register(email, password, username, new AuthCallback() {
                 @Override
                 public void onSuccess(FirebaseUser user) {
+                    Log.d(TAG, "Register SUCCESS, uid=" + user.getUid());
                     Toast.makeText(RegisterActivity.this, "Registration successful!", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -106,6 +110,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(String errorMessage) {
+                    Log.e(TAG, "Register FAILED: " + errorMessage);
                     Toast.makeText(RegisterActivity.this, "Error: " + errorMessage, Toast.LENGTH_LONG).show();
                 }
             });
@@ -119,7 +124,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private boolean isValidEmail(String email) {
-        String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
-        return email.matches(emailPattern);
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 }
+

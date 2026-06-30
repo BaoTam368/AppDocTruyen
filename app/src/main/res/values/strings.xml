@@ -118,14 +118,14 @@
 
     <string name="group_title">Translation Teams</string>
     <string name="group_tab_all">All</string>
-    <string name="group_tab_famous">Popular</string>
+    <string name="group_tab_famous">Most Active</string>
     <string name="group_tab_comic_count">Manga Count</string>
     <string name="group_empty">No data available.</string>
     <string name="group_loading">Loading translation teams...</string>
     <string name="group_search_hint">Search groups...</string>
     <string name="group_empty_search">No groups found.</string>
     <string name="group_error">Unable to load data. Please try again.</string>
-    <string name="group_stats_unavailable">Group statistics are not available.</string>
+    <string name="group_stats_unavailable">Follower statistics are not available from MangaDex.</string>
     <string name="group_stats_unavailable_short">N/A</string>
     <string name="group_detail_title">Translation Team Details</string>
     <string name="group_default_name">Translation Team</string>

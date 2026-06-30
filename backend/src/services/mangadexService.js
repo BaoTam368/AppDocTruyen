@@ -174,6 +174,50 @@ async function getGroupDetail(groupId) {
     }
 }
 
+async function getGroupMangaCount(groupId) {
+    if (!groupId || !groupId.trim()) {
+        throw createHttpError(400, 'Missing groupId');
+    }
+
+    const uniqueMangaIds = new Set();
+    let offset = 0;
+    const limit = 100;
+    const maxPages = 5;
+
+    for (let page = 0; page < maxPages; page++) {
+        const params = new URLSearchParams();
+        params.append('groups[]', groupId.trim());
+        params.set('limit', String(limit));
+        params.set('offset', String(offset));
+        params.set('order[publishAt]', 'desc');
+
+        try {
+            const response = await mangadexClient.get('/chapter', {params});
+            const chapters = response.data.data || [];
+
+            for (const chapter of chapters) {
+                const mangaRel = (chapter.relationships || []).find((r) => r.type === 'manga');
+                if (mangaRel && mangaRel.id) {
+                    uniqueMangaIds.add(mangaRel.id);
+                }
+            }
+
+            const total = response.data.total || 0;
+            offset += limit;
+            if (offset >= total || chapters.length < limit) {
+                break;
+            }
+        } catch (error) {
+            if (page === 0) {
+                throw normalizeMangaDexError(error, 'Unable to count manga for this group');
+            }
+            break;
+        }
+    }
+
+    return uniqueMangaIds.size;
+}
+
 function mapMangaSummary(item) {
     const attributes = item.attributes || {};
     const coverFileName = getCoverFileName(item);
@@ -386,5 +430,6 @@ module.exports = {
     getChapterPages,
     getGroups,
     searchGroups,
-    getGroupDetail
+    getGroupDetail,
+    getGroupMangaCount
 };

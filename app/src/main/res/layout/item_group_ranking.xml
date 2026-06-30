@@ -20,17 +20,35 @@
             android:textSize="18sp"
             android:textStyle="bold"/>
 
-    <!-- Avatar nhóm -->
-    <ImageView
-            android:id="@+id/imgRankAvatar"
+    <!-- Avatar nhóm: FrameLayout chứa ImageView + TextView initials -->
+    <FrameLayout
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_marginStart="12dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/placeholder_group"
-            android:background="@drawable/bg_card_comic"
-            android:clipToOutline="true"
-            android:contentDescription="@string/group_rank_avatar_content_description"/>
+            android:layout_marginStart="12dp">
+
+        <ImageView
+                android:id="@+id/imgRankAvatar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:background="@drawable/bg_card_comic"
+                android:clipToOutline="true"
+                android:visibility="gone"
+                android:contentDescription="@string/group_rank_avatar_content_description"/>
+
+        <TextView
+                android:id="@+id/tvRankInitials"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:background="@drawable/placeholder_group"
+                android:clipToOutline="true"
+                android:text=""
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:visibility="visible"/>
+    </FrameLayout>
 
     <!-- Thông tin nhóm -->
     <LinearLayout

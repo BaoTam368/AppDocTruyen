@@ -44,15 +44,33 @@
                 android:gravity="center_horizontal"
                 android:padding="24dp">
 
-            <!-- Avatar nhóm -->
-            <ImageView
-                    android:id="@+id/imgGroupDetailAvatar"
+            <!-- Avatar nhóm: FrameLayout chứa ImageView + TextView initials -->
+            <FrameLayout
                     android:layout_width="120dp"
                     android:layout_height="120dp"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/placeholder_group"
-                    android:layout_marginTop="16dp"
-                    android:contentDescription="@string/group_avatar_content_description"/>
+                    android:layout_marginTop="16dp">
+
+                <ImageView
+                        android:id="@+id/imgGroupDetailAvatar"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:visibility="gone"
+                        android:contentDescription="@string/group_avatar_content_description"/>
+
+                <TextView
+                        android:id="@+id/tvGroupDetailInitials"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:background="@drawable/placeholder_group"
+                        android:clipToOutline="true"
+                        android:text=""
+                        android:textColor="@color/white"
+                        android:textSize="40sp"
+                        android:textStyle="bold"
+                        android:visibility="visible"/>
+            </FrameLayout>
 
             <!-- Tên nhóm -->
             <TextView

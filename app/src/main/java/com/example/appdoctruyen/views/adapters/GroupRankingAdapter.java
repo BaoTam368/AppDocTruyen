@@ -10,7 +10,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.example.appdoctruyen.R;
 import com.example.appdoctruyen.models.TranslationGroup;
 
@@ -49,7 +48,9 @@ public class GroupRankingAdapter extends RecyclerView.Adapter<GroupRankingAdapte
             holder.tvRankNumber.setText("-");
             holder.tvRankGroupName.setText(R.string.group_default_name);
             holder.tvRankMemberCount.setText(R.string.group_stats_unavailable_short);
-            holder.imgRankAvatar.setImageResource(R.drawable.placeholder_group);
+            holder.imgRankAvatar.setVisibility(View.GONE);
+            holder.tvRankInitials.setVisibility(View.VISIBLE);
+            holder.tvRankInitials.setText("?");
             holder.imgRankTrophy.setVisibility(View.GONE);
             holder.itemView.setOnClickListener(null);
             return;
@@ -60,13 +61,11 @@ public class GroupRankingAdapter extends RecyclerView.Adapter<GroupRankingAdapte
         holder.tvRankGroupName.setText(isBlank(group.getName())
                 ? context.getString(R.string.group_default_name)
                 : group.getName());
-        holder.tvRankMemberCount.setText(formatCount(group.getMemberCount(), R.string.group_members_count_format));
+        holder.tvRankMemberCount.setText(formatCount(group.getComicCount(), R.string.group_comic_count_format));
 
-        Glide.with(holder.itemView.getContext())
-                .load(group.getAvatarUrl())
-                .placeholder(R.drawable.placeholder_group)
-                .error(R.drawable.placeholder_group)
-                .into(holder.imgRankAvatar);
+        // Initials avatar
+        BookshelfGroupAdapter.bindInitialsAvatar(holder.imgRankAvatar, holder.tvRankInitials,
+                group.getName(), group.getGroupId());
 
         holder.imgRankTrophy.setVisibility(hasRank && position < 3 ? View.VISIBLE : View.GONE);
 
@@ -109,6 +108,7 @@ public class GroupRankingAdapter extends RecyclerView.Adapter<GroupRankingAdapte
     public static class RankingViewHolder extends RecyclerView.ViewHolder {
         TextView tvRankNumber;
         ImageView imgRankAvatar;
+        TextView tvRankInitials;
         TextView tvRankGroupName;
         TextView tvRankMemberCount;
         ImageView imgRankTrophy;
@@ -117,6 +117,7 @@ public class GroupRankingAdapter extends RecyclerView.Adapter<GroupRankingAdapte
             super(itemView);
             tvRankNumber = itemView.findViewById(R.id.tvRankNumber);
             imgRankAvatar = itemView.findViewById(R.id.imgRankAvatar);
+            tvRankInitials = itemView.findViewById(R.id.tvRankInitials);
             tvRankGroupName = itemView.findViewById(R.id.tvRankGroupName);
             tvRankMemberCount = itemView.findViewById(R.id.tvRankMemberCount);
             imgRankTrophy = itemView.findViewById(R.id.imgRankTrophy);

@@ -125,56 +125,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
-    <LinearLayout
-            android:id="@+id/layout_or"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:gravity="center"
-            android:orientation="horizontal"
-            app:layout_constraintTop_toBottomOf="@id/btn_register"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
-        <View
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1"
-                android:background="@color/divider_light"/>
-
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingHorizontal="8dp"
-                android:text="@string/text_or"
-                android:textColor="@color/text_secondary_light"
-                android:textSize="12sp"/>
-
-        <View
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1"
-                android:background="@color/divider_light"/>
-    </LinearLayout>
-
-    <LinearLayout
-            android:id="@+id/layout_social"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:orientation="horizontal"
-            app:layout_constraintTop_toBottomOf="@id/layout_or"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
-        <View android:layout_width="40dp" android:layout_height="40dp" android:layout_marginHorizontal="12dp"
-              android:background="@drawable/facebook"/>
-        <View android:layout_width="40dp" android:layout_height="40dp" android:layout_marginHorizontal="12dp"
-              android:background="@drawable/google"/>
-        <View android:layout_width="40dp" android:layout_height="40dp" android:layout_marginHorizontal="12dp"
-              android:background="@drawable/twitter"/>
-    </LinearLayout>
-
     <Button
         android:id="@+id/btn_login"
         android:layout_width="0dp"
@@ -185,7 +135,7 @@
         android:text="@string/btn_login"
         android:textColor="@color/text_primary_light"
         android:textAllCaps="false"
-        app:layout_constraintTop_toBottomOf="@id/layout_social"
+        app:layout_constraintTop_toBottomOf="@id/btn_register"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

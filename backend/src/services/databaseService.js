@@ -93,6 +93,7 @@ function initializeDatabase() {
     ensureChapterColumns();
     ensureCommentColumns();
     ensurePostColumns();
+    ensureGroupMangaCountCache();
 }
 
 function saveManga(manga) {
@@ -332,6 +333,33 @@ function ensureChapterColumns() {
     ensureColumn('chapters', 'publish_at', 'TEXT');
     ensureColumn('chapters', 'readable_at', 'TEXT');
 }
+
+function ensureGroupMangaCountCache() {
+    db.exec(`
+        CREATE TABLE IF NOT EXISTS group_manga_count_cache (
+            group_id TEXT PRIMARY KEY,
+            manga_count INTEGER NOT NULL DEFAULT 0,
+            cached_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
+    `);
+}
+
+function getCachedGroupMangaCount(groupId) {
+    const database = getDatabase();
+    const row = database.prepare(
+        `SELECT manga_count FROM group_manga_count_cache
+         WHERE group_id = ? AND cached_at > datetime('now', '-24 hours')`
+    ).get(groupId);
+    return row ? row.manga_count : null;
+}
+
+function setCachedGroupMangaCount(groupId, mangaCount) {
+    const database = getDatabase();
+    database.prepare(
+        `INSERT OR REPLACE INTO group_manga_count_cache (group_id, manga_count, cached_at)
+         VALUES (?, ?, CURRENT_TIMESTAMP)`
+    ).run(groupId, mangaCount);
+}
 function ensureCommentColumns() {
     ensureColumn('comments', 'manga_id', 'TEXT');
     ensureColumn('comments', 'chapter_id', 'TEXT');
@@ -450,5 +478,7 @@ module.exports = {
     getMangaById,
     getMangaChapters,
     getMangaCount,
+    getCachedGroupMangaCount,
+    setCachedGroupMangaCount,
     closeDatabase
 };
