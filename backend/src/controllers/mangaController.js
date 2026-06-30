@@ -30,6 +30,22 @@ async function getMangaDetail(req, res, next) {
     }
 }
 
+async function getMangaCovers(req, res, next) {
+    try {
+        const data = await mangadexService.getMangaCovers(req.params.mangaId, {
+            limit: req.query.limit,
+            offset: req.query.offset
+        });
+
+        res.json({
+            success: true,
+            data
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
 async function getMangaChapters(req, res, next) {
     try {
         const data = await mangadexService.getMangaChapters(req.params.mangaId, {
@@ -63,6 +79,7 @@ async function getChapterPages(req, res, next) {
 module.exports = {
     getMangaList,
     getMangaDetail,
+    getMangaCovers,
     getMangaChapters,
     getChapterPages
 };

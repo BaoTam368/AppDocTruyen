@@ -27,6 +27,38 @@
                 android:textSize="20sp"
                 android:textStyle="bold" />
         </LinearLayout>
+        <LinearLayout
+            android:id="@+id/profileLoginRequired"
+            android:layout_width="match_parent"
+            android:layout_height="220dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/login_required_generic"
+                android:textColor="#444444"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/btnProfileLogin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:backgroundTint="@color/brand_blue"
+                android:text="@string/btn_login"
+                android:textAllCaps="false" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/profileContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
         <!-- HEADER USER -->
 
         <LinearLayout
@@ -326,6 +358,8 @@
                     android:layout_marginStart="16dp"
                     android:text="Log out" />
             </LinearLayout>
+
+        </LinearLayout>
 
         </LinearLayout>
 

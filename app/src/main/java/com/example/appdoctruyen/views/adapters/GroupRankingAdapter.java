@@ -46,24 +46,21 @@ public class GroupRankingAdapter extends RecyclerView.Adapter<GroupRankingAdapte
     public void onBindViewHolder(@NonNull RankingViewHolder holder, int position) {
         TranslationGroup group = groupList.get(position);
         if (group == null) {
-            holder.tvRankNumber.setText(String.valueOf(position + 1));
+            holder.tvRankNumber.setText("-");
             holder.tvRankGroupName.setText(R.string.group_default_name);
-            holder.tvRankMemberCount.setText(context.getString(R.string.group_members_count_format, 0));
+            holder.tvRankMemberCount.setText(R.string.group_stats_unavailable_short);
             holder.imgRankAvatar.setImageResource(R.drawable.placeholder_group);
             holder.imgRankTrophy.setVisibility(View.GONE);
             holder.itemView.setOnClickListener(null);
             return;
         }
 
-        int displayRank = group.getRank() > 0 ? group.getRank() : position + 1;
-        holder.tvRankNumber.setText(String.valueOf(displayRank));
+        boolean hasRank = group.getRank() > 0;
+        holder.tvRankNumber.setText(hasRank ? String.valueOf(group.getRank()) : "-");
         holder.tvRankGroupName.setText(isBlank(group.getName())
                 ? context.getString(R.string.group_default_name)
                 : group.getName());
-        holder.tvRankMemberCount.setText(context.getString(
-                R.string.group_members_count_format,
-                group.getMemberCount()
-        ));
+        holder.tvRankMemberCount.setText(formatCount(group.getMemberCount(), R.string.group_members_count_format));
 
         Glide.with(holder.itemView.getContext())
                 .load(group.getAvatarUrl())
@@ -71,9 +68,11 @@ public class GroupRankingAdapter extends RecyclerView.Adapter<GroupRankingAdapte
                 .error(R.drawable.placeholder_group)
                 .into(holder.imgRankAvatar);
 
-        holder.imgRankTrophy.setVisibility(position < 3 ? View.VISIBLE : View.GONE);
+        holder.imgRankTrophy.setVisibility(hasRank && position < 3 ? View.VISIBLE : View.GONE);
 
-        if (position == 0) {
+        if (!hasRank) {
+            holder.tvRankNumber.setTextColor(context.getResources().getColor(R.color.text_secondary_light, null));
+        } else if (position == 0) {
             holder.tvRankNumber.setTextColor(context.getResources().getColor(R.color.badge_red, null));
         } else if (position < 3) {
             holder.tvRankNumber.setTextColor(context.getResources().getColor(R.color.brand_blue, null));
@@ -91,6 +90,12 @@ public class GroupRankingAdapter extends RecyclerView.Adapter<GroupRankingAdapte
     @Override
     public int getItemCount() {
         return groupList != null ? groupList.size() : 0;
+    }
+
+    private String formatCount(int value, int formatResId) {
+        return value > 0
+                ? context.getString(formatResId, value)
+                : context.getString(R.string.group_stats_unavailable_short);
     }
 
     private boolean isBlank(String value) {

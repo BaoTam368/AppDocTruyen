@@ -42,9 +42,9 @@ public class GroupDetailActivity extends AppCompatActivity {
 
         tvName.setText(!isBlank(name) ? name : getString(R.string.group_default_name));
         tvDescription.setText(!isBlank(description) ? description : getString(R.string.group_default_description));
-        tvComicCount.setText(String.valueOf(comicCount));
-        tvMemberCount.setText(String.valueOf(memberCount));
-        tvFollowerCount.setText(String.valueOf(followerCount));
+        tvComicCount.setText(formatCount(comicCount));
+        tvMemberCount.setText(formatCount(memberCount));
+        tvFollowerCount.setText(formatCount(followerCount));
 
         if (avatarResId != 0) {
             imgAvatar.setImageResource(avatarResId);
@@ -71,9 +71,9 @@ public class GroupDetailActivity extends AppCompatActivity {
                 if (group.getDescription() != null && !group.getDescription().isEmpty()) {
                     tvDescription.setText(group.getDescription());
                 }
-                tvComicCount.setText(String.valueOf(group.getComicCount()));
-                tvMemberCount.setText(String.valueOf(group.getMemberCount()));
-                tvFollowerCount.setText(String.valueOf(group.getFollowerCount()));
+                tvComicCount.setText(formatCount(group.getComicCount()));
+                tvMemberCount.setText(formatCount(group.getMemberCount()));
+                tvFollowerCount.setText(formatCount(group.getFollowerCount()));
             }
 
             @Override
@@ -81,6 +81,10 @@ public class GroupDetailActivity extends AppCompatActivity {
                 // Giữ data từ intent, không cần báo lỗi
             }
         });
+    }
+
+    private String formatCount(int value) {
+        return value > 0 ? String.valueOf(value) : getString(R.string.group_stats_unavailable_short);
     }
 
     private boolean isBlank(String value) {

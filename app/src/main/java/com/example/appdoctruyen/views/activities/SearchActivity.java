@@ -3,14 +3,14 @@ package com.example.appdoctruyen.views.activities;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,12 +20,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.appdoctruyen.R;
+import com.example.appdoctruyen.data.api.MangaRepository;
 import com.example.appdoctruyen.models.Comic;
 import com.example.appdoctruyen.models.Genre;
 import com.example.appdoctruyen.views.adapters.BookshelfAdapter;
 import com.example.appdoctruyen.views.adapters.GenreAdapter;
 import com.example.appdoctruyen.views.adapters.TopSearchTagAdapter;
-import com.example.appdoctruyen.data.api.MangaRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,16 +35,19 @@ public class SearchActivity extends AppCompatActivity {
     private NestedScrollView layoutFilter;
     private EditText edtSearchInput;
     private ImageView ivClearSearch;
-
-    private Button btnApplyFilter;
+    private Button btnApplyFilter, btnSearchRetry;
     private MangaRepository mangaRepository;
-
     private RecyclerView rvTopSearchTags;
     private RecyclerView rvSearchResult;
     private RecyclerView rvGenresCheckbox;
-
     private List<Comic> resultList;
     private BookshelfAdapter resultAdapter;
+    private GenreAdapter genreAdapter;
+    private String selectedSort = "title_asc";
+    private TextView tvSortTitleAsc, tvSortTitleDesc, tvSearchState;
+    private final Handler searchHandler = new Handler();
+    private Runnable searchRunnable;
+    private static final long SEARCH_DELAY_MS = 500;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -56,14 +59,20 @@ public class SearchActivity extends AppCompatActivity {
         btnFilter = findViewById(R.id.btnFilter);
         layoutFilter = findViewById(R.id.layoutFilter);
         btnApplyFilter = findViewById(R.id.btnApplyFilter);
+        btnSearchRetry = findViewById(R.id.btn_search_retry);
         edtSearchInput = findViewById(R.id.edt_search_input);
         ivClearSearch = findViewById(R.id.iv_clear_search);
         rvTopSearchTags = findViewById(R.id.rv_top_search_tags);
         rvSearchResult = findViewById(R.id.rv_search_result);
         rvGenresCheckbox = findViewById(R.id.rv_genres_checkbox);
         rvGenresCheckbox.setNestedScrollingEnabled(false);
+        tvSortTitleAsc = findViewById(R.id.tvSortTitleAsc);
+        tvSortTitleDesc = findViewById(R.id.tvSortTitleDesc);
+        tvSearchState = findViewById(R.id.tv_search_state);
 
         mangaRepository = new MangaRepository();
+
+        setupSortTabs();
 
         btnBack.setOnClickListener(v -> finish());
         btnFilter.setOnClickListener(v -> {
@@ -77,6 +86,9 @@ public class SearchActivity extends AppCompatActivity {
             applySearch();
             layoutFilter.setVisibility(View.GONE);
         });
+        if (btnSearchRetry != null) {
+            btnSearchRetry.setOnClickListener(v -> applySearch());
+        }
 
         edtSearchInput.addTextChangedListener(new TextWatcher() {
             @Override
@@ -88,10 +100,16 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {
                 String query = s.toString().trim();
+                if (searchRunnable != null) {
+                    searchHandler.removeCallbacks(searchRunnable);
+                }
                 if (query.length() >= 2) {
-                    searchManga(query);
+                    searchRunnable = () -> searchManga(query);
+                    searchHandler.postDelayed(searchRunnable, SEARCH_DELAY_MS);
                 } else if (query.isEmpty()) {
                     loadDefaultResults();
+                } else {
+                    clearSearchResults("Search manga...");
                 }
             }
         });
@@ -104,7 +122,34 @@ public class SearchActivity extends AppCompatActivity {
         setupSearchResult();
         setupCheckbox();
         setupTopSearchTags();
+    }
 
+    private void setupSortTabs() {
+        View.OnClickListener sortListener = v -> {
+            if (v.getId() == R.id.tvSortTitleAsc) {
+                selectedSort = "title_asc";
+            } else if (v.getId() == R.id.tvSortTitleDesc) {
+                selectedSort = "title_desc";
+            }
+            updateSortTabUI();
+            applySearch();
+        };
+
+        if (tvSortTitleAsc != null) tvSortTitleAsc.setOnClickListener(sortListener);
+        if (tvSortTitleDesc != null) tvSortTitleDesc.setOnClickListener(sortListener);
+        updateSortTabUI();
+    }
+
+    private void updateSortTabUI() {
+        int selected = R.drawable.bg_tab_selected;
+        int unselected = R.drawable.bg_tab_unselected;
+
+        if (tvSortTitleAsc != null) {
+            tvSortTitleAsc.setBackgroundResource("title_asc".equals(selectedSort) ? selected : unselected);
+        }
+        if (tvSortTitleDesc != null) {
+            tvSortTitleDesc.setBackgroundResource("title_desc".equals(selectedSort) ? selected : unselected);
+        }
     }
 
     private void setupTopSearchTags() {
@@ -119,7 +164,10 @@ public class SearchActivity extends AppCompatActivity {
         data.add("Bleach");
         data.add("Black Clover");
         data.add("Chainsaw Man");
-        TopSearchTagAdapter adapter = new TopSearchTagAdapter(data);
+        TopSearchTagAdapter adapter = new TopSearchTagAdapter(data, tag -> {
+            edtSearchInput.setText(tag);
+            edtSearchInput.setSelection(edtSearchInput.getText().length());
+        });
 
         rvTopSearchTags.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         rvTopSearchTags.setAdapter(adapter);
@@ -145,14 +193,29 @@ public class SearchActivity extends AppCompatActivity {
         genres.add(new Genre("Urban"));
         genres.add(new Genre("Horror"));
 
-        GenreAdapter adapter = new GenreAdapter(genres);
+        genreAdapter = new GenreAdapter(genres);
 
         rvGenresCheckbox.setLayoutManager(new GridLayoutManager(this, 3));
-        rvGenresCheckbox.setAdapter(adapter);
-
+        rvGenresCheckbox.setAdapter(genreAdapter);
     }
 
     private void applySearch() {
+        String query = edtSearchInput.getText().toString().trim();
+        String selectedTag = "";
+        if (genreAdapter != null) {
+            List<String> selectedGenres = genreAdapter.getSelectedGenres();
+            if (!selectedGenres.isEmpty()) {
+                selectedTag = selectedGenres.get(0);
+            }
+        }
+
+        if (query.isEmpty()) {
+            loadFilteredResults(selectedTag);
+        } else if (query.length() >= 2) {
+            searchMangaWithFilter(query, selectedTag);
+        } else {
+            clearSearchResults("Search manga...");
+        }
     }
 
     private void setupSearchResult() {
@@ -163,7 +226,7 @@ public class SearchActivity extends AppCompatActivity {
             intent.putExtra("comic_id", comic.getId());
             intent.putExtra("mangaId", comic.getMangaId());
             intent.putExtra("comic_title", comic.getTitle());
-            intent.putExtra("mangaId", comic.getMangaId());
+            intent.putExtra("comic_cover", comic.getCoverUrl());
             startActivity(intent);
         });
 
@@ -174,36 +237,155 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void loadDefaultResults() {
+        loadFilteredResults("");
+    }
+
+    private void loadFilteredResults(String tag) {
+        showSearchState("Loading manga...");
         mangaRepository.getLocalMangaList(20, 0, new MangaRepository.RepositoryCallback<List<Comic>>() {
             @Override
             public void onSuccess(List<Comic> data) {
                 resultList.clear();
-                resultList.addAll(data);
+                if (data != null) {
+                    for (Comic comic : data) {
+                        if (!tag.isEmpty() && (comic.getTags() == null || !containsTag(comic.getTags(), tag))) {
+                            continue;
+                        }
+                        resultList.add(comic);
+                    }
+                    applySortToList(resultList);
+                }
                 resultAdapter.notifyDataSetChanged();
+                updateSearchStateForResults();
             }
 
             @Override
             public void onError(String message) {
+                showSearchState("Unable to load manga. Please try again.", true);
                 Toast.makeText(SearchActivity.this, message, Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void searchManga(String query) {
-        mangaRepository.searchLocalMangas(query, 20, 0, new MangaRepository.RepositoryCallback<List<Comic>>() {
+        searchMangaWithFilter(query, "");
+    }
+
+    private void searchMangaWithFilter(String query, String tag) {
+        showSearchState("Searching manga...");
+        mangaRepository.searchAndSync(query, 20, 0, new MangaRepository.RepositoryCallback<List<Comic>>() {
             @Override
             public void onSuccess(List<Comic> data) {
-                resultList.clear();
-                resultList.addAll(data);
-                resultAdapter.notifyDataSetChanged();
+                updateSearchResults(data, tag);
             }
 
             @Override
             public void onError(String message) {
-                Toast.makeText(SearchActivity.this, message, Toast.LENGTH_SHORT).show();
+                mangaRepository.searchLocalMangas(query, 20, 0, new MangaRepository.RepositoryCallback<List<Comic>>() {
+                    @Override
+                    public void onSuccess(List<Comic> data) {
+                        updateSearchResults(data, tag);
+                    }
+
+                    @Override
+                    public void onError(String fallbackMessage) {
+                        resultList.clear();
+                        resultAdapter.notifyDataSetChanged();
+                        showSearchState("Unable to search manga. Please try again.", true);
+                        Toast.makeText(SearchActivity.this, fallbackMessage, Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
     }
 
+    private void updateSearchResults(List<Comic> data, String tag) {
+        resultList.clear();
+        if (data != null) {
+            for (Comic comic : data) {
+                if (!tag.isEmpty() && (comic.getTags() == null || !containsTag(comic.getTags(), tag))) {
+                    continue;
+                }
+                resultList.add(comic);
+            }
+            applySortToList(resultList);
+        }
+        resultAdapter.notifyDataSetChanged();
+        updateSearchStateForResults();
+    }
 
+    private void applySortToList(List<Comic> list) {
+        switch (selectedSort) {
+            case "title_desc":
+                list.sort((a, b) -> {
+                    if (a.getTitle() == null) return 1;
+                    if (b.getTitle() == null) return -1;
+                    return b.getTitle().compareToIgnoreCase(a.getTitle());
+                });
+                break;
+            case "title_asc":
+            default:
+                list.sort((a, b) -> {
+                    if (a.getTitle() == null) return 1;
+                    if (b.getTitle() == null) return -1;
+                    return a.getTitle().compareToIgnoreCase(b.getTitle());
+                });
+                break;
+        }
+    }
+
+    private void updateSearchStateForResults() {
+        if (resultList == null || resultList.isEmpty()) {
+            showSearchState("No manga found. Try another keyword.");
+        } else {
+            hideSearchState();
+        }
+    }
+
+    private void clearSearchResults(String message) {
+        if (resultList != null) {
+            resultList.clear();
+        }
+        if (resultAdapter != null) {
+            resultAdapter.notifyDataSetChanged();
+        }
+        showSearchState(message);
+    }
+
+    private void showSearchState(String message) {
+        showSearchState(message, false);
+    }
+
+    private void showSearchState(String message, boolean showRetry) {
+        if (tvSearchState == null) return;
+        tvSearchState.setText(message);
+        tvSearchState.setVisibility(View.VISIBLE);
+        if (btnSearchRetry != null) {
+            btnSearchRetry.setVisibility(showRetry ? View.VISIBLE : View.GONE);
+        }
+    }
+
+    private void hideSearchState() {
+        if (tvSearchState != null) {
+            tvSearchState.setVisibility(View.GONE);
+        }
+        if (btnSearchRetry != null) {
+            btnSearchRetry.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (searchRunnable != null) {
+            searchHandler.removeCallbacks(searchRunnable);
+        }
+        super.onDestroy();
+    }
+
+    private boolean containsTag(List<String> tags, String tag) {
+        for (String currentTag : tags) {
+            if (currentTag != null && currentTag.equalsIgnoreCase(tag)) return true;
+        }
+        return false;
+    }
 }

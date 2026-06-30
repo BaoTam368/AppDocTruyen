@@ -89,15 +89,34 @@
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:spanCount="3"/>
 
-    <TextView
-            android:id="@+id/tvEmptyBookshelf"
+    <LinearLayout
+            android:id="@+id/layoutBookshelfState"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="@string/bookshelf_empty_downloaded"
-            android:textColor="@color/text_secondary_light"
-            android:textSize="16sp"
-            android:visibility="gone"/>
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:visibility="gone">
+
+        <TextView
+                android:id="@+id/tvEmptyBookshelf"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/bookshelf_empty_downloaded"
+                android:textColor="@color/text_secondary_light"
+                android:textSize="16sp"/>
+
+        <Button
+                android:id="@+id/btnBookshelfLogin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:backgroundTint="@color/brand_blue"
+                android:text="@string/btn_login"
+                android:textAllCaps="false"
+                android:visibility="gone"/>
+    </LinearLayout>
 
 </LinearLayout>

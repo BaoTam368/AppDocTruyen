@@ -15,10 +15,21 @@ import java.util.List;
 
 public class TopSearchTagAdapter extends RecyclerView.Adapter<TopSearchTagAdapter.TagViewHolder> {
 
-    private List<String> list;
+    public interface OnTagClickListener {
+        void onTagClick(String tag);
+    }
+
+    private final List<String> list;
+    private final OnTagClickListener listener;
 
     public TopSearchTagAdapter(List<String> list) {
         this.list = list;
+        this.listener = null;
+    }
+
+    public TopSearchTagAdapter(List<String> list, OnTagClickListener listener) {
+        this.list = list;
+        this.listener = listener;
     }
 
     @NonNull
@@ -35,7 +46,11 @@ public class TopSearchTagAdapter extends RecyclerView.Adapter<TopSearchTagAdapte
         holder.tvTagName.setText(tag);
 
         holder.itemView.setOnClickListener(v -> {
-            Toast.makeText(v.getContext(), "Search: " + tag, Toast.LENGTH_SHORT).show();
+            if (listener != null) {
+                listener.onTagClick(tag);
+            } else {
+                Toast.makeText(v.getContext(), "Search: " + tag, Toast.LENGTH_SHORT).show();
+            }
         });
     }
 

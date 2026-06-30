@@ -48,6 +48,13 @@ public class CreatePostActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_post);
         repository = new MangaRepository();
+        authManager = new AuthManager(this);
+        if (!authManager.isLoggedIn()) {
+            Toast.makeText(this, "Please log in to use this feature.", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            return;
+        }
 
         initViews();
         loadUserProfile();
@@ -69,12 +76,15 @@ public class CreatePostActivity extends AppCompatActivity {
 
         tvDisplayName = findViewById(R.id.tv_display_name);
         imgAvatar = findViewById(R.id.img_avatar);
-        authManager = new AuthManager(this);
 
     }
 
     public void loadUserProfile() {
         String userId = authManager.getCurrentUserId();
+        if (userId == null) {
+            tvDisplayName.setText("User");
+            return;
+        }
         repository.getUserProfile(userId, new MangaRepository.RepositoryCallback<User>() {
             @Override
             public void onSuccess(User user) {
@@ -105,6 +115,12 @@ public class CreatePostActivity extends AppCompatActivity {
         }
 
         String userId = authManager.getCurrentUserId();
+        if (userId == null) {
+            Toast.makeText(this, "Please log in to use this feature.", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            return;
+        }
         CreatePostRequest request = new CreatePostRequest(userId, content, selectedImageUri != null ? selectedImageUri.toString() : null);
         repository.createPost(request, new MangaRepository.RepositoryCallback<Post>() {
             @Override

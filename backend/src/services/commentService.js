@@ -1,18 +1,35 @@
 const databaseService = require('./databaseService');
 const userService = require('./userService');
 
-function getComments({  limit = 50, offset = 0 } = {}) {
+function getComments({mangaId, chapterId, limit = 50, offset = 0} = {}) {
     const database = databaseService.getDatabase();
     const filters = [];
     const params = [];
+    const mangaIdFilter = normalizeNullable(mangaId);
+    const chapterIdFilter = normalizeNullable(chapterId);
+
+    if (mangaIdFilter) {
+        filters.push('c.manga_id = ?');
+        params.push(mangaIdFilter);
+    }
+
+    if (chapterIdFilter) {
+        filters.push('c.chapter_id = ?');
+        params.push(chapterIdFilter);
+    } else if (mangaIdFilter) {
+        filters.push('c.chapter_id IS NULL');
+    }
 
     const whereClause = filters.length ? `WHERE ${filters.join(' AND ')}` : '';
     const stmt = database.prepare(`
         SELECT
             c.id,
+            c.manga_id,
+            c.chapter_id,
             c.user_id,
             c.content,
             c.created_at,
+            c.updated_at,
             u.display_name,
             u.avatar_url
         FROM comments c
@@ -27,22 +44,29 @@ function getComments({  limit = 50, offset = 0 } = {}) {
 }
 
 function createComment(payload = {}) {
-    const userId = normalizeText(payload.userId || payload.user_id);
+    const requestedUserId = normalizeText(payload.userId || payload.user_id);
+    const mangaId = normalizeNullable(payload.mangaId || payload.manga_id);
+    const chapterId = normalizeNullable(payload.chapterId || payload.chapter_id);
     const content = normalizeText(payload.content);
+
+    if (!requestedUserId) {
+        throw createHttpError(400, 'User is required.');
+    }
 
     if (!content) {
         throw createHttpError(400, 'Missing comment content');
     }
 
-    userService.createOrUpdateUser({ userId });
+    const user = userService.createOrUpdateUser({ userId: requestedUserId });
+    const userId = user && user.userId ? user.userId : requestedUserId;
 
     const database = databaseService.getDatabase();
     const stmt = database.prepare(`
-        INSERT INTO comments (user_id, content)
-        VALUES (?, ?)
+        INSERT INTO comments (manga_id, chapter_id, user_id, content)
+        VALUES (?, ?, ?, ?)
     `);
 
-    const result = stmt.run(userId, content);
+    const result = stmt.run(mangaId, chapterId, userId, content);
     return getCommentById(result.lastInsertRowid);
 }
 
@@ -60,11 +84,11 @@ function updateComment(commentId, payload = {}) {
     const database = databaseService.getDatabase();
     const stmt = database.prepare(`
         UPDATE comments
-        SET content = ?
+        SET content = ?, updated_at = datetime('now', '+7 hours')
         WHERE id = ?
     `);
 
-    stmt.run( content, commentId);
+    stmt.run(content, commentId);
     return getCommentById(commentId);
 }
 
@@ -80,9 +104,12 @@ function getCommentById(commentId) {
     const stmt = database.prepare(`
         SELECT
             c.id,
+            c.manga_id,
+            c.chapter_id,
             c.user_id,
             c.content,
             c.created_at,
+            c.updated_at,
             u.display_name,
             u.avatar_url
         FROM comments c
@@ -95,13 +122,27 @@ function getCommentById(commentId) {
 }
 
 function mapComment(row) {
+    const displayName = row.display_name || row.user_id || 'Unknown';
+    const avatarUrl = row.avatar_url || '';
+
     return {
         id: row.id,
+        mangaId: row.manga_id || null,
+        chapterId: row.chapter_id || null,
         userId: row.user_id,
+        username: displayName,
+        displayName,
         content: row.content,
+        avatarUrl,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+        manga_id: row.manga_id || null,
+        chapter_id: row.chapter_id || null,
+        user_id: row.user_id,
+        display_name: displayName,
+        avatar_url: avatarUrl,
         created_at: row.created_at,
-        display_name: row.display_name,
-        avatar_url: row.avatar_url
+        updated_at: row.updated_at
     };
 }
 
@@ -111,17 +152,15 @@ function normalizeText(value) {
 
 function normalizeNullable(value) {
     const text = normalizeText(value);
-    return text || null;
+    if (!text) return null;
+    const lowerText = text.toLowerCase();
+    return lowerText === 'null' || lowerText === 'undefined' ? null : text;
 }
 
 function clampNumber(value, min, max, fallback) {
     const numberValue = Number.parseInt(value, 10);
     if (Number.isNaN(numberValue)) return fallback;
     return Math.max(min, Math.min(max, numberValue));
-}
-
-function hasOwn(object, key) {
-    return Object.prototype.hasOwnProperty.call(object, key);
 }
 
 function createHttpError(statusCode, message) {

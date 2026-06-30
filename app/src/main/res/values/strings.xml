@@ -7,6 +7,8 @@
     <string name="tv_forgot_password">Forgot password?</string>
     <string name="text_or">OR</string>
     <string name="btn_register">Create new account</string>
+    <string name="btn_continue_as_guest">Continue as Guest</string>
+    <string name="guest_mode_hint">You can browse and read manga without an account.</string>
     <string name="hint_login_email">Enter email</string>
     <string name="hint_username">Enter username</string>
     <string name="hint_password">Enter password</string>
@@ -26,9 +28,9 @@
 
     <string name="tab_following">Following</string>
     <string name="tab_recent">Recently Read</string>
-    <string name="tab_downloaded">Downloaded</string>
+    <string name="tab_downloaded">Saved</string>
 
-    <string name="text_no_downloaded_stories">No downloaded manga</string>
+    <string name="text_no_downloaded_stories">No saved manga</string>
 
 
     <string name="hint_search_comic">Search manga...</string>
@@ -102,7 +104,10 @@
     <string name="func_logout">Log out</string>
     <string name="bookshelf_empty_following">You are not following any manga yet</string>
     <string name="bookshelf_empty_history">You have not read any manga yet</string>
-    <string name="bookshelf_empty_downloaded">You have not downloaded any manga yet</string>
+    <string name="bookshelf_empty_downloaded">You have not saved any manga yet</string>
+    <string name="bookshelf_login_required">Please log in to view your bookshelf.</string>
+    <string name="login_required_generic">Please log in to use this feature.</string>
+    <string name="bookshelf_sync_hint">Your data will be synced after you log in.</string>
     <string name="bookshelf_last_read_format">Last read: %1$s</string>
     <string name="bookshelf_last_read_with_time_format">Last read: %1$s - %2$s</string>
     <string name="bookshelf_local_comment_title">Local Comments</string>
@@ -116,6 +121,12 @@
     <string name="group_tab_famous">Popular</string>
     <string name="group_tab_comic_count">Manga Count</string>
     <string name="group_empty">No translation teams</string>
+    <string name="group_loading">Loading translation teams...</string>
+    <string name="group_search_hint">Search groups...</string>
+    <string name="group_empty_search">No groups found.</string>
+    <string name="group_error">Unable to load groups.</string>
+    <string name="group_stats_unavailable">Group statistics are not available.</string>
+    <string name="group_stats_unavailable_short">N/A</string>
     <string name="group_detail_title">Translation Team Details</string>
     <string name="group_default_name">Translation Team</string>
     <string name="group_default_description">Manga translation team</string>

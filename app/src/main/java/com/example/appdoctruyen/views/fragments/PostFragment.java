@@ -21,6 +21,7 @@ import com.example.appdoctruyen.data.api.MangaRepository;
 import com.example.appdoctruyen.data.firebase.AuthManager;
 import com.example.appdoctruyen.models.Post;
 import com.example.appdoctruyen.views.activities.CreatePostActivity;
+import com.example.appdoctruyen.views.activities.LoginActivity;
 import com.example.appdoctruyen.views.adapters.PostAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -61,6 +62,7 @@ public class PostFragment extends Fragment {
         loadPosts();
 
         fabAddPost.setOnClickListener(v -> {
+            if (!requireLogin("Please log in to use this feature.")) return;
             Intent intent = new Intent(requireContext(), CreatePostActivity.class);
             createPostLauncher.launch(intent);
         });
@@ -78,7 +80,7 @@ public class PostFragment extends Fragment {
             String currentUserId = authManager.getCurrentUserId();
 
             if (currentUserId == null) {
-                Toast.makeText(requireContext(), "Please log in to like posts!", Toast.LENGTH_SHORT).show();
+                requireLogin("Please log in to use this feature.");
                 return;
             }
 
@@ -112,6 +114,18 @@ public class PostFragment extends Fragment {
         );
     }
 
+    private boolean requireLogin(String message) {
+        if (authManager == null) {
+            authManager = new AuthManager(requireContext());
+        }
+        if (!authManager.isLoggedIn()) {
+            Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(requireContext(), LoginActivity.class));
+            return false;
+        }
+        return true;
+    }
+
     private void loadPosts() {
         repository.getPosts(new MangaRepository.RepositoryCallback<List<Post>>() {
             @Override
@@ -119,7 +133,9 @@ public class PostFragment extends Fragment {
                 if (!isAdded() || getActivity() == null) return;
 
                 postList.clear();
-                postList.addAll(data);
+                if (data != null) {
+                    postList.addAll(data);
+                }
                 postAdapter.notifyDataSetChanged();
             }
 

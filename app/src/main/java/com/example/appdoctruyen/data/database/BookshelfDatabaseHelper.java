@@ -323,7 +323,7 @@ public class BookshelfDatabaseHelper extends SQLiteOpenHelper {
     public long addDownloadedComic(String userId, String mangaId, String chapterId, String chapterName,
                                    String localPath, String titleCache, String coverUrlCache,
                                    String descriptionCache, String statusCache, Integer yearCache) {
-        if (isBlank(userId) || isBlank(mangaId)) return -1;
+        if (isBlank(userId) || isBlank(mangaId) || isBlank(chapterId)) return -1;
 
         ContentValues values = new ContentValues();
         values.put(COL_USER_ID, userId);

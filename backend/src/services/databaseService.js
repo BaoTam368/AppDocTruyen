@@ -53,21 +53,22 @@ function initializeDatabase() {
 
         CREATE TABLE IF NOT EXISTS comments (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            manga_id TEXT,
+            chapter_id TEXT,
             user_id TEXT NOT NULL,
             content TEXT NOT NULL,
             created_at DATETIME DEFAULT (datetime('now', '+7 hours')),
+            updated_at DATETIME DEFAULT (datetime('now', '+7 hours')),
             FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
         );
 
         CREATE TABLE IF NOT EXISTS posts (
-
-              id INTEGER PRIMARY KEY AUTOINCREMENT,
-              user_id TEXT NOT NULL,
-              content TEXT NOT NULL,
-              image_url TEXT,
-              like_count INTEGER DEFAULT 0,
-              created_at DATETIME DEFAULT (datetime('now', '+7 hours')),
-
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id TEXT NOT NULL,
+            content TEXT NOT NULL,
+            image_url TEXT,
+            like_count INTEGER DEFAULT 0,
+            created_at DATETIME DEFAULT (datetime('now', '+7 hours')),
             FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
         );
 
@@ -86,6 +87,7 @@ function initializeDatabase() {
     `);
 
     ensureMangaMetadataColumns();
+    ensureCommentColumns();
 }
 
 function saveManga(manga) {
@@ -127,9 +129,31 @@ function saveChapter(chapter) {
     );
 }
 
-function getAllMangas({ limit = 20, offset = 0 } = {}) {
+function getAllMangas({ limit = 20, offset = 0, status = '', tag = '', sort = 'latest' } = {}) {
     const database = getDatabase();
     const paging = normalizePaging({ limit, offset });
+    
+    let whereClause = '';
+    const params = [];
+    const conditions = [];
+    
+    if (status && status.trim() && status.trim() !== 'all') {
+        conditions.push('status = ?');
+        params.push(status.trim());
+    }
+    
+    if (tag && tag.trim()) {
+        conditions.push('tags LIKE ?');
+        params.push(`%${tag.trim()}%`);
+    }
+    
+    if (conditions.length > 0) {
+        whereClause = 'WHERE ' + conditions.join(' AND ');
+    }
+    
+    const orderBy = buildOrderBy(sort);
+    params.push(paging.limit, paging.offset);
+    
     const stmt = database.prepare(`
         SELECT 
             id as mangaId,
@@ -143,11 +167,12 @@ function getAllMangas({ limit = 20, offset = 0 } = {}) {
             content_rating as contentRating,
             available_translated_languages as availableTranslatedLanguages
         FROM mangas
-        ORDER BY updated_at DESC
+        ${whereClause}
+        ORDER BY ${orderBy}
         LIMIT ? OFFSET ?
     `);
     
-    const mangas = stmt.all(paging.limit, paging.offset);
+    const mangas = stmt.all(...params);
     return mangas.map(manga => ({
         ...manga,
         tags: parseJsonArray(manga.tags),
@@ -155,9 +180,28 @@ function getAllMangas({ limit = 20, offset = 0 } = {}) {
     }));
 }
 
-function searchMangas(query, { limit = 20, offset = 0 } = {}) {
+function searchMangas(query, { limit = 20, offset = 0, status = '', tag = '', sort = 'latest' } = {}) {
     const database = getDatabase();
     const paging = normalizePaging({ limit, offset });
+    
+    let whereClause = 'WHERE (title LIKE ? OR description LIKE ?)';
+    const params = [];
+    const searchPattern = `%${query}%`;
+    params.push(searchPattern, searchPattern);
+    
+    if (status && status.trim() && status.trim() !== 'all') {
+        whereClause += ' AND status = ?';
+        params.push(status.trim());
+    }
+    
+    if (tag && tag.trim()) {
+        whereClause += ' AND tags LIKE ?';
+        params.push(`%${tag.trim()}%`);
+    }
+    
+    const orderBy = buildOrderBy(sort);
+    params.push(paging.limit, paging.offset);
+    
     const stmt = database.prepare(`
         SELECT 
             id as mangaId,
@@ -171,13 +215,12 @@ function searchMangas(query, { limit = 20, offset = 0 } = {}) {
             content_rating as contentRating,
             available_translated_languages as availableTranslatedLanguages
         FROM mangas
-        WHERE title LIKE ? OR description LIKE ?
-        ORDER BY updated_at DESC
+        ${whereClause}
+        ORDER BY ${orderBy}
         LIMIT ? OFFSET ?
     `);
     
-    const searchPattern = `%${query}%`;
-    const mangas = stmt.all(searchPattern, searchPattern, paging.limit, paging.offset);
+    const mangas = stmt.all(...params);
     return mangas.map(manga => ({
         ...manga,
         tags: parseJsonArray(manga.tags),
@@ -243,6 +286,18 @@ function ensureMangaMetadataColumns() {
     ensureColumn('mangas', 'available_translated_languages', 'TEXT');
 }
 
+function ensureCommentColumns() {
+    ensureColumn('comments', 'manga_id', 'TEXT');
+    ensureColumn('comments', 'chapter_id', 'TEXT');
+    ensureColumn('comments', 'updated_at', 'DATETIME');
+    db.exec("UPDATE comments SET updated_at = created_at WHERE updated_at IS NULL");
+    db.exec(`
+        CREATE INDEX IF NOT EXISTS idx_comments_manga_id ON comments(manga_id);
+        CREATE INDEX IF NOT EXISTS idx_comments_chapter_id ON comments(chapter_id);
+        CREATE INDEX IF NOT EXISTS idx_comments_manga_chapter ON comments(manga_id, chapter_id);
+    `);
+}
+
 function ensureColumn(tableName, columnName, definition) {
     const columns = db.prepare(`PRAGMA table_info(${tableName})`).all();
     const exists = columns.some((column) => column.name === columnName);
@@ -258,6 +313,17 @@ function parseJsonArray(value) {
         return Array.isArray(parsed) ? parsed : [];
     } catch (error) {
         return [];
+    }
+}
+
+function buildOrderBy(sort) {
+    switch (String(sort || '').toLowerCase()) {
+        case 'title_asc': return 'title ASC';
+        case 'title_desc': return 'title DESC';
+        case 'year_asc': return 'year ASC';
+        case 'year_desc': return 'year DESC';
+        case 'latest':
+        default: return 'updated_at DESC';
     }
 }
 

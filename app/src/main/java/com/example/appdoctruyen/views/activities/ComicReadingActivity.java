@@ -31,7 +31,7 @@ import java.util.List;
 public class ComicReadingActivity extends AppCompatActivity {
 
     private ImageView btnBack, btnChapterList, btnReport, btnReload, btnNextChapter;
-    private TextView tvChapterTitle;
+    private TextView tvChapterTitle, tvReaderState;
     private RecyclerView lvPages;
 
     private List<ComicPage> pageList;
@@ -93,6 +93,7 @@ public class ComicReadingActivity extends AppCompatActivity {
         btnReload = findViewById(R.id.btnReload);
         btnNextChapter = findViewById(R.id.btnNextChapter);
         tvChapterTitle = findViewById(R.id.tvChapterTitle);
+        tvReaderState = findViewById(R.id.tvReaderState);
         lvPages = findViewById(R.id.lvPages);
         lvPages.setLayoutManager(new LinearLayoutManager(this));
 
@@ -142,28 +143,25 @@ public class ComicReadingActivity extends AppCompatActivity {
      * Hàm tải dữ liệu hình ảnh từ API
      */
     private void loadChapterData(int chapterNum) {
-        // Cập nhật lại tiêu đề trên thanh Top Bar
+        currentChapter = chapterNum;
         if (chapterName != null && !chapterName.isEmpty()) {
             tvChapterTitle.setText(chapterName);
         } else {
             tvChapterTitle.setText("Chapter " + chapterNum);
         }
 
-        // Xóa sạch các trang truyện cũ đang hiển thị
         pageList.clear();
+        adapter.notifyDataSetChanged();
 
-        // Nếu có chapterId, gọi API lấy pages
         if (chapterId != null && !chapterId.isEmpty()) {
             loadChapterPagesFromApi(chapterId);
             saveHistory();
         } else {
-            Toast.makeText(this, "No chapterId found. Showing sample images.", Toast.LENGTH_SHORT).show();
-            loadMockPages(chapterNum);
-            saveHistory();
+            showReaderState("This chapter is missing a readable page source.");
         }
     }
-
     private void saveHistory() {
+        if (mangaId == null || mangaId.trim().isEmpty() || chapterId == null || chapterId.trim().isEmpty()) return;
         String userId = getCurrentUserId();
         String title = mangaTitle != null ? mangaTitle : ("Manga " + mangaId);
         String chName = chapterName != null ? chapterName : ("Chapter " + currentChapter);
@@ -208,53 +206,55 @@ public class ComicReadingActivity extends AppCompatActivity {
         return userId != null ? userId : "local_user";
     }
 
+    private void showReaderState(String message) {
+        if (tvReaderState == null) return;
+        tvReaderState.setText(message);
+        tvReaderState.setVisibility(View.VISIBLE);
+    }
+
+    private void hideReaderState() {
+        if (tvReaderState != null) {
+            tvReaderState.setVisibility(View.GONE);
+        }
+    }
     private void loadChapterPagesFromApi(String chapterId) {
-        Toast.makeText(this, "Loading pages...", Toast.LENGTH_SHORT).show();
-        
+        showReaderState("Loading pages...");
+
         mangaRepository.getChapterPages(chapterId, new MangaRepository.RepositoryCallback<List<ComicPage>>() {
             @Override
             public void onSuccess(List<ComicPage> data) {
+                if (isFinishing() || isDestroyed()) return;
+                pageList.clear();
                 if (data == null || data.isEmpty()) {
-                    Toast.makeText(ComicReadingActivity.this, "No pages found for this chapter", Toast.LENGTH_SHORT).show();
-                    loadMockPages(currentChapter);
+                    adapter.notifyDataSetChanged();
+                    showReaderState("No pages are available for this chapter.");
                     return;
                 }
-                
-                pageList.clear();
+
                 pageList.addAll(data);
                 adapter.notifyDataSetChanged();
                 lvPages.scrollToPosition(0);
-                Toast.makeText(ComicReadingActivity.this, "Loaded " + data.size() + " pages", Toast.LENGTH_SHORT).show();
+                hideReaderState();
             }
 
             @Override
             public void onError(String message) {
-                Toast.makeText(ComicReadingActivity.this, "Page loading error: " + message, Toast.LENGTH_SHORT).show();
-                loadMockPages(currentChapter);
+                if (isFinishing() || isDestroyed()) return;
+                pageList.clear();
+                adapter.notifyDataSetChanged();
+                showReaderState("Unable to load pages. Tap reload to try again.");
+                Toast.makeText(ComicReadingActivity.this, "Unable to load pages", Toast.LENGTH_SHORT).show();
             }
         });
     }
-
-    private void loadMockPages(int chapterNum) {
-        // Giả lập thay đổi ảnh dựa trên số chương chẵn/lẻ
-        if (chapterNum % 2 == 0) {
-            pageList.add(new ComicPage("https://loremflickr.com/600/800/manga"));
-            pageList.add(new ComicPage("https://loremflickr.com/600/800/comic"));
-        } else {
-            pageList.add(new ComicPage("https://loremflickr.com/600/800/comic"));
-            pageList.add(new ComicPage("https://loremflickr.com/600/800/manga"));
-            pageList.add(new ComicPage("https://loremflickr.com/600/900/action"));
-        }
-        adapter.notifyDataSetChanged();
-        lvPages.scrollToPosition(0);
-    }
-
     private void loadChapterList() {
         mangaRepository.getMangaChapters(mangaId, new MangaRepository.RepositoryCallback<List<Chapter>>() {
             @Override
             public void onSuccess(List<Chapter> data) {
                 chapterList.clear();
-                chapterList.addAll(data);
+                if (data != null) {
+                    chapterList.addAll(data);
+                }
                 
                 // Tìm vị trí của chapter hiện tại
                 if (chapterId != null && !chapterId.isEmpty()) {
@@ -291,9 +291,8 @@ public class ComicReadingActivity extends AppCompatActivity {
                 : new ArrayList<>();
         
         if (displayChapters.isEmpty()) {
-            for (int i = 1; i <= 20; i++) {
-                displayChapters.add(new Chapter("Chapter " + i, "12:15 12/1/2021", i <= 5));
-            }
+            Toast.makeText(this, "No chapter list available", Toast.LENGTH_SHORT).show();
+            return;
         }
 
         // Sử dụng ChapterAdapter để đổ dữ liệu vào ListView của BottomSheet

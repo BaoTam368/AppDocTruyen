@@ -60,12 +60,32 @@ async function getMangaDetail(mangaId) {
             const statsRes = await mangadexClient.get(`/statistics/manga/${mangaId}`);
             statsData = statsRes.data.statistics[mangaId] || {};
         } catch (statsError) {
-            console.warn(`Không thể lấy thống kê cho manga ${mangaId}:`, statsError.message);
+            console.warn(`Unable to load manga statistics for ${mangaId}:`, statsError.message);
         }
         return mapMangaDetail(response.data.data, statsData);
     } catch (error) {
         if (error.statusCode) throw error;
         throw normalizeMangaDexError(error, 'Unable to load manga details from MangaDex');
+    }
+}
+
+async function getMangaCovers(mangaId, {limit = 100, offset = 0} = {}) {
+    if (!mangaId || !mangaId.trim()) {
+        throw createHttpError(400, 'Missing mangaId');
+    }
+
+    const normalizedMangaId = mangaId.trim();
+    const params = new URLSearchParams();
+    params.append('manga[]', normalizedMangaId);
+    params.set('limit', clampNumber(limit, 1, MANGADEX_MAX_LIMIT, 100));
+    params.set('offset', clampNumber(offset, 0, 10000, 0));
+    params.set('order[createdAt]', 'desc');
+
+    try {
+        const response = await mangadexClient.get('/cover', {params});
+        return (response.data.data || []).map((item) => mapCover(item, normalizedMangaId));
+    } catch (error) {
+        throw normalizeMangaDexError(error, 'Unable to load cover list from MangaDex');
     }
 }
 
@@ -133,7 +153,7 @@ async function getGroups({limit = 50, offset = 0, name = ''} = {}) {
     }
 }
 
-async function searchGroups(name, {limit = 50, offset = 0} = {}) {
+function searchGroups(name, {limit = 50, offset = 0} = {}) {
     return getGroups({name, limit, offset});
 }
 
@@ -156,11 +176,12 @@ async function getGroupDetail(groupId) {
 
 function mapMangaSummary(item) {
     const attributes = item.attributes || {};
+    const coverFileName = getCoverFileName(item);
     return {
         mangaId: item.id,
         title: pickLocalizedText(attributes.title) || 'Untitled',
         description: shortenText(pickLocalizedText(attributes.description), 180),
-        coverUrl: buildCoverUrl(item),
+        coverUrl: buildCoverUrl(item.id, coverFileName),
         status: attributes.status || '',
         year: attributes.year || null,
         tags: mapTags(attributes.tags),
@@ -172,11 +193,12 @@ function mapMangaSummary(item) {
 
 function mapMangaDetail(item, stats = {}) {
     const attributes = item.attributes || {};
+    const coverFileName = getCoverFileName(item);
     return {
         mangaId: item.id,
         title: pickLocalizedText(attributes.title) || 'Untitled',
         description: pickLocalizedText(attributes.description) || '',
-        coverUrl: buildCoverUrl(item),
+        coverUrl: buildCoverUrl(item.id, coverFileName),
         status: attributes.status || '',
         year: attributes.year || null,
         tags: mapTags(attributes.tags),
@@ -184,6 +206,25 @@ function mapMangaDetail(item, stats = {}) {
         availableTranslatedLanguages: attributes.availableTranslatedLanguages || [],
         likes: stats.follows || 0,
         views: 0
+    };
+}
+
+function mapCover(item, fallbackMangaId = '') {
+    const attributes = item.attributes || {};
+    const mangaRelation = (item.relationships || []).find((relation) => relation.type === 'manga');
+    const mangaId = mangaRelation ? mangaRelation.id : fallbackMangaId;
+    const fileName = attributes.fileName || '';
+
+    return {
+        coverId: item.id,
+        mangaId,
+        fileName,
+        coverUrl: buildCoverUrl(mangaId, fileName),
+        thumbnailUrl: buildThumbnailUrl(mangaId, fileName),
+        volume: attributes.volume || '',
+        locale: attributes.locale || '',
+        createdAt: attributes.createdAt || '',
+        updatedAt: attributes.updatedAt || ''
     };
 }
 
@@ -216,11 +257,19 @@ function mapGroupSummary(item) {
     };
 }
 
-function buildCoverUrl(item) {
+function getCoverFileName(item) {
     const cover = (item.relationships || []).find((relation) => relation.type === 'cover_art');
-    const fileName = cover && cover.attributes && cover.attributes.fileName;
-    if (!fileName) return '';
-    return `${MANGADEX_UPLOADS_BASE_URL}/covers/${item.id}/${fileName}`;
+    return cover && cover.attributes && cover.attributes.fileName ? cover.attributes.fileName : '';
+}
+
+function buildCoverUrl(mangaId, fileName) {
+    if (!mangaId || !fileName) return '';
+    return `${MANGADEX_UPLOADS_BASE_URL}/covers/${mangaId}/${fileName}`;
+}
+
+function buildThumbnailUrl(mangaId, fileName) {
+    if (!mangaId || !fileName) return '';
+    return `${buildCoverUrl(mangaId, fileName)}.256.jpg`;
 }
 
 function mapTags(tags) {
@@ -282,6 +331,7 @@ function createHttpError(statusCode, message) {
 module.exports = {
     searchManga,
     getMangaDetail,
+    getMangaCovers,
     getMangaChapters,
     getChapterPages,
     getGroups,

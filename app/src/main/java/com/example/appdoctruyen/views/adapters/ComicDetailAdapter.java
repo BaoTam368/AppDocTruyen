@@ -5,8 +5,9 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-import com.example.appdoctruyen.views.fragments.ComicInfoFragment;
+import com.example.appdoctruyen.views.fragments.CommentFragment;
 import com.example.appdoctruyen.views.fragments.ComicChaptersFragment;
+import com.example.appdoctruyen.views.fragments.ComicInfoFragment;
 
 public class ComicDetailAdapter extends FragmentStateAdapter {
     private String mangaId;
@@ -21,16 +22,17 @@ public class ComicDetailAdapter extends FragmentStateAdapter {
     @NonNull
     @Override
     public Fragment createFragment(int position) {
-        // Position 0 là Tab đầu tiên, Position 1 là Tab thứ hai
         if (position == 0) {
-            return ComicInfoFragment.newInstance(mangaId, mangaTitle); // Trả về Fragment Giới thiệu
+            return ComicInfoFragment.newInstance(mangaId, mangaTitle);
+        } else if (position == 1) {
+            return ComicChaptersFragment.newInstance(mangaId, mangaTitle);
         } else {
-            return ComicChaptersFragment.newInstance(mangaId, mangaTitle); // Trả về Fragment Danh sách chương
+            return CommentFragment.newInstance(mangaId, null);
         }
     }
 
     @Override
     public int getItemCount() {
-        return 2; // Số lượng Tab là 2
+        return 3;
     }
 }
