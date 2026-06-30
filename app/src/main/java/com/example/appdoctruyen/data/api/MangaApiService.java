@@ -195,12 +195,18 @@ class CoverDto {
 class ChapterDto {
     String chapterId;
     String mangaId;
+    String title;
     String chapterName;
+    String chapter;
     String chapterNumber;
+    String volume;
+    String translatedLanguage;
     String language;
+    String publishAt;
+    String readableAt;
     String createdAt;
+    String updatedAt;
 }
-
 class ChapterPagesDto {
     String chapterId;
     List<String> pages;

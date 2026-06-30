@@ -79,11 +79,17 @@ public class BookshelfAdapter extends RecyclerView.Adapter<BookshelfAdapter.Comi
             holder.tvComicChapter.setText("");
         }
 
-        Glide.with(holder.itemView.getContext())
-                .load(comic.getCoverUrl())
-                .placeholder(R.drawable.placeholder_comic)
-                .error(R.drawable.placeholder_comic)
-                .into(holder.imgComicCover);
+        String coverUrl = comic.getCoverUrl() != null ? comic.getCoverUrl().trim() : "";
+        if (!coverUrl.isEmpty()) {
+            Glide.with(holder.itemView.getContext())
+                    .load(coverUrl)
+                    .placeholder(R.drawable.placeholder_comic)
+                    .error(R.drawable.placeholder_comic)
+                    .centerCrop()
+                    .into(holder.imgComicCover);
+        } else {
+            holder.imgComicCover.setImageResource(R.drawable.placeholder_comic);
+        }
 
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {

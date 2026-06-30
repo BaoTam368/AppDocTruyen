@@ -20,7 +20,7 @@ function getPosts({ userId, limit = 50, offset = 0 } = {}) {
                 u.avatar_url,
                 p.content,
                 p.image_url,
-                p.like_count,
+                COALESCE(p.like_count, 0) AS like_count,
                 p.created_at
             FROM posts p
             LEFT JOIN users u
@@ -44,7 +44,7 @@ function getPostById(postId) {
              u.avatar_url,
              p.content,
              p.image_url,
-             p.like_count,
+             COALESCE(p.like_count, 0) AS like_count,
              p.created_at
         FROM posts p
         LEFT JOIN users u
@@ -195,7 +195,7 @@ function toggleLikePost(postId, userId) {
 
 function getLikeCount(postId) {
     const database = databaseService.getDatabase();
-    const row = database.prepare('SELECT like_count FROM posts WHERE id = ?').get(postId);
+    const row = database.prepare('SELECT COALESCE(like_count, 0) AS like_count FROM posts WHERE id = ?').get(postId);
     return row ? row.like_count : 0;
 }
 

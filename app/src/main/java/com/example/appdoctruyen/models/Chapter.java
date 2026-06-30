@@ -5,18 +5,22 @@ public class Chapter {
     private String name;
     private String date;
     private boolean isFree; // true là miễn phí, false là khóa
+    private String chapterNumber;
 
     public Chapter(String name, String date, boolean isFree) {
-        this.name = name;
-        this.date = date;
-        this.isFree = isFree;
+        this(null, name, date, isFree, null);
     }
 
     public Chapter(String chapterId, String name, String date, boolean isFree) {
+        this(chapterId, name, date, isFree, null);
+    }
+
+    public Chapter(String chapterId, String name, String date, boolean isFree, String chapterNumber) {
         this.chapterId = chapterId;
         this.name = name;
         this.date = date;
         this.isFree = isFree;
+        this.chapterNumber = chapterNumber;
     }
 
     public String getChapterId() {
@@ -37,5 +41,13 @@ public class Chapter {
 
     public boolean isFree() {
         return isFree;
+    }
+
+    public String getChapterNumber() {
+        return chapterNumber;
+    }
+
+    public void setChapterNumber(String chapterNumber) {
+        this.chapterNumber = chapterNumber;
     }
 }

@@ -32,6 +32,8 @@ async function syncPopularMangas(options = {}) {
     const { total, limit, pages, offset, delayMs, maxRetries } = normalizePopularSyncOptions(options);
     const syncedMangas = [];
     const seenMangaIds = new Set();
+    let withCoverCount = 0;
+    let withoutCoverCount = 0;
 
     for (let page = 0; page < pages && syncedMangas.length < total; page++) {
         const remaining = total - syncedMangas.length;
@@ -61,6 +63,11 @@ async function syncPopularMangas(options = {}) {
                 seenMangaIds.add(manga.mangaId);
                 databaseService.saveManga(manga);
                 syncedMangas.push(manga);
+                if (manga.coverUrl && String(manga.coverUrl).trim()) {
+                    withCoverCount++;
+                } else {
+                    withoutCoverCount++;
+                }
                 savedCount++;
             } catch (error) {
                 console.error(`Failed to save manga ${manga.title || manga.mangaId}:`, error.message);
@@ -75,6 +82,8 @@ async function syncPopularMangas(options = {}) {
     }
 
     console.log(`Sync completed: ${syncedMangas.length} manga`);
+    console.log(`Manga with coverUrl: ${withCoverCount}`);
+    console.log(`Manga without coverUrl: ${withoutCoverCount}`);
     return syncedMangas;
 }
 

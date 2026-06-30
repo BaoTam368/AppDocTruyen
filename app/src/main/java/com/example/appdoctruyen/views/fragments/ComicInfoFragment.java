@@ -290,18 +290,19 @@ public class ComicInfoFragment extends Fragment {
                     tvAuthorName.setText("MangaDex");
                 }
                 
-                String coverUrl = data.getCoverUrl();
+                String coverUrl = data.getCoverUrl() != null ? data.getCoverUrl().trim() : "";
                 if (getActivity() instanceof ComicDetailActivity) {
                     ((ComicDetailActivity) getActivity()).setCoverUrl(coverUrl);
                 }
 
                 if (imgCover != null) {
-                    if (coverUrl != null && !coverUrl.isEmpty()) {
+                    if (!coverUrl.isEmpty()) {
                         android.util.Log.d("MANGA_COVER", "Loading coverUrl: " + coverUrl);
                         Glide.with(requireContext())
                                 .load(coverUrl)
                                 .placeholder(R.drawable.placeholder_comic)
                                 .error(R.drawable.placeholder_comic)
+                                .centerCrop()
                                 .into(imgCover);
                     } else {
                         android.util.Log.d("MANGA_COVER", "Empty coverUrl for mangaId: " + mangaId);

@@ -106,7 +106,7 @@ async function getMangaChapters(mangaId, {limit = 100, offset = 0, language = DE
 
     try {
         const response = await mangadexClient.get(`/manga/${mangaId}/feed`, {params});
-        return (response.data.data || []).map((item) => mapChapterSummary(item, mangaId));
+        return sortChapters((response.data.data || []).map((item) => mapChapterSummary(item, mangaId)));
     } catch (error) {
         throw normalizeMangaDexError(error, 'Unable to load chapter list from MangaDex');
     }
@@ -232,14 +232,55 @@ function mapChapterSummary(item, fallbackMangaId = '') {
     const attributes = item.attributes || {};
     const chapterNumber = attributes.chapter || '';
     const mangaRelation = (item.relationships || []).find((relation) => relation.type === 'manga');
+    const title = attributes.title || '';
     return {
         chapterId: item.id,
         mangaId: mangaRelation ? mangaRelation.id : fallbackMangaId,
-        chapterName: attributes.title || (chapterNumber ? `Chapter ${chapterNumber}` : 'Chapter'),
+        title,
+        chapterName: title || (chapterNumber ? `Chapter ${chapterNumber}` : 'Chapter'),
+        chapter: chapterNumber || null,
         chapterNumber,
+        volume: attributes.volume || '',
+        translatedLanguage: attributes.translatedLanguage || '',
         language: attributes.translatedLanguage || '',
-        createdAt: attributes.createdAt || ''
+        publishAt: attributes.publishAt || '',
+        readableAt: attributes.readableAt || '',
+        createdAt: attributes.createdAt || '',
+        updatedAt: attributes.updatedAt || ''
     };
+}
+
+function sortChapters(chapters) {
+    return (chapters || []).sort((a, b) => {
+        const chapterA = parseChapterNumber(a && (a.chapter || a.chapterNumber));
+        const chapterB = parseChapterNumber(b && (b.chapter || b.chapterNumber));
+
+        if (chapterA !== chapterB) {
+            return chapterA - chapterB;
+        }
+
+        return chapterDateValue(a) - chapterDateValue(b);
+    });
+}
+
+function parseChapterNumber(chapter) {
+    if (chapter === null || chapter === undefined) {
+        return Number.POSITIVE_INFINITY;
+    }
+
+    const value = String(chapter).trim();
+    if (!value) {
+        return Number.POSITIVE_INFINITY;
+    }
+
+    const parsed = Number.parseFloat(value.replace(',', '.'));
+    return Number.isFinite(parsed) ? parsed : Number.POSITIVE_INFINITY;
+}
+
+function chapterDateValue(chapter) {
+    const value = chapter && (chapter.publishAt || chapter.readableAt || chapter.createdAt);
+    const time = value ? new Date(value).getTime() : 0;
+    return Number.isFinite(time) ? time : 0;
 }
 
 function mapGroupSummary(item) {
@@ -264,12 +305,11 @@ function getCoverFileName(item) {
 
 function buildCoverUrl(mangaId, fileName) {
     if (!mangaId || !fileName) return '';
-    return `${MANGADEX_UPLOADS_BASE_URL}/covers/${mangaId}/${fileName}`;
+    return `${MANGADEX_UPLOADS_BASE_URL}/covers/${mangaId}/${fileName}.256.jpg`;
 }
 
 function buildThumbnailUrl(mangaId, fileName) {
-    if (!mangaId || !fileName) return '';
-    return `${buildCoverUrl(mangaId, fileName)}.256.jpg`;
+    return buildCoverUrl(mangaId, fileName);
 }
 
 function mapTags(tags) {

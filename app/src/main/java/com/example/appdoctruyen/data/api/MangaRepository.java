@@ -11,6 +11,7 @@ import com.example.appdoctruyen.models.Post;
 import com.example.appdoctruyen.models.User;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import retrofit2.Call;
@@ -347,10 +348,42 @@ public class MangaRepository {
 
         for (ChapterDto dto : dtoList) {
             if (dto == null || isBlank(dto.chapterId)) continue;
-            String chapterName = isBlank(dto.chapterName) ? "Chapter " + (isBlank(dto.chapterNumber) ? "" : dto.chapterNumber) : dto.chapterName;
-            chapters.add(new Chapter(dto.chapterId, chapterName.trim(), dto.createdAt, true));
+            String chapterNumber = firstNonBlank(dto.chapterNumber, dto.chapter);
+            String fallbackName = isBlank(chapterNumber) ? "Chapter" : "Chapter " + chapterNumber;
+            String chapterName = firstNonBlank(dto.chapterName, dto.title, fallbackName);
+            String date = firstNonBlank(dto.publishAt, dto.readableAt, dto.createdAt);
+            chapters.add(new Chapter(dto.chapterId, chapterName.trim(), date, true, chapterNumber));
         }
+
+        sortChaptersByNumber(chapters);
         return chapters;
+    }
+    private void sortChaptersByNumber(List<Chapter> chapters) {
+        Collections.sort(chapters, (a, b) -> {
+            double chapterA = parseChapterNumber(a != null ? a.getChapterNumber() : null);
+            double chapterB = parseChapterNumber(b != null ? b.getChapterNumber() : null);
+
+            int compare = Double.compare(chapterA, chapterB);
+            if (compare != 0) {
+                return compare;
+            }
+
+            String dateA = a != null && a.getDate() != null ? a.getDate() : "";
+            String dateB = b != null && b.getDate() != null ? b.getDate() : "";
+            return dateA.compareTo(dateB);
+        });
+    }
+
+    private double parseChapterNumber(String chapter) {
+        if (isBlank(chapter)) {
+            return Double.MAX_VALUE;
+        }
+
+        try {
+            return Double.parseDouble(chapter.trim().replace(',', '.'));
+        } catch (NumberFormatException ignored) {
+            return Double.MAX_VALUE;
+        }
     }
 
     private List<ComicPage> mapPageList(List<String> pageUrls) {

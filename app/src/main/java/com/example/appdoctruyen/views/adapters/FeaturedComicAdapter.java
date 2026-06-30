@@ -43,11 +43,13 @@ public class FeaturedComicAdapter extends RecyclerView.Adapter<FeaturedComicAdap
 
         holder.tvComicLargeTitle.setText(comic.getTitle());
 
-        if (comic.getCoverUrl() != null && !comic.getCoverUrl().isEmpty()) {
-            Glide.with(context)
-                    .load(comic.getCoverUrl())
+        String coverUrl = comic.getCoverUrl() != null ? comic.getCoverUrl().trim() : "";
+        if (!coverUrl.isEmpty()) {
+            Glide.with(holder.itemView.getContext())
+                    .load(coverUrl)
                     .placeholder(R.drawable.placeholder_comic)
                     .error(R.drawable.placeholder_comic)
+                    .centerCrop()
                     .into(holder.ivComicLargeCover);
         } else if (comic.getCoverImageResId() != 0) {
             holder.ivComicLargeCover.setImageResource(comic.getCoverImageResId());
