@@ -23,16 +23,16 @@ public class ForgotPasswordActivity extends AppCompatActivity {
             String emailAddress = edtEmail.getText().toString().trim();
 
             if (emailAddress.isEmpty()) {
-                Toast.makeText(this, "Please enter your email address.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Please type your email!", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             FirebaseAuth.getInstance().sendPasswordResetEmail(emailAddress).addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
-                    Toast.makeText(this, "Password reset email sent. Please check your inbox.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Recovery Email was sent, Please check your email!", Toast.LENGTH_LONG).show();
                     finish();
                 } else {
-                    String errorMsg = task.getException() != null ? task.getException().getLocalizedMessage() : "Something went wrong";
+                    String errorMsg = task.getException() != null ? task.getException().getLocalizedMessage() : "Error";
                     Toast.makeText(this, "Error: " + errorMsg, Toast.LENGTH_LONG).show();
                 }
             });
