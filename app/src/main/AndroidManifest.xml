@@ -23,11 +23,6 @@
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".views.activities.ForgotPasswordActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"/>
-
-        <activity
             android:name=".views.activities.RegisterActivity"
             android:exported="false"
             android:screenOrientation="portrait" />

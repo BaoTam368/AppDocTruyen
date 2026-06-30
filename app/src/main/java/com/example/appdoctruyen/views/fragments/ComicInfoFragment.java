@@ -2,13 +2,11 @@ package com.example.appdoctruyen.views.fragments;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,19 +18,16 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.model.LazyHeaders;
 import com.example.appdoctruyen.R;
-import com.example.appdoctruyen.models.TranslationGroup;
 import com.example.appdoctruyen.views.activities.ComicDetailActivity;
-import com.example.appdoctruyen.views.activities.ComicReadingActivity;
-import com.example.appdoctruyen.views.activities.GroupDetailActivity;
 import com.example.appdoctruyen.views.activities.LoginActivity;
-import com.example.appdoctruyen.views.activities.MainActivity;
-import com.example.appdoctruyen.views.activities.NotificationActivity;
 import com.example.appdoctruyen.data.api.MangaRepository;
 import com.example.appdoctruyen.data.database.BookshelfDatabaseHelper;
 import com.example.appdoctruyen.data.firebase.AuthManager;
 import com.example.appdoctruyen.data.firebase.BookshelfFirebaseHelper;
 import com.example.appdoctruyen.models.Chapter;
 import com.example.appdoctruyen.models.Comic;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import java.util.List;
 
 public class ComicInfoFragment extends Fragment {
@@ -40,10 +35,10 @@ public class ComicInfoFragment extends Fragment {
     private static final String ARG_MANGA_ID = "mangaId";
     private static final String ARG_MANGA_TITLE = "mangaTitle";
     
-    private ImageView imgCover, imgAuthorAvatar;
+    private ImageView imgCover;
     private ImageView btnBookmark, btnDownload;
-    private TextView tvMangaName, tvAuthorName, tvDescription, tvViews, tvLikes;
-    private LinearLayout layoutTags;
+    private TextView tvMangaName, tvDescription;
+    private ChipGroup chipGroupTags;
     private String mangaId;
     private String mangaTitle;
     private MangaRepository mangaRepository;
@@ -86,12 +81,9 @@ public class ComicInfoFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_comic_info, container, false);
 
         imgCover = view.findViewById(R.id.imgCover);
-        imgAuthorAvatar = view.findViewById(R.id.imgAuthorAvatar);
         tvMangaName = view.findViewById(R.id.tvMangaName);
-        tvAuthorName = view.findViewById(R.id.tvAuthorName);
         tvDescription = view.findViewById(R.id.tvDescription);
-        tvLikes = view.findViewById(R.id.tvLikes);
-        layoutTags = view.findViewById(R.id.layoutTags);
+        chipGroupTags = view.findViewById(R.id.chipGroupTags);
         
         btnBookmark = view.findViewById(R.id.btnBookmark);
         btnDownload = view.findViewById(R.id.btnDownload);
@@ -103,14 +95,6 @@ public class ComicInfoFragment extends Fragment {
 
         updateBookmarkUI();
         updateDownloadUI();
-
-        tvAuthorName.setOnClickListener(v -> {
-            openGroupDetail();
-        });
-
-        imgAuthorAvatar.setOnClickListener(v -> {
-            openGroupDetail();
-        });
 
         btnBookmark.setOnClickListener(v -> {
             if (mangaId == null || mangaId.isEmpty()) {
@@ -279,19 +263,13 @@ public class ComicInfoFragment extends Fragment {
 
                 if (tvDescription != null) {
                     tvDescription.setText(isBlank(data.getDescription()) ? "No description available." : data.getDescription());
-                    tvDescription.setMaxLines(Integer.MAX_VALUE); // Hiển thị toàn bộ
+                    tvDescription.setMaxLines(Integer.MAX_VALUE);
+                    tvDescription.setEllipsize(null);
                 }
 
                 // Ẩn nút "Đọc thêm" vì giờ đã hiện toàn bộ
                 TextView tvReadMore = getView().findViewById(R.id.tvReadMore);
                 if (tvReadMore != null) tvReadMore.setVisibility(View.GONE);
-
-                // Cập nhật Lượt thích
-                if (tvLikes != null) tvLikes.setText(String.valueOf(data.getLikes()));
-                
-                if (tvAuthorName != null) {
-                    tvAuthorName.setText("MangaDex");
-                }
                 
                 String coverUrl = data.getCoverUrl() != null ? data.getCoverUrl().trim() : "";
                 if (getActivity() instanceof ComicDetailActivity) {
@@ -311,22 +289,26 @@ public class ComicInfoFragment extends Fragment {
                         android.util.Log.d("MANGA_COVER", "Empty coverUrl for mangaId: " + mangaId);
                         imgCover.setImageResource(R.drawable.placeholder_comic);
                     }
-                }                // Hiển thị tags nếu có
-                if (layoutTags != null && data.getTags() != null && !data.getTags().isEmpty()) {
-                    layoutTags.removeAllViews();
+                }
+
+                // Hiển thị tags nếu có
+                if (chipGroupTags != null && data.getTags() != null && !data.getTags().isEmpty()) {
+                    chipGroupTags.removeAllViews();
                     for (String tag : data.getTags()) {
-                        TextView tagView = new TextView(getContext());
-                        tagView.setText("#" + tag);
-                        tagView.setBackgroundColor(getResources().getColor(R.color.brand_blue));
-                        tagView.setTextColor(Color.BLACK);
-                        tagView.setTextSize(12);
-                        tagView.setPadding(24, 16, 24, 16);
-                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.WRAP_CONTENT,
-                                LinearLayout.LayoutParams.WRAP_CONTENT
-                        );
-                        params.setMargins(0, 0, 32, 0);
-                        layoutTags.addView(tagView, params);
+                        Chip chip = new Chip(requireContext());
+                        chip.setText(tag);
+                        chip.setChipBackgroundColorResource(R.color.brand_blue);
+                        chip.setTextColor(getResources().getColor(R.color.white, null));
+                        chip.setTextSize(11);
+                        chip.setChipMinHeight(0);
+                        chip.setMinHeight(0);
+                        chip.setChipStartPadding(8);
+                        chip.setChipEndPadding(8);
+                        chip.setPadding(0, 0, 0, 0);
+                        chip.setClickable(false);
+                        chip.setCheckable(false);
+                        chip.setEnsureMinTouchTargetSize(false);
+                        chipGroupTags.addView(chip);
                     }
                 }
             }
@@ -343,10 +325,5 @@ public class ComicInfoFragment extends Fragment {
         return new GlideUrl(coverUrl, new LazyHeaders.Builder()
                 .addHeader("User-Agent", IMAGE_USER_AGENT)
                 .build());
-    }
-
-    private void openGroupDetail() {
-        if (!isAdded()) return;
-        Toast.makeText(requireContext(), "Translation team details are not available for this manga.", Toast.LENGTH_SHORT).show();
     }
 }

@@ -93,7 +93,7 @@ public class ComicDetailActivity extends AppCompatActivity {
                 if (history != null && !isBlank(history.getChapterId())) {
                     targetChapter = findChapterById(chapters, history.getChapterId());
                     if (targetChapter != null) {
-                        btnReadChapter.setText("Continue " + displayChapterName(history.getLastReadChapter(), "previous chapter") + " \u2192");
+                        btnReadChapter.setText("Continue Reading: " + displayChapterName(history.getLastReadChapter(), "previous chapter") + " \u2192");
                     }
                 }
 
@@ -103,7 +103,7 @@ public class ComicDetailActivity extends AppCompatActivity {
                         btnReadChapter.setVisibility(View.GONE);
                         return;
                     }
-                    btnReadChapter.setText("Read from start (" + displayChapterName(targetChapter.getName(), "Chapter") + ") \u2192");
+                    btnReadChapter.setText("Continue Reading \u2192");
                 }
 
                 final Chapter chapterToOpen = targetChapter;

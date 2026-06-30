@@ -2,6 +2,7 @@ package com.example.appdoctruyen.views.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PostFragment extends Fragment {
+    private static final String TAG = "PostDebug";
 
     private RecyclerView rvPosts;
     private PostAdapter postAdapter;
@@ -129,20 +131,29 @@ public class PostFragment extends Fragment {
     }
 
     private void loadPosts() {
+        Log.d(TAG, "loadPosts() called — sending GET /api/posts request...");
         repository.getPosts(new MangaRepository.RepositoryCallback<List<Post>>() {
             @Override
             public void onSuccess(List<Post> data) {
-                if (!isAdded() || getActivity() == null) return;
+                if (!isAdded() || getActivity() == null) {
+                    Log.w(TAG, "loadPosts onSuccess — Fragment not attached, ignoring.");
+                    return;
+                }
 
                 postList.clear();
-                if (data != null) {
+                if (data != null && !data.isEmpty()) {
                     postList.addAll(data);
+                    Log.d(TAG, "loadPosts SUCCESS — received " + data.size() + " posts. First post: id=" + data.get(0).getId() + ", content=" + data.get(0).getContent().substring(0, Math.min(50, data.get(0).getContent().length())) + "...");
+                } else {
+                    Log.w(TAG, "loadPosts SUCCESS — but data is null or EMPTY. This means the backend returned an empty list. Check if DB has data (run: node backend/scripts/checkPostsCount.js)");
                 }
                 postAdapter.notifyDataSetChanged();
+                Log.d(TAG, "RecyclerView updated. Adapter itemCount=" + postAdapter.getItemCount());
             }
 
             @Override
             public void onError(String message) {
+                Log.e(TAG, "loadPosts ERROR — " + message + ". Check: 1) Is backend running? 2) Is BASE_URL correct for your device type (emulator=10.0.2.2, physical=LAN IP)?");
                 if (!isAdded()) return;
                 Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
             }

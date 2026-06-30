@@ -1,7 +1,9 @@
 const Database = require('better-sqlite3');
 const path = require('path');
 
-const dbPath = path.join(__dirname, '../../mangas.db');
+// Path: backend/src/services/ → cần lên 2 cấp để đến backend/mangas.db
+const dbPath = path.resolve(__dirname, '../../mangas.db');
+console.log('[DB] Resolved database path:', dbPath);
 let db;
 
 function getDatabase() {

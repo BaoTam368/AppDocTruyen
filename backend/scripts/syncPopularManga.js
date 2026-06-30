@@ -27,9 +27,13 @@ async function main() {
     const total = readNumberArg(['--limit'], DEFAULT_LIMIT);
     const pageSize = readNumberArg(['--page-size', '--pageSize'], DEFAULT_PAGE_SIZE);
 
+    // Xác nhận đường dẫn DB đang dùng
+    const mangaCountBefore = databaseService.getMangaCount();
+    console.log(`[SyncScript] Current manga count in DB: ${mangaCountBefore}`);
     console.log(`Starting MangaDex popular sync: ${total} manga, page size ${pageSize}`);
     const mangas = await syncService.syncPopularMangas({ total, pageSize });
-    console.log(`Sync completed: ${mangas.length} manga`);
+    const mangaCountAfter = databaseService.getMangaCount();
+    console.log(`Sync completed: ${mangas.length} manga synced. Total in DB: ${mangaCountAfter}`);
 }
 
 main()

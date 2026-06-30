@@ -8,11 +8,13 @@ function getPosts(req, res, next) {
             offset: req.query.offset
         });
 
+        console.log(`[PostController] getPosts: returned ${data ? data.length : 0} posts`);
         res.json({
             success: true,
             data
         });
     } catch (error) {
+        console.error('[PostController] getPosts ERROR:', error.message, error.stack);
         next(error);
     }
 }
@@ -33,6 +35,7 @@ function getPost(req, res, next) {
             data
         });
     } catch (error) {
+        console.error('[PostController] getPost ERROR:', error.message, error.stack);
         next(error);
     }
 }
@@ -47,6 +50,7 @@ function createPost(req, res, next) {
             message: 'Post created'
         });
     } catch (error) {
+        console.error('[PostController] createPost ERROR:', error.message, error.stack);
         next(error);
     }
 }
@@ -61,6 +65,7 @@ function updatePost(req, res, next) {
             message: 'Post updated'
         });
     } catch (error) {
+        console.error('[PostController] updatePost ERROR:', error.message, error.stack);
         next(error);
     }
 }
@@ -82,6 +87,7 @@ function deletePost(req, res, next) {
             message: 'Post deleted'
         });
     } catch (error) {
+        console.error('[PostController] deletePost ERROR:', error.message, error.stack);
         next(error);
     }
 }
@@ -90,6 +96,8 @@ function toggleLike(req, res, next) {
     try {
         const { postId } = req.params;
         const { userId } = req.body;
+
+        console.log('[PostController] toggleLike request - postId:', postId, 'userId:', userId);
 
         if (!userId) {
             return res.status(400).json({ success: false, message: 'User is required.' });
@@ -103,7 +111,12 @@ function toggleLike(req, res, next) {
             message: result.liked ? 'Like added' : 'Like removed'
         });
     } catch (error) {
-        next(error);
+        console.error('[PostController] toggleLike ERROR:', error.message, error.stack);
+        const statusCode = error.statusCode || 400;
+        res.status(statusCode).json({
+            success: false,
+            message: error.message || 'Failed to toggle like'
+        });
     }
 }
 
