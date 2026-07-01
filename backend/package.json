@@ -4,7 +4,7 @@
   "description": "RESTful Web Service Node.js cho Android AppDocTruyen, lấy dữ liệu từ MangaDex API.",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node --watch server.js",
     "dev": "nodemon server.js"
   },
   "dependencies": {

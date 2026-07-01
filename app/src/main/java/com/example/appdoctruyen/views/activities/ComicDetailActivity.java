@@ -77,71 +77,109 @@ public class ComicDetailActivity extends AppCompatActivity {
 
     private void setupReadButton() {
         MangaRepository mangaRepository = new MangaRepository();
-        if (mangaId != null && !mangaId.isEmpty()) {
+        if (isBlank(mangaId)) {
             btnReadChapter.setVisibility(View.GONE);
-            mangaRepository.getMangaChapters(mangaId, new MangaRepository.RepositoryCallback<List<Chapter>>() {
-                @Override
-                public void onSuccess(List<Chapter> chapters) {
-                    if (chapters != null && !chapters.isEmpty() && !isFinishing()) {
-                        BookshelfDatabaseHelper dbHelper = new BookshelfDatabaseHelper(ComicDetailActivity.this);
-                        AuthManager authManager = new AuthManager(ComicDetailActivity.this);
-                        String userId = authManager.getCurrentUserId();
-                        if (userId == null) userId = "local_user";
+            return;
+        }
 
-                        Comic history = dbHelper.getReadingHistoryForManga(userId, mangaId);
-                        final Chapter targetChapter;
-                        if (history != null && history.getChapterId() != null) {
-                            targetChapter = findChapterById(chapters, history.getChapterId());
-                            btnReadChapter.setText("Continue " + (history.getLastReadChapter() != null ? history.getLastReadChapter() : "previous chapter") + " \u2192");
-                        } else {
-                            targetChapter = findFirstChapter(chapters);
-                            btnReadChapter.setText("Read from start (" + targetChapter.getName() + ") \u2192");
-                        }
+        btnReadChapter.setVisibility(View.GONE);
+        mangaRepository.getMangaChapters(mangaId, new MangaRepository.RepositoryCallback<List<Chapter>>() {
+            @Override
+            public void onSuccess(List<Chapter> chapters) {
+                if (isFinishing() || isDestroyed()) return;
 
-                        btnReadChapter.setOnClickListener(v -> {
-                            Intent intent = new Intent(ComicDetailActivity.this, ComicReadingActivity.class);
-                            intent.putExtra("mangaId", mangaId);
-                            intent.putExtra("mangaTitle", mangaTitle);
-                            intent.putExtra("chapterId", targetChapter.getChapterId());
-                            intent.putExtra("chapterName", targetChapter.getName());
-                            intent.putExtra("comic_cover", currentCoverUrl);
-                            startActivity(intent);
-                        });
-                        btnReadChapter.setVisibility(View.VISIBLE);
-                    } else {
-                        btnReadChapter.setVisibility(View.GONE);
+                Comic history = getReadingHistoryIfLoggedIn();
+                Chapter targetChapter = null;
+                if (history != null && !isBlank(history.getChapterId())) {
+                    targetChapter = findChapterById(chapters, history.getChapterId());
+                    if (targetChapter != null) {
+                        btnReadChapter.setText("Continue Reading: " + displayChapterName(history.getLastReadChapter(), "previous chapter") + " \u2192");
                     }
                 }
 
-                @Override
-                public void onError(String message) {
-                    btnReadChapter.setVisibility(View.GONE);
+                if (targetChapter == null) {
+                    targetChapter = findFirstChapter(chapters);
+                    if (targetChapter == null) {
+                        btnReadChapter.setVisibility(View.GONE);
+                        return;
+                    }
+                    btnReadChapter.setText("Continue Reading \u2192");
                 }
-            });
-        } else {
-            btnReadChapter.setVisibility(View.GONE);
+
+                final Chapter chapterToOpen = targetChapter;
+                btnReadChapter.setOnClickListener(v -> {
+                    if (chapterToOpen == null || isBlank(chapterToOpen.getChapterId())) {
+                        btnReadChapter.setVisibility(View.GONE);
+                        return;
+                    }
+                    Intent intent = new Intent(ComicDetailActivity.this, ComicReadingActivity.class);
+                    intent.putExtra("mangaId", mangaId);
+                    intent.putExtra("mangaTitle", mangaTitle);
+                    intent.putExtra("chapterId", chapterToOpen.getChapterId());
+                    intent.putExtra("chapterName", chapterToOpen.getName());
+                    intent.putExtra("comic_cover", currentCoverUrl);
+                    startActivity(intent);
+                });
+                btnReadChapter.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onError(String message) {
+                if (isFinishing() || isDestroyed()) return;
+                btnReadChapter.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    private Comic getReadingHistoryIfLoggedIn() {
+        AuthManager authManager = new AuthManager(this);
+        String userId = authManager.getCurrentUserId();
+        if (isBlank(userId)) return null;
+
+        BookshelfDatabaseHelper dbHelper = null;
+        try {
+            dbHelper = new BookshelfDatabaseHelper(this);
+            return dbHelper.getReadingHistoryForManga(userId, mangaId);
+        } catch (RuntimeException ignored) {
+            return null;
+        } finally {
+            if (dbHelper != null) {
+                dbHelper.close();
+            }
         }
     }
 
     private Chapter findChapterById(List<Chapter> chapters, String chapterId) {
+        if (chapters == null || isBlank(chapterId)) return null;
         for (Chapter ch : chapters) {
-            if (ch.getChapterId() != null && ch.getChapterId().equals(chapterId)) {
+            if (ch != null && chapterId.equals(ch.getChapterId())) {
                 return ch;
             }
         }
-        return findFirstChapter(chapters);
+        return null;
     }
 
     private Chapter findFirstChapter(List<Chapter> chapters) {
-        Chapter firstChapter = chapters.get(0);
+        if (chapters == null || chapters.isEmpty()) return null;
+
+        Chapter firstChapter = null;
         for (Chapter ch : chapters) {
-            String name = ch.getName().toLowerCase();
-            if (name.contains("chapter 1") || name.contains("chapter 1") || name.equals("1")) {
-                firstChapter = ch;
-                break;
+            if (ch == null || isBlank(ch.getChapterId())) continue;
+            if (firstChapter == null) firstChapter = ch;
+            String name = ch.getName() != null ? ch.getName().toLowerCase() : "";
+            if (name.contains("chapter 1") || name.equals("1")) {
+                return ch;
             }
         }
         return firstChapter;
+    }
+
+    private String displayChapterName(String value, String fallback) {
+        return isBlank(value) ? fallback : value;
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
     }
 
     public String getMangaId() {

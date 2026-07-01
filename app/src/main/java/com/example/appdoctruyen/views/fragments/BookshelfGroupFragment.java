@@ -202,7 +202,7 @@ public class BookshelfGroupFragment extends Fragment {
                 tabFamous.setBackgroundResource(R.drawable.bg_tab_selected);
                 tabFamous.setTextColor(getResources().getColor(R.color.white, null));
                 tabFamous.setTypeface(null, android.graphics.Typeface.BOLD);
-                showStatsNote(!groupSource.isEmpty() && !hasPositiveMemberCount(groupSource));
+                showStatsNote(!groupSource.isEmpty() && !hasPositiveComicCount(groupSource));
                 showRankingGroups(groupsForFamousTab());
                 break;
             case 2:
@@ -221,8 +221,8 @@ public class BookshelfGroupFragment extends Fragment {
 
     private List<TranslationGroup> groupsForFamousTab() {
         List<TranslationGroup> sorted = new ArrayList<>(groupSource);
-        if (hasPositiveMemberCount(sorted)) {
-            Collections.sort(sorted, (g1, g2) -> g2.getMemberCount() - g1.getMemberCount());
+        if (hasPositiveComicCount(sorted)) {
+            Collections.sort(sorted, (g1, g2) -> g2.getComicCount() - g1.getComicCount());
             assignRanks(sorted);
         } else {
             clearRanks(sorted);

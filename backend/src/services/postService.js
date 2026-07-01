@@ -20,7 +20,7 @@ function getPosts({ userId, limit = 50, offset = 0 } = {}) {
                 u.avatar_url,
                 p.content,
                 p.image_url,
-                p.like_count,
+                COALESCE(p.like_count, 0) AS like_count,
                 p.created_at
             FROM posts p
             LEFT JOIN users u
@@ -44,7 +44,7 @@ function getPostById(postId) {
              u.avatar_url,
              p.content,
              p.image_url,
-             p.like_count,
+             COALESCE(p.like_count, 0) AS like_count,
              p.created_at
         FROM posts p
         LEFT JOIN users u
@@ -172,26 +172,60 @@ function createHttpError(statusCode, message) {
 }
 
 function toggleLikePost(postId, userId) {
-    const database = databaseService.getDatabase();
+    console.log("Toggling like for user_id:", userId, "post_id:", postId);
 
-    const checkLike = database.prepare('SELECT 1 FROM post_likes WHERE user_id = ? AND post_id = ?').get(userId, postId);
+    if (!normalizeText(userId)) {
+        throw createHttpError(400, 'User is required.');
+    }
 
-    if (checkLike) {
-        database.prepare('DELETE FROM post_likes WHERE user_id = ? AND post_id = ?').run(userId, postId);
-        database.prepare('UPDATE posts SET like_count = MAX(0, like_count - 1) WHERE id = ?').run(postId);
+    if (!postId) {
+        throw createHttpError(400, 'Post ID is required.');
+    }
 
-        return { liked: false, likeCount: getLikeCount(postId) };
-    } else {
-        database.prepare('INSERT INTO post_likes (user_id, post_id) VALUES (?, ?)').run(userId, postId);
-        database.prepare('UPDATE posts SET like_count = like_count + 1 WHERE id = ?').run(postId);
+    try {
+        const database = databaseService.getDatabase();
 
-        return { liked: true, likeCount: getLikeCount(postId) };
+        // Kiểm tra post có tồn tại không
+        const postExists = database.prepare('SELECT 1 FROM posts WHERE id = ?').get(postId);
+        if (!postExists) {
+            throw createHttpError(404, `Post with id ${postId} not found.`);
+        }
+
+        // Kiểm tra user có tồn tại không — nếu chưa thì tự tạo
+        // (Android gửi Firebase UID, có thể user chưa được sync vào SQLite)
+        const userExists = database.prepare('SELECT 1 FROM users WHERE user_id = ?').get(userId);
+        if (!userExists) {
+            console.log(`[toggleLikePost] User "${userId}" not found in SQLite, auto-creating...`);
+            userService.createOrUpdateUser({ userId });
+        }
+
+        const checkLike = database.prepare('SELECT 1 FROM post_likes WHERE user_id = ? AND post_id = ?').get(userId, postId);
+
+        if (checkLike) {
+            database.prepare('DELETE FROM post_likes WHERE user_id = ? AND post_id = ?').run(userId, postId);
+            database.prepare('UPDATE posts SET like_count = MAX(0, like_count - 1) WHERE id = ?').run(postId);
+
+            return { liked: false, likeCount: getLikeCount(postId) };
+        } else {
+            database.prepare('INSERT INTO post_likes (user_id, post_id) VALUES (?, ?)').run(userId, postId);
+            database.prepare('UPDATE posts SET like_count = like_count + 1 WHERE id = ?').run(postId);
+
+            return { liked: true, likeCount: getLikeCount(postId) };
+        }
+    } catch (error) {
+        console.error('[toggleLikePost] Database error:', error.message);
+        // Re-throw nếu đã là HTTP error (có statusCode)
+        if (error.statusCode) {
+            throw error;
+        }
+        // Wrap SQLite errors thành HTTP 400 thay vì để crash server
+        throw createHttpError(400, `Failed to toggle like: ${error.message}`);
     }
 }
 
 function getLikeCount(postId) {
     const database = databaseService.getDatabase();
-    const row = database.prepare('SELECT like_count FROM posts WHERE id = ?').get(postId);
+    const row = database.prepare('SELECT COALESCE(like_count, 0) AS like_count FROM posts WHERE id = ?').get(postId);
     return row ? row.like_count : 0;
 }
 

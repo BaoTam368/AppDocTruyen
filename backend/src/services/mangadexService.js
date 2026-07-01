@@ -106,7 +106,7 @@ async function getMangaChapters(mangaId, {limit = 100, offset = 0, language = DE
 
     try {
         const response = await mangadexClient.get(`/manga/${mangaId}/feed`, {params});
-        return (response.data.data || []).map((item) => mapChapterSummary(item, mangaId));
+        return sortChapters((response.data.data || []).map((item) => mapChapterSummary(item, mangaId)));
     } catch (error) {
         throw normalizeMangaDexError(error, 'Unable to load chapter list from MangaDex');
     }
@@ -174,6 +174,50 @@ async function getGroupDetail(groupId) {
     }
 }
 
+async function getGroupMangaCount(groupId) {
+    if (!groupId || !groupId.trim()) {
+        throw createHttpError(400, 'Missing groupId');
+    }
+
+    const uniqueMangaIds = new Set();
+    let offset = 0;
+    const limit = 100;
+    const maxPages = 5;
+
+    for (let page = 0; page < maxPages; page++) {
+        const params = new URLSearchParams();
+        params.append('groups[]', groupId.trim());
+        params.set('limit', String(limit));
+        params.set('offset', String(offset));
+        params.set('order[publishAt]', 'desc');
+
+        try {
+            const response = await mangadexClient.get('/chapter', {params});
+            const chapters = response.data.data || [];
+
+            for (const chapter of chapters) {
+                const mangaRel = (chapter.relationships || []).find((r) => r.type === 'manga');
+                if (mangaRel && mangaRel.id) {
+                    uniqueMangaIds.add(mangaRel.id);
+                }
+            }
+
+            const total = response.data.total || 0;
+            offset += limit;
+            if (offset >= total || chapters.length < limit) {
+                break;
+            }
+        } catch (error) {
+            if (page === 0) {
+                throw normalizeMangaDexError(error, 'Unable to count manga for this group');
+            }
+            break;
+        }
+    }
+
+    return uniqueMangaIds.size;
+}
+
 function mapMangaSummary(item) {
     const attributes = item.attributes || {};
     const coverFileName = getCoverFileName(item);
@@ -232,14 +276,55 @@ function mapChapterSummary(item, fallbackMangaId = '') {
     const attributes = item.attributes || {};
     const chapterNumber = attributes.chapter || '';
     const mangaRelation = (item.relationships || []).find((relation) => relation.type === 'manga');
+    const title = attributes.title || '';
     return {
         chapterId: item.id,
         mangaId: mangaRelation ? mangaRelation.id : fallbackMangaId,
-        chapterName: attributes.title || (chapterNumber ? `Chapter ${chapterNumber}` : 'Chapter'),
+        title,
+        chapterName: title || (chapterNumber ? `Chapter ${chapterNumber}` : 'Chapter'),
+        chapter: chapterNumber || null,
         chapterNumber,
+        volume: attributes.volume || '',
+        translatedLanguage: attributes.translatedLanguage || '',
         language: attributes.translatedLanguage || '',
-        createdAt: attributes.createdAt || ''
+        publishAt: attributes.publishAt || '',
+        readableAt: attributes.readableAt || '',
+        createdAt: attributes.createdAt || '',
+        updatedAt: attributes.updatedAt || ''
     };
+}
+
+function sortChapters(chapters) {
+    return (chapters || []).sort((a, b) => {
+        const chapterA = parseChapterNumber(a && (a.chapter || a.chapterNumber));
+        const chapterB = parseChapterNumber(b && (b.chapter || b.chapterNumber));
+
+        if (chapterA !== chapterB) {
+            return chapterA - chapterB;
+        }
+
+        return chapterDateValue(a) - chapterDateValue(b);
+    });
+}
+
+function parseChapterNumber(chapter) {
+    if (chapter === null || chapter === undefined) {
+        return Number.POSITIVE_INFINITY;
+    }
+
+    const value = String(chapter).trim();
+    if (!value) {
+        return Number.POSITIVE_INFINITY;
+    }
+
+    const parsed = Number.parseFloat(value.replace(',', '.'));
+    return Number.isFinite(parsed) ? parsed : Number.POSITIVE_INFINITY;
+}
+
+function chapterDateValue(chapter) {
+    const value = chapter && (chapter.publishAt || chapter.readableAt || chapter.createdAt);
+    const time = value ? new Date(value).getTime() : 0;
+    return Number.isFinite(time) ? time : 0;
 }
 
 function mapGroupSummary(item) {
@@ -264,12 +349,11 @@ function getCoverFileName(item) {
 
 function buildCoverUrl(mangaId, fileName) {
     if (!mangaId || !fileName) return '';
-    return `${MANGADEX_UPLOADS_BASE_URL}/covers/${mangaId}/${fileName}`;
+    return `${MANGADEX_UPLOADS_BASE_URL}/covers/${mangaId}/${fileName}.256.jpg`;
 }
 
 function buildThumbnailUrl(mangaId, fileName) {
-    if (!mangaId || !fileName) return '';
-    return `${buildCoverUrl(mangaId, fileName)}.256.jpg`;
+    return buildCoverUrl(mangaId, fileName);
 }
 
 function mapTags(tags) {
@@ -303,8 +387,18 @@ function normalizeMangaDexError(error, fallbackMessage) {
     if (error.response) {
         const apiError = error.response.data && error.response.data.errors && error.response.data.errors[0];
         const message = (apiError && (apiError.detail || apiError.title)) || fallbackMessage;
-        const statusCode = error.response.status === 404 ? 404 : 502;
-        return createHttpError(statusCode, message);
+        const status = error.response.status;
+        const statusCode = status === 404 ? 404 : (status === 429 ? 429 : 502);
+        const normalizedError = createHttpError(statusCode, message);
+
+        if (status === 429) {
+            const retryAfterSeconds = Number.parseInt(error.response.headers && error.response.headers['retry-after'], 10);
+            if (!Number.isNaN(retryAfterSeconds)) {
+                normalizedError.retryAfterMs = retryAfterSeconds * 1000;
+            }
+        }
+
+        return normalizedError;
     }
 
     if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT') {
@@ -336,5 +430,6 @@ module.exports = {
     getChapterPages,
     getGroups,
     searchGroups,
-    getGroupDetail
+    getGroupDetail,
+    getGroupMangaCount
 };

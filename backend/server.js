@@ -11,6 +11,7 @@ const mangaRoutes = require('./src/routes/mangaRoutes');
 const localMangaRoutes = require('./src/routes/localMangaRoutes');
 const postRoutes = require('./src/routes/postRoutes');
 const userRoutes = require('./src/routes/userRoutes');
+const databaseService = require('./src/services/databaseService');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -52,5 +53,15 @@ app.use((err, req, res, next) => {
 
 app.listen(port, () => {
     console.log(`Node.js MangaDex service is running at http://localhost:${port}`);
+
+    try {
+        const cachedCount = databaseService.getMangaCount();
+        console.log(`Cached manga count: ${cachedCount}`);
+        if (cachedCount === 0) {
+            console.log('No cached manga found. Run node backend/scripts/syncPopularManga.js to preload data.');
+        }
+    } catch (error) {
+        console.warn('Unable to read manga cache status:', error.message);
+    }
 });
 

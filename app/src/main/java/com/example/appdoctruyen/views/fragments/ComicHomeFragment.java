@@ -3,6 +3,7 @@ package com.example.appdoctruyen.views.fragments;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -115,7 +116,7 @@ public class ComicHomeFragment extends Fragment {
     }
 
     private void loadHomeData() {
-        showHomeState("Loading cached manga...", false);
+        showHomeState("Loading manga...", false);
         setRefreshEnabled(false);
 
         mangaRepository.getLocalMangaList(20, 0, new MangaRepository.RepositoryCallback<List<Comic>>() {
@@ -124,6 +125,7 @@ public class ComicHomeFragment extends Fragment {
                 if (!isAdded()) return;
                 setRefreshEnabled(true);
                 List<Comic> safeData = data != null ? data : new ArrayList<>();
+                logCoverDebug(safeData);
                 applyHomeData(safeData);
                 if (safeData.isEmpty()) {
                     showHomeState("No manga available.", true);
@@ -150,15 +152,16 @@ public class ComicHomeFragment extends Fragment {
 
         isSyncing = true;
         setRefreshEnabled(false);
-        showHomeState(hasHomeData ? "Refreshing manga..." : "Loading manga...", false);
+        showHomeState("Loading manga...", false);
 
-        mangaRepository.syncPopularMangas(200, new MangaRepository.RepositoryCallback<List<Comic>>() {
+        mangaRepository.getLocalMangaList(20, 0, new MangaRepository.RepositoryCallback<List<Comic>>() {
             @Override
             public void onSuccess(List<Comic> data) {
                 if (!isAdded()) return;
                 isSyncing = false;
                 setRefreshEnabled(true);
                 List<Comic> safeData = data != null ? data : new ArrayList<>();
+                logCoverDebug(safeData);
                 applyHomeData(safeData);
                 if (safeData.isEmpty()) {
                     showHomeState("No manga available.", true);
@@ -177,6 +180,7 @@ public class ComicHomeFragment extends Fragment {
                     hideHomeState();
                     Toast.makeText(requireContext(), "Unable to refresh. Showing cached data.", Toast.LENGTH_SHORT).show();
                 } else {
+                    applyHomeData(new ArrayList<>());
                     showHomeState("Unable to load manga. Please try again.", true);
                 }
             }
@@ -216,6 +220,19 @@ public class ComicHomeFragment extends Fragment {
         intent.putExtra("mangaId", comic.getMangaId());
         intent.putExtra("comic_cover", comic.getCoverUrl());
         startActivity(intent);
+    }
+
+    private void logCoverDebug(List<Comic> mangaList) {
+        if (mangaList == null) return;
+        for (int i = 0; i < Math.min(3, mangaList.size()); i++) {
+            Comic comic = mangaList.get(i);
+            if (comic == null) {
+                Log.d("COVER_DEBUG", "item=" + i + " is null");
+                continue;
+            }
+            Log.d("COVER_DEBUG", "title=" + comic.getTitle()
+                    + ", coverUrl=" + comic.getCoverUrl());
+        }
     }
 
     private void showHomeState(String message, boolean showRetry) {

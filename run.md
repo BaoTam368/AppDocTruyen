@@ -1,23 +1,35 @@
-# AppDocTruyen
+# Hướng dẫn chạy AppDocTruyen
 
-AppDocTruyen là đồ án Android App đọc truyện. Ứng dụng Android viết bằng Java/XML, giao tiếp với Node.js backend qua Retrofit. Backend dùng Express để gọi MangaDex API lấy dữ liệu truyện/chapter/trang đọc, đồng thời dùng SQLite runtime để lưu/cache dữ liệu truyện, user, comment và bài viết.
+AppDocTruyen là app Android đọc truyện. Ứng dụng Android gọi backend Node.js qua Retrofit. Backend dùng Express làm lớp trung gian giữa app và MangaDex API, đồng thời dùng SQLite/better-sqlite3 để cache manga, chapter, user, comment và post.
 
-Các màn chính hiện có trong app gồm Home, Search, Detail, Reader, Bookshelf, World và Profile. Một số phần vẫn là demo hoặc cần kiểm tra thêm theo tình trạng code hiện tại.
+Luồng hiện tại nên hiểu như sau:
+
+```text
+Android Home/Search
+  -> Retrofit gọi backend local
+  -> backend đọc SQLite cache trước
+  -> MangaDex chỉ được gọi khi sync thủ công hoặc khi một màn cần fallback rõ ràng
+```
+
+Không nên fetch 200+ manga từ MangaDex mỗi lần bật backend hoặc mỗi lần mở Home. Trước khi demo nên preload dữ liệu vào SQLite cache để Home/Search tải nhanh và ít phụ thuộc mạng.
+
+Backend chính để chạy app nằm trong thư mục `backend/`.
 
 ## 1. Công nghệ sử dụng
 
-| Thành phần         | Công nghệ                    |
-| ------------------ | ---------------------------- |
-| Mobile app         | Android Java/XML             |
-| IDE                | Android Studio               |
-| Backend            | Node.js + Express            |
-| API client Android | Retrofit 2.9.0 + Gson        |
-| Ảnh                | Glide 4.16.0                 |
-| Database Android   | SQLite local                 |
-| Database Backend   | SQLite/better-sqlite3        |
-| Nguồn truyện       | MangaDex API                 |
+| Thành phần | Công nghệ hiện có |
+| --- | --- |
+| Mobile app | Android Java/XML |
+| IDE | Android Studio |
+| Backend | Node.js + Express |
+| Android API client | Retrofit 2.9.0 + Gson |
+| Image loading | Glide 4.16.0 |
+| Backend database/cache | SQLite + better-sqlite3 |
+| Android local database | SQLite (`bookshelf.db`) |
+| Manga source | MangaDex API |
+| Auth | Firebase Auth qua `AuthManager`, có sync user về backend |
 
-Ghi chú: Gradle hiện có bật Compose và một số dependency Compose, nhưng giao diện chính của đồ án đang nằm trong Java/XML layout.
+Ghi chú: Gradle còn bật Compose và có dependency Compose, nhưng giao diện chính của đồ án hiện dùng Java/XML layout.
 
 ## 2. Cấu trúc project
 
@@ -26,46 +38,38 @@ AppDocTruyen/
   app/                  Android app Java/XML
   backend/              Backend chính Node.js + Express
   gradle/               Gradle wrapper/config
-  README.md
+  run.md                Hướng dẫn chạy project
   settings.gradle.kts
 ```
 
-Trong root project hiện cũng có `package.json` và `server.js`, nhưng backend chính dùng để chạy app là thư mục `backend/`.
-
-- Không chạy nhầm root `server.js` vì file này chỉ là Express tối giản, không mount các API `/api/manga`, `/api/local-manga`, `/api/users`, `/api/comments`, `/api/posts`.
-- Không xóa root `package.json`/`server.js` nếu chưa hỏi nhóm, vì có thể là file cũ hoặc file test của nhóm.
+Trong lần kiểm tra hiện tại không thấy root `server.js` hoặc root `package.json`. Backend cần chạy là `backend/server.js`, không chạy nhầm entrypoint ở nơi khác nếu sau này có file test được thêm vào root.
 
 ## 3. Yêu cầu trước khi chạy
 
 Cần cài trên máy:
 
 - Android Studio.
-- JDK 21, vì `app/build.gradle.kts` đang cấu hình `sourceCompatibility` và `targetCompatibility` là Java 21.
-- Node.js LTS.
-- npm.
-- Git nếu clone từ GitHub.
-- 1.1.1.1/WARP hoặc mạng khác nếu mạng hiện tại không truy cập được MangaDex.
+- JDK 21, vì `app/build.gradle.kts` đang cấu hình Java 21.
+- Node.js và npm.
+- Git nếu clone từ repository.
+- Mạng truy cập được MangaDex nếu muốn sync dữ liệu mới.
 
-Thông tin project hiện tại:
+Thông tin Android hiện tại:
 
-- Android Gradle Plugin: 9.1.1.
-- compileSdk: 36.
-- minSdk: 24.
-- targetSdk: 36.
+- Android Gradle Plugin: theo version catalog của project.
+- `compileSdk`: 36.
+- `minSdk`: 24.
+- `targetSdk`: 36.
+- Package/app id: `com.example.appdoctruyen`.
 
-## 4. Cách tải project
-
-```bash
-git clone https://github.com/BaoTam368/AppDocTruyen.git
-cd AppDocTruyen
-```
-
-Nếu nhóm dùng repository khác, thay URL bằng link repo thật:
+## 4. Clone project
 
 ```bash
 git clone <URL_REPOSITORY>
 cd AppDocTruyen
 ```
+
+Thay `<URL_REPOSITORY>` bằng link Git thật của nhóm.
 
 ## 5. Chạy backend Node.js
 
@@ -77,76 +81,135 @@ npm install
 npm start
 ```
 
-Trong `backend/package.json` cũng có script dev:
-
-```bash
-npm run dev
-```
-
 Giải thích:
 
 - `npm install` chỉ cần chạy lần đầu hoặc khi dependency thay đổi.
-- `npm start` dùng để chạy backend bằng `node server.js`.
-- `npm run dev` dùng `nodemon server.js`, tiện khi sửa backend.
-- Backend thường chạy ở port 3000 vì `backend/server.js` dùng `process.env.PORT || 3000`.
+- `npm start` chạy backend bằng `node server.js`.
+- `npm run dev` dùng `nodemon server.js` nếu cần dev backend.
+- Backend mặc định chạy port `3000` vì `backend/server.js` dùng `process.env.PORT || 3000`.
 
-Kiểm tra backend bằng trình duyệt hoặc Postman:
+Kiểm tra backend:
 
 ```text
 http://localhost:3000/api/health
 ```
 
-Nếu cần file `.env`, tạo từ file mẫu:
+Nếu cần file môi trường, copy từ file mẫu trong `backend/`:
 
-```bash
+```cmd
 copy .env.example .env
 ```
 
-Hoặc trên PowerShell:
+Hoặc PowerShell:
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-Các biến trong `backend/.env.example`:
+Các biến hiện có trong `backend/.env.example`:
 
 | Biến | Ý nghĩa |
-| ---- | ------- |
+| --- | --- |
 | `PORT` | Port backend, mặc định 3000 |
-| `MANGADEX_BASE_URL` | Base URL của MangaDex API |
+| `MANGADEX_BASE_URL` | Base URL MangaDex API |
+| `MANGADEX_UPLOADS_BASE_URL` | Base URL ảnh cover MangaDex |
 | `REQUEST_TIMEOUT_MS` | Timeout khi backend gọi MangaDex |
+| `DEFAULT_TRANSLATED_LANGUAGE` | Ngôn ngữ chapter mặc định, hiện là `en` |
 
-Các route backend đang được mount trong `backend/server.js`:
+## 6. Route backend hiện có
 
-- `GET /api/health`
-- `/api/manga`
-- `/api/chapter`
-- `/api/local-manga`
-- `/api/users`
-- `/api/comments`
-- `/api/posts`
+Các route được mount trong `backend/server.js`:
 
-## 6. Chạy Android app bằng emulator
+| Route | Trạng thái theo code hiện tại |
+| --- | --- |
+| `GET /api/health` | Có |
+| `GET /api/manga` | Có, list/search đọc SQLite cache local-first |
+| `GET /api/manga/:mangaId` | Có, đọc cache trước rồi fallback MangaDex nếu thiếu |
+| `GET /api/manga/:mangaId/chapters` | Có, đọc chapter cache trước rồi fallback MangaDex nếu thiếu |
+| `GET /api/manga/:mangaId/covers` | Có, gọi MangaDex covers |
+| `GET /api/manga/chapter/:chapterId/pages` | Có |
+| `GET /api/chapter/:chapterId/pages` | Có alias |
+| `GET /api/local-manga` | Có, đọc SQLite cache |
+| `GET /api/local-manga/search` | Có, search SQLite cache |
+| `POST /api/local-manga/sync-popular` | Có, sync thủ công popular manga |
+| `POST /api/local-manga/sync/popular` | Có route cũ, vẫn được giữ |
+| `GET /api/groups` | Có |
+| `GET /api/groups/search` | Có |
+| `GET /api/groups/:groupId` | Có |
+| `GET/POST/PUT/DELETE /api/comments` | Có |
+| `GET/POST/PUT/DELETE /api/posts` | Có, thêm `POST /api/posts/:postId/like` |
+| `POST /api/users` | Có |
+| `POST /api/users/sync` | Có |
+| `GET /api/users/:userId` | Có |
+| `PUT /api/users/:userId` | Có |
+| `DELETE /api/users` | Chưa thấy route delete user |
 
-1. Mở project bằng Android Studio.
-2. Đợi Gradle Sync hoàn tất.
-3. Chọn Android emulator.
-4. Đảm bảo backend Node.js trong thư mục `backend/` đang chạy.
-5. Kiểm tra base URL trong `app/src/main/java/com/example/appdoctruyen/data/api/ApiClient.java`.
+Backend `createPost`, `createComment` và like post hiện validate `userId`; thiếu user trả lỗi `400` với message `User is required.`.
 
-Base URL hiện tại:
+## 7. Đồng bộ dữ liệu MangaDex vào SQLite cache
+
+Không nên fetch 200+ manga mỗi lần bật backend hoặc mỗi lần mở app. Backend đã có SQLite cache và các route Home/Search nên đọc cache trước.
+
+Trước khi demo, nên sync một lần để preload dữ liệu:
+
+```bash
+cd backend
+node scripts/syncPopularManga.js --limit 200 --page-size 50
+```
+
+Nếu đang đứng ở root project, có thể chạy:
+
+```bash
+node backend/scripts/syncPopularManga.js --limit 200 --page-size 50
+```
+
+Script này dùng service backend, fetch MangaDex theo từng page, page size mặc định 50, có delay/retry giới hạn khi gặp rate limit. Script ghi dữ liệu vào SQLite runtime `backend/mangas.db`.
+
+Nếu muốn gọi qua HTTP endpoint, backend phải đang chạy:
+
+```text
+POST http://localhost:3000/api/local-manga/sync-popular?total=200&limit=50&pages=4
+```
+
+Flow lần đầu:
+
+1. Chạy `npm install` trong `backend/` nếu chưa có dependency.
+2. Chạy script sync hoặc gọi endpoint sync để preload MangaDex vào SQLite.
+3. Chạy backend bằng `npm start`.
+4. Android Home/Search đọc dữ liệu từ SQLite cache.
+
+Flow các lần sau:
+
+1. Chạy backend bằng `npm start`.
+2. Android đọc cache ngay.
+3. Không cần sync lại MangaDex nếu chưa muốn refresh dữ liệu.
+
+Nếu sync báo lỗi MangaDex/network, thử đổi mạng hoặc bật 1.1.1.1/WARP. Không nên phụ thuộc sync live ngay trong lúc demo.
+
+## 8. Chạy Android app bằng emulator
+
+Base URL emulator hiện tại trong `ApiClient.java`:
 
 ```text
 http://10.0.2.2:3000/api/
 ```
 
-`10.0.2.2` là địa chỉ đặc biệt để Android emulator gọi backend đang chạy trên máy tính. Sau đó bấm Run trong Android Studio.
+Các bước chạy:
 
-## 7. Chạy Android app bằng điện thoại thật
+1. Mở project bằng Android Studio.
+2. Đợi Gradle Sync hoàn tất.
+3. Chạy backend trong thư mục `backend/`.
+4. Kiểm tra `http://localhost:3000/api/health` trả về OK.
+5. Nếu muốn Home có nhiều truyện, chạy sync/preload MangaDex vào SQLite trước demo.
+6. Run app trên Android emulator.
 
-Điện thoại thật không dùng được `10.0.2.2`. Máy tính chạy backend và điện thoại phải cùng Wi-Fi.
+`10.0.2.2` là địa chỉ đặc biệt để Android emulator gọi `localhost` của máy tính. Không dùng `localhost` trong app Android emulator.
 
-Lấy IP LAN của máy tính bằng:
+## 9. Chạy Android app bằng điện thoại thật
+
+Điện thoại thật không dùng được `10.0.2.2`. Điện thoại và máy tính phải cùng Wi-Fi.
+
+Lấy IP LAN máy tính bằng:
 
 ```cmd
 ipconfig
@@ -158,7 +221,7 @@ Ví dụ IP máy tính là:
 192.168.1.10
 ```
 
-Thì base URL trong `ApiClient.java` phải đổi thành:
+Khi đó base URL cần dùng dạng:
 
 ```text
 http://192.168.1.10:3000/api/
@@ -166,156 +229,210 @@ http://192.168.1.10:3000/api/
 
 Lưu ý:
 
-- Cho phép firewall nếu Windows hỏi.
-- Backend Node.js phải đang chạy.
-- Điện thoại và máy tính phải cùng mạng.
-- Sau khi đổi base URL, chạy lại app từ Android Studio.
+- Backend phải đang chạy.
+- Windows Firewall phải cho phép Node.js nhận kết nối.
+- Nếu đổi IP/base URL thì cần rebuild/rerun app.
+- `ApiClient.java` dùng Retrofit base URL cho phần lớn API.
+- `AuthManager.java` hiện vẫn hard-code URL `http://10.0.2.2:3000/api/users...` cho sync/update user bằng Volley. Nếu chạy điện thoại thật, cần đổi cả các URL trong `AuthManager.java` hoặc refactor sau để dùng chung base URL.
 
-## 8. Ghi chú về MangaDex API và 1.1.1.1
+## 10. Database và cache
 
-Backend gọi MangaDex API để lấy danh sách truyện, chi tiết truyện, chapter và ảnh đọc truyện. Một số mạng có thể chặn hoặc làm chậm MangaDex.
-
-Nếu backend báo lỗi không lấy được truyện:
-
-- Bật 1.1.1.1/WARP.
-- Đổi mạng.
-- Kiểm tra `http://localhost:3000/api/health`.
-- Xem log backend trong terminal.
-
-Đây có thể là vấn đề mạng, không phải lúc nào cũng do code.
-
-## 9. Database và dữ liệu local
-
-Backend dùng `better-sqlite3`. Khi chạy, backend có thể tạo SQLite runtime file:
+Backend dùng `better-sqlite3`, database path hiện nằm ở:
 
 ```text
 backend/mangas.db
+```
+
+Khi chạy, SQLite có thể tạo thêm WAL files:
+
+```text
 backend/mangas.db-shm
 backend/mangas.db-wal
 ```
 
-Các bảng backend hiện được tạo trong `backend/src/services/databaseService.js`, gồm `mangas`, `chapters`, `users`, `comments`, `posts`.
+Database backend hiện tạo các bảng chính:
 
-Android cũng có SQLite local trong `BookshelfDatabaseHelper.java`, database tên `bookshelf.db`. Phần này dùng để lưu/đọc:
+- `mangas`
+- `chapters`
+- `users`
+- `comments`
+- `posts`
+- `post_likes`
 
-- bookmark/tủ sách;
-- lịch sử đọc;
-- truyện đã tải;
-- comment local.
+Các file DB này là runtime local cache, không push lên GitHub. Nếu muốn có dữ liệu demo, chạy script/endpoint sync để tạo cache local trên máy.
 
-Nếu database Android rỗng, `BookshelfFragment` có fallback dữ liệu mẫu cho phần tủ sách/lịch sử đọc.
-
-Không nên push file runtime lên GitHub:
-
-- `node_modules/`
-- `*.db`
-- `*.db-shm`
-- `*.db-wal`
-- `.env`
-
-Chỉ cần push `backend/package.json` và `backend/package-lock.json` để người khác tự chạy `npm install`.
-
-## 10. Các chức năng chính
-
-| Chức năng | Trạng thái hiện tại | Ghi chú |
-| --------- | ------------------- | ------- |
-| Home/truyện | Đã có | `ComicHomeFragment` gọi backend local manga và có nút đồng bộ MangaDex. Cần backend chạy. |
-| Tìm kiếm | Đang hoàn thiện | `SearchActivity` tìm trong local manga qua backend; phần filter có UI nhưng `applySearch()` hiện chưa xử lý. |
-| Chi tiết truyện | Đã có | `ComicDetailActivity`, `ComicInfoFragment`, `ComicChaptersFragment` lấy chi tiết/chapter qua backend. |
-| Đọc truyện | Đã có | `ComicReadingActivity` lấy ảnh chapter qua backend; có fallback ảnh mẫu khi thiếu dữ liệu/lỗi. |
-| Tủ sách | Đã có | Dùng SQLite Android `bookshelf.db`, có dữ liệu mẫu nếu DB rỗng. |
-| Nhóm dịch | Cần kiểm tra thêm | Bottom nav còn item Nhóm dịch nhưng `MainActivity` hiện không mở fragment; backend hiện chưa mount `/api/groups`. |
-| World/comment/post | Demo/đang hoàn thiện | UI post/comment có dữ liệu mẫu; backend có API `/api/comments` và `/api/posts`. |
-| Profile/login/register | Demo/đang hoàn thiện | Màn login/register/profile có UI; `AuthManager` hiện trống, chưa thấy dependency Firebase trong Gradle. |
-| Node.js backend | Đã có | Backend chính ở `backend/`, dùng Express, SQLite và route `/api/health`. |
-| MangaDex API | Đã có | Backend gọi MangaDex bằng axios; cần kiểm tra mạng/1.1.1.1 nếu lỗi. |
-
-Trạng thái trên dựa theo đọc source hiện tại, chưa phải kết quả chạy build hay chạy app.
-
-## 11. Phân công nhóm
-
-Theo `Task.md`:
-
-- Nguyễn Thắng: xử lý MangaDex API, Node.js để lưu trữ dữ liệu user/comment/bài viết/truyện, Tủ sách và phần Nhóm dịch nếu nhóm quyết định giữ.
-- Thanh An: Firebase đăng nhập/đăng ký, nạp xu, thanh toán, mua truyện từng chapter.
-- Phạm Đức: trình bày truyện, lấy dữ liệu từ SQLite/Node.js, thanh tìm kiếm.
-- Minh Đức: liên kết SQLite, lưu truyện, trình bày trang truyện trên app.
-- Bảo Tâm: comment, bình luận, đăng bài cho user, phần nền tối/dark mode.
-
-## 12. Lưu ý về Nhóm dịch
+Android cũng dùng SQLite local qua `BookshelfDatabaseHelper.java`, database tên:
 
 ```text
-Phần Nhóm dịch đang được nhóm cân nhắc giữ hoặc bỏ vì dữ liệu truyện lấy trực tiếp từ MangaDex API. Nếu giữ, cần đảm bảo tab Nhóm dịch có Fragment điều khiển và backend/API tương ứng. Nếu bỏ, cần dọn tab/navigation có chủ đích.
+bookshelf.db
 ```
 
-Ghi chú theo code hiện tại: `bottom_nav_menu.xml` vẫn có `nav_translation_team`, nhưng `MainActivity` đang để comment `Feature removed - translation teams not needed for API-based manga app`. Backend hiện chưa thấy route `/api/groups` được mount trong `backend/server.js`, dù Android interface có khai báo `GET groups`.
+SQLite Android dùng cho:
 
-## 13. Lỗi thường gặp khi chạy
+- Following/bookmark.
+- Recently read/reading history.
+- Saved manga trong Bookshelf.
+- Local comments.
+
+Phần Saved hiện lưu metadata/chapter vào local DB và Firebase helper, chưa tải toàn bộ ảnh chapter về storage để đọc offline thật. Vì vậy tài liệu và UI nên gọi là `Save/Saved`, không gọi là offline download.
+
+## 11. Chức năng chính
+
+| Chức năng | Trạng thái | Ghi chú |
+| --- | --- | --- |
+| Home/truyện | Đã có | `ComicHomeFragment` gọi `getLocalMangaList`, có loading/empty/error/retry; refresh chỉ reload cache local, không sync 200 manga. |
+| Search | Đã có | `SearchActivity` debounce 500ms, query ngắn không gọi API, search trong SQLite cache qua `/api/local-manga/search`, có empty/error/retry. |
+| Chi tiết truyện | Đã có | `ComicDetailActivity`/`ComicInfoFragment` gọi backend detail; cover dùng Glide placeholder/error. |
+| Chapter list | Đã có | Lấy chapter qua backend, backend có cache/fallback MangaDex khi thiếu. |
+| Reader | Đã có | Lấy page chapter qua backend, có loading/empty/error; không tự tạo mock page, nhưng Glide có placeholder/error image khi URL lỗi. |
+| Save/Bookshelf | Đã có | Guest thấy login-required state; user login có following, history, saved manga trong SQLite/Firebase helper. Chưa phải offline download thật. |
+| Groups/Translation Teams | Đã có | Bottom nav mở `BookshelfGroupFragment`, backend có `/api/groups`, `/api/groups/search`, `/api/groups/:groupId`; stats thiếu thì UI hiển thị `N/A`/message không có thống kê. |
+| Comment/Post | Đã có/đang hoàn thiện | Backend có CRUD comments/posts; Android có luồng post/comment. Guest cần bị chặn ở UI trước khi tạo dữ liệu. |
+| Profile/Login/Register | Đã có | `AuthManager` dùng Firebase Auth, có Google/Facebook credential methods và sync user về backend. Profile guest có login prompt. |
+| Backend cache/sync | Đã có | SQLite local-first, script `syncPopularManga.js`, endpoint sync thủ công. |
+| MangaDex API | Đã có | Backend gọi MangaDex bằng axios; mạng yếu/MangaDex lỗi có thể làm sync hoặc fallback detail/chapter fail. |
+
+## 12. Phân công nhóm tham khảo
+
+Nếu nhóm vẫn dùng `Task.md` cho báo cáo, có thể giữ phân công ở mức tham khảo:
+
+- Nguyễn Thắng: MangaDex API, Node.js backend, lưu trữ dữ liệu user/comment/post/manga, Bookshelf và Groups nếu nhóm giữ.
+- Thanh An: Firebase đăng nhập/đăng ký, nạp xu/thanh toán/mua chapter nếu demo có dùng.
+- Phạm Đức: trình bày truyện, lấy dữ liệu từ SQLite/Node.js, search.
+- Minh Đức: SQLite, lưu truyện, trình bày trang truyện.
+- Bảo Tâm: comment, bình luận, đăng bài user, dark mode nếu còn trong scope.
+
+Phân công này chỉ là tham khảo báo cáo; khi sửa lỗi demo nên ưu tiên app chạy ổn và giữ đúng kiến trúc hiện tại.
+
+## 13. Lỗi thường gặp
 
 ### Backend không chạy
 
 - Kiểm tra đã `cd backend` chưa.
-- Chạy `npm install`.
-- Kiểm tra Node.js và npm:
+- Chạy `npm install` nếu chưa có dependency.
+- Chạy `npm start`.
+- Kiểm tra `http://localhost:3000/api/health`.
+- Nếu port 3000 bận, đổi `PORT` trong `backend/.env` hoặc tắt process đang chiếm port.
 
-```bash
-node -v
-npm -v
-```
+### Home không có truyện
+
+- Backend có thể chưa có cache manga.
+- Chạy script/endpoint sync MangaDex trước.
+- Kiểm tra `backend/mangas.db` đã được tạo chưa.
+- Kiểm tra log backend có dòng `Cached manga count`.
+- Test nhanh: `http://localhost:3000/api/local-manga?limit=30&offset=0`.
+
+### MangaDex chậm/lỗi
+
+- Bật 1.1.1.1/WARP hoặc đổi mạng.
+- Không nên phụ thuộc MangaDex khi demo.
+- Nên preload data vào SQLite trước.
+- Nếu sync fail, app vẫn có thể đọc cache đã có.
 
 ### Android không gọi được backend
 
 - Emulator dùng `10.0.2.2`, không dùng `localhost`.
-- Điện thoại thật dùng IP LAN của máy tính.
-- Backend phải đang chạy.
-- Kiểm tra firewall Windows.
-- Kiểm tra base URL trong `ApiClient.java`.
+- Điện thoại thật dùng IP LAN máy tính.
+- Backend đang chạy.
+- Firewall cho phép Node.js.
+- Kiểm tra base URL trong `ApiClient.java` và các URL hard-code còn lại trong `AuthManager.java` nếu chạy điện thoại thật.
 
-### Không lấy được truyện MangaDex
+### Search không ra kết quả
 
-- Bật 1.1.1.1/WARP.
-- Đổi mạng.
-- Kiểm tra endpoint `/api/health`.
-- Kiểm tra log backend.
+- Kiểm tra đã sync manga vào SQLite chưa.
+- Query dưới 2 ký tự có thể không gọi API.
+- Test backend: `http://localhost:3000/api/local-manga/search?title=one&limit=30&offset=0`.
+- Nếu cache rỗng, search sẽ trả empty state thay vì gọi MangaDex liên tục.
 
-### Lỗi Gradle Sync
+### Reader không có trang
 
-- Mở project bằng Android Studio.
+- ChapterId có thể thiếu hoặc MangaDex chưa có page cho chapter đó.
+- Kiểm tra endpoint `GET /api/chapter/:chapterId/pages`.
+- Nếu backend/MangaDex lỗi, Reader hiển thị `Unable to load pages. Please try again.`.
+
+### Gradle Sync lỗi
+
+- Mở đúng root project bằng Android Studio.
 - Kiểm tra JDK 21.
 - Không xóa Gradle wrapper.
 - Kiểm tra `local.properties` có SDK path đúng trên máy cá nhân.
 
-### Không nên push file nào
+## 14. Không nên push lên GitHub
+
+Không push các file runtime/cấu hình cá nhân sau:
 
 ```gitignore
 node_modules/
+backend/node_modules/
 *.db
 *.db-shm
 *.db-wal
+backend/*.db
+backend/*.db-shm
+backend/*.db-wal
 .gradle/
 build/
 app/build/
 local.properties
 .env
+backend/.env
 ```
 
-## 14. Quy trình chạy nhanh
+Chỉ push `package.json`/`package-lock.json`, không push `node_modules`. Không push database runtime. Không push file `.env` chứa cấu hình cá nhân.
 
-Chạy backend:
+## 15. Quy trình chạy nhanh
+
+### Lần đầu clone hoặc máy chưa có dependency
 
 ```bash
 cd backend
 npm install
+```
+
+Nếu cần dữ liệu demo 200+ truyện, preload cache trước hoặc chạy ở terminal riêng:
+
+```bash
+node scripts/syncPopularManga.js --limit 200 --page-size 50
+```
+
+Sau đó chạy backend:
+
+```bash
 npm start
 ```
 
-Sau đó:
+Kiểm tra backend:
 
-- Mở Android Studio.
-- Đợi Gradle Sync.
-- Run app trên emulator.
-- Đảm bảo base URL là:
+```text
+http://localhost:3000/api/health
+```
+
+Mở Android Studio, kiểm tra `ApiClient.java` đang dùng:
 
 ```text
 http://10.0.2.2:3000/api/
 ```
+
+Run app trên emulator.
+
+### Nếu muốn sync bằng endpoint thay vì script
+
+Terminal 1:
+
+```bash
+cd backend
+npm start
+```
+
+Terminal 2 hoặc Postman:
+
+```text
+POST http://localhost:3000/api/local-manga/sync-popular?total=200&limit=50&pages=4
+```
+
+## 16. Cần kiểm tra thêm
+
+- Sync 200 manga phụ thuộc mạng tới MangaDex; nếu mạng hiện tại chặn MangaDex, cần WARP/đổi mạng trước khi preload.
+- Saved manga hiện chưa phải offline download ảnh thật. Nếu muốn offline reader, cần bổ sung cơ chế tải ảnh chapter về local storage và đọc từ local path.
+- Groups lấy dữ liệu từ MangaDex group API, nhưng MangaDex không cung cấp đủ member/manga/follower stats cho mọi group; UI hiện hiển thị `N/A` khi thiếu thống kê.
+- Khi chạy trên điện thoại thật, cần kiểm tra lại các URL hard-code trong `AuthManager.java`, không chỉ `ApiClient.java`.

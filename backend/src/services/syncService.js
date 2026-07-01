@@ -2,7 +2,9 @@ const mangadexService = require('./mangadexService');
 const databaseService = require('./databaseService');
 
 const DEFAULT_SYNC_TOTAL = 200;
-const DEFAULT_SYNC_LIMIT = 100;
+const DEFAULT_SYNC_LIMIT = 50;
+const DEFAULT_SYNC_DELAY_MS = 500;
+const DEFAULT_MAX_RETRIES = 2;
 const MAX_SYNC_LIMIT = 100;
 const MAX_SYNC_TOTAL = 500;
 
@@ -27,36 +29,62 @@ async function syncMangaFromMangaDex(mangaId) {
 }
 
 async function syncPopularMangas(options = {}) {
-    const { total, limit, pages, offset } = normalizePopularSyncOptions(options);
+    const { total, limit, pages, offset, delayMs, maxRetries } = normalizePopularSyncOptions(options);
     const syncedMangas = [];
     const seenMangaIds = new Set();
+    let withCoverCount = 0;
+    let withoutCoverCount = 0;
 
-    try {
-        for (let page = 0; page < pages && syncedMangas.length < total; page++) {
-            const remaining = total - syncedMangas.length;
-            const pageLimit = Math.min(limit, remaining);
-            const pageOffset = offset + page * limit;
-            const mangas = await mangadexService.searchManga('', pageLimit, pageOffset);
+    for (let page = 0; page < pages && syncedMangas.length < total; page++) {
+        const remaining = total - syncedMangas.length;
+        const pageLimit = Math.min(limit, remaining);
+        const pageOffset = offset + page * limit;
+        const startIndex = pageOffset + 1;
+        const endIndex = pageOffset + pageLimit;
 
-            if (!mangas.length) break;
+        console.log(`Syncing manga ${startIndex}-${endIndex}...`);
+        const mangas = await fetchMangaPageWithRetry(pageLimit, pageOffset, maxRetries, delayMs);
 
-            for (const manga of mangas) {
-                if (!manga.mangaId || seenMangaIds.has(manga.mangaId)) continue;
+        if (!mangas) {
+            console.warn(`Skipped manga page at offset ${pageOffset}`);
+            if (page < pages - 1) await delay(delayMs);
+            continue;
+        }
 
+        if (!mangas.length) {
+            break;
+        }
+
+        let savedCount = 0;
+        for (const manga of mangas) {
+            if (!manga.mangaId || seenMangaIds.has(manga.mangaId)) continue;
+
+            try {
                 seenMangaIds.add(manga.mangaId);
                 databaseService.saveManga(manga);
                 syncedMangas.push(manga);
-                console.log(`Synced manga summary: ${manga.title}`);
-
-                if (syncedMangas.length >= total) break;
+                if (manga.coverUrl && String(manga.coverUrl).trim()) {
+                    withCoverCount++;
+                } else {
+                    withoutCoverCount++;
+                }
+                savedCount++;
+            } catch (error) {
+                console.error(`Failed to save manga ${manga.title || manga.mangaId}:`, error.message);
             }
+
+            if (syncedMangas.length >= total) break;
         }
 
-        return syncedMangas;
-    } catch (error) {
-        console.error('Error syncing popular mangas:', error.message);
-        throw error;
+        console.log(`Saved ${savedCount} manga`);
+        if (mangas.length < pageLimit) break;
+        if (page < pages - 1 && syncedMangas.length < total) await delay(delayMs);
     }
+
+    console.log(`Sync completed: ${syncedMangas.length} manga`);
+    console.log(`Manga with coverUrl: ${withCoverCount}`);
+    console.log(`Manga without coverUrl: ${withoutCoverCount}`);
+    return syncedMangas;
 }
 
 async function searchAndSync(query, options = {}) {
@@ -84,16 +112,48 @@ async function searchAndSync(query, options = {}) {
 
 function normalizePopularSyncOptions(options) {
     const source = typeof options === 'number' ? { total: options } : (options || {});
+    const pageSize = source.pageSize || source.page_size || source['page-size'] || source.limit;
     const requestedPages = parsePositiveInt(source.pages, null);
-    const limit = clampNumber(source.limit, 1, MAX_SYNC_LIMIT, DEFAULT_SYNC_LIMIT);
+    const limit = clampNumber(pageSize, 1, MAX_SYNC_LIMIT, DEFAULT_SYNC_LIMIT);
     const totalFallback = requestedPages ? requestedPages * limit : DEFAULT_SYNC_TOTAL;
     const total = clampNumber(source.total || source.count, 1, MAX_SYNC_TOTAL, totalFallback);
     const pages = requestedPages
         ? clampNumber(requestedPages, 1, Math.ceil(MAX_SYNC_TOTAL / limit), Math.ceil(total / limit))
         : Math.ceil(total / limit);
     const offset = clampNumber(source.offset, 0, 10000, 0);
+    const delayMs = clampNumber(source.delayMs || source.delay_ms || source.delay, 300, 700, DEFAULT_SYNC_DELAY_MS);
+    const maxRetries = clampNumber(source.maxRetries || source.max_retries, 0, 5, DEFAULT_MAX_RETRIES);
 
-    return { total, limit, pages, offset };
+    return { total, limit, pages, offset, delayMs, maxRetries };
+}
+
+async function fetchMangaPageWithRetry(limit, offset, maxRetries, delayMs) {
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        try {
+            return await mangadexService.searchManga('', limit, offset);
+        } catch (error) {
+            if (error.statusCode === 429) {
+                if (attempt >= maxRetries) {
+                    console.warn(`Rate limited at offset ${offset}; retries exhausted.`);
+                    return null;
+                }
+
+                const retryDelayMs = error.retryAfterMs || delayMs * (attempt + 1);
+                console.warn(`Rate limited at offset ${offset}; retrying in ${retryDelayMs}ms.`);
+                await delay(retryDelayMs);
+                continue;
+            }
+
+            console.error(`Unable to sync MangaDex page at offset ${offset}:`, error.message);
+            throw error;
+        }
+    }
+
+    return null;
+}
+
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 function parsePositiveInt(value, fallback) {

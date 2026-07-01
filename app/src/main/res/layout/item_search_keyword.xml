@@ -14,7 +14,7 @@
             android:gravity="center_vertical"
             android:paddingHorizontal="20dp"
             android:paddingVertical="10dp"
-            android:text="Sample top search manga title"
+            android:text="Search keyword"
             android:textColor="@color/text_primary_light"
             android:textSize="14sp"/>
 

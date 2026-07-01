@@ -11,12 +11,16 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.model.GlideUrl;
+import com.bumptech.glide.load.model.LazyHeaders;
 import com.example.appdoctruyen.R;
 import com.example.appdoctruyen.models.Comic;
 
 import java.util.List;
 
 public class FeaturedComicAdapter extends RecyclerView.Adapter<FeaturedComicAdapter.FeaturedComicViewHolder> {
+
+    private static final String IMAGE_USER_AGENT = "AppDocTruyenAndroid/1.0";
 
     private Context context;
     private List<Comic> comicList;
@@ -43,11 +47,13 @@ public class FeaturedComicAdapter extends RecyclerView.Adapter<FeaturedComicAdap
 
         holder.tvComicLargeTitle.setText(comic.getTitle());
 
-        if (comic.getCoverUrl() != null && !comic.getCoverUrl().isEmpty()) {
-            Glide.with(context)
-                    .load(comic.getCoverUrl())
+        String coverUrl = comic.getCoverUrl() != null ? comic.getCoverUrl().trim() : "";
+        if (!coverUrl.isEmpty()) {
+            Glide.with(holder.itemView.getContext())
+                    .load(buildImageRequest(coverUrl))
                     .placeholder(R.drawable.placeholder_comic)
                     .error(R.drawable.placeholder_comic)
+                    .centerCrop()
                     .into(holder.ivComicLargeCover);
         } else if (comic.getCoverImageResId() != 0) {
             holder.ivComicLargeCover.setImageResource(comic.getCoverImageResId());
@@ -65,6 +71,12 @@ public class FeaturedComicAdapter extends RecyclerView.Adapter<FeaturedComicAdap
     @Override
     public int getItemCount() {
         return comicList != null ? comicList.size() : 0;
+    }
+
+    private GlideUrl buildImageRequest(String coverUrl) {
+        return new GlideUrl(coverUrl, new LazyHeaders.Builder()
+                .addHeader("User-Agent", IMAGE_USER_AGENT)
+                .build());
     }
 
     public interface OnFeaturedComicClickListener {

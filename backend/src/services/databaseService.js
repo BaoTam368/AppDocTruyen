@@ -1,7 +1,9 @@
 const Database = require('better-sqlite3');
 const path = require('path');
 
-const dbPath = path.join(__dirname, '../../mangas.db');
+// Path: backend/src/services/ → cần lên 2 cấp để đến backend/mangas.db
+const dbPath = path.resolve(__dirname, '../../mangas.db');
+console.log('[DB] Resolved database path:', dbPath);
 let db;
 
 function getDatabase() {
@@ -27,6 +29,7 @@ function initializeDatabase() {
             latest_chapter TEXT,
             content_rating TEXT,
             available_translated_languages TEXT,
+            last_synced_at DATETIME,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
@@ -37,6 +40,8 @@ function initializeDatabase() {
             chapter_number TEXT,
             chapter_name TEXT,
             language TEXT,
+            publish_at TEXT,
+            readable_at TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (manga_id) REFERENCES mangas(id) ON DELETE CASCADE
         );
@@ -87,22 +92,41 @@ function initializeDatabase() {
     `);
 
     ensureMangaMetadataColumns();
+    ensureChapterColumns();
     ensureCommentColumns();
+    ensurePostColumns();
+    ensureGroupMangaCountCache();
 }
 
 function saveManga(manga) {
+    if (!manga || !manga.mangaId || !manga.title) {
+        return;
+    }
+
     const database = getDatabase();
     const stmt = database.prepare(`
-        INSERT OR REPLACE INTO mangas 
-        (id, title, description, cover_url, status, year, tags, latest_chapter, content_rating, available_translated_languages, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+        INSERT INTO mangas 
+        (id, title, description, cover_url, status, year, tags, latest_chapter, content_rating, available_translated_languages, last_synced_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        ON CONFLICT(id) DO UPDATE SET
+            title = excluded.title,
+            description = excluded.description,
+            cover_url = COALESCE(NULLIF(excluded.cover_url, ''), mangas.cover_url),
+            status = excluded.status,
+            year = excluded.year,
+            tags = excluded.tags,
+            latest_chapter = excluded.latest_chapter,
+            content_rating = excluded.content_rating,
+            available_translated_languages = excluded.available_translated_languages,
+            last_synced_at = CURRENT_TIMESTAMP,
+            updated_at = CURRENT_TIMESTAMP
     `);
     
     stmt.run(
         manga.mangaId,
         manga.title,
         manga.description,
-        manga.coverUrl,
+        normalizeCoverUrl(manga.coverUrl),
         manga.status,
         manga.year,
         JSON.stringify(manga.tags || []),
@@ -113,22 +137,28 @@ function saveManga(manga) {
 }
 
 function saveChapter(chapter) {
+    if (!chapter || !chapter.chapterId || !chapter.mangaId) {
+        return;
+    }
+
     const database = getDatabase();
     const stmt = database.prepare(`
         INSERT OR REPLACE INTO chapters 
-        (id, manga_id, chapter_number, chapter_name, language)
-        VALUES (?, ?, ?, ?, ?)
+        (id, manga_id, chapter_number, chapter_name, language, publish_at, readable_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
     `);
+    const chapterNumber = firstNonBlank(chapter.chapterNumber, chapter.chapter);
     
     stmt.run(
         chapter.chapterId,
         chapter.mangaId,
-        chapter.chapterNumber,
-        chapter.chapterName,
-        chapter.language
+        chapterNumber,
+        firstNonBlank(chapter.chapterName, chapter.title, chapterNumber ? `Chapter ${chapterNumber}` : 'Chapter'),
+        firstNonBlank(chapter.language, chapter.translatedLanguage),
+        firstNonBlank(chapter.publishAt),
+        firstNonBlank(chapter.readableAt)
     );
 }
-
 function getAllMangas({ limit = 20, offset = 0, status = '', tag = '', sort = 'latest' } = {}) {
     const database = getDatabase();
     const paging = normalizePaging({ limit, offset });
@@ -165,7 +195,8 @@ function getAllMangas({ limit = 20, offset = 0, status = '', tag = '', sort = 'l
             tags,
             latest_chapter as latestChapter,
             content_rating as contentRating,
-            available_translated_languages as availableTranslatedLanguages
+            available_translated_languages as availableTranslatedLanguages,
+            last_synced_at as lastSyncedAt
         FROM mangas
         ${whereClause}
         ORDER BY ${orderBy}
@@ -175,6 +206,7 @@ function getAllMangas({ limit = 20, offset = 0, status = '', tag = '', sort = 'l
     const mangas = stmt.all(...params);
     return mangas.map(manga => ({
         ...manga,
+        coverUrl: normalizeCoverUrl(manga.coverUrl),
         tags: parseJsonArray(manga.tags),
         availableTranslatedLanguages: parseJsonArray(manga.availableTranslatedLanguages)
     }));
@@ -213,7 +245,8 @@ function searchMangas(query, { limit = 20, offset = 0, status = '', tag = '', so
             tags,
             latest_chapter as latestChapter,
             content_rating as contentRating,
-            available_translated_languages as availableTranslatedLanguages
+            available_translated_languages as availableTranslatedLanguages,
+            last_synced_at as lastSyncedAt
         FROM mangas
         ${whereClause}
         ORDER BY ${orderBy}
@@ -223,6 +256,7 @@ function searchMangas(query, { limit = 20, offset = 0, status = '', tag = '', so
     const mangas = stmt.all(...params);
     return mangas.map(manga => ({
         ...manga,
+        coverUrl: normalizeCoverUrl(manga.coverUrl),
         tags: parseJsonArray(manga.tags),
         availableTranslatedLanguages: parseJsonArray(manga.availableTranslatedLanguages)
     }));
@@ -241,7 +275,8 @@ function getMangaById(mangaId) {
             tags,
             latest_chapter as latestChapter,
             content_rating as contentRating,
-            available_translated_languages as availableTranslatedLanguages
+            available_translated_languages as availableTranslatedLanguages,
+            last_synced_at as lastSyncedAt
         FROM mangas
         WHERE id = ?
     `);
@@ -251,6 +286,7 @@ function getMangaById(mangaId) {
     
     return {
         ...manga,
+        coverUrl: normalizeCoverUrl(manga.coverUrl),
         tags: parseJsonArray(manga.tags),
         availableTranslatedLanguages: parseJsonArray(manga.availableTranslatedLanguages)
     };
@@ -262,18 +298,21 @@ function getMangaChapters(mangaId) {
         SELECT 
             id as chapterId,
             manga_id as mangaId,
+            chapter_number as chapter,
             chapter_number as chapterNumber,
+            chapter_name as title,
             chapter_name as chapterName,
             language,
+            language as translatedLanguage,
+            publish_at as publishAt,
+            readable_at as readableAt,
             created_at as createdAt
         FROM chapters
         WHERE manga_id = ?
-        ORDER BY chapter_number ASC
     `);
     
-    return stmt.all(mangaId);
+    return sortChapters(stmt.all(mangaId));
 }
-
 function closeDatabase() {
     if (db) {
         db.close();
@@ -284,8 +323,45 @@ function closeDatabase() {
 function ensureMangaMetadataColumns() {
     ensureColumn('mangas', 'content_rating', 'TEXT');
     ensureColumn('mangas', 'available_translated_languages', 'TEXT');
+    ensureColumn('mangas', 'last_synced_at', 'DATETIME');
+    ensureColumn('mangas', 'cover_url', 'TEXT');
 }
 
+function ensurePostColumns() {
+    ensureColumn('posts', 'like_count', 'INTEGER DEFAULT 0');
+}
+
+function ensureChapterColumns() {
+    ensureColumn('chapters', 'publish_at', 'TEXT');
+    ensureColumn('chapters', 'readable_at', 'TEXT');
+}
+
+function ensureGroupMangaCountCache() {
+    db.exec(`
+        CREATE TABLE IF NOT EXISTS group_manga_count_cache (
+            group_id TEXT PRIMARY KEY,
+            manga_count INTEGER NOT NULL DEFAULT 0,
+            cached_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
+    `);
+}
+
+function getCachedGroupMangaCount(groupId) {
+    const database = getDatabase();
+    const row = database.prepare(
+        `SELECT manga_count FROM group_manga_count_cache
+         WHERE group_id = ? AND cached_at > datetime('now', '-24 hours')`
+    ).get(groupId);
+    return row ? row.manga_count : null;
+}
+
+function setCachedGroupMangaCount(groupId, mangaCount) {
+    const database = getDatabase();
+    database.prepare(
+        `INSERT OR REPLACE INTO group_manga_count_cache (group_id, manga_count, cached_at)
+         VALUES (?, ?, CURRENT_TIMESTAMP)`
+    ).run(groupId, mangaCount);
+}
 function ensureCommentColumns() {
     ensureColumn('comments', 'manga_id', 'TEXT');
     ensureColumn('comments', 'chapter_id', 'TEXT');
@@ -304,6 +380,55 @@ function ensureColumn(tableName, columnName, definition) {
     if (!exists) {
         db.exec(`ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${definition}`);
     }
+}
+
+function sortChapters(chapters) {
+    return (chapters || []).sort((a, b) => {
+        const chapterA = parseChapterNumber(a && (a.chapter || a.chapterNumber));
+        const chapterB = parseChapterNumber(b && (b.chapter || b.chapterNumber));
+
+        if (chapterA !== chapterB) {
+            return chapterA - chapterB;
+        }
+
+        return chapterDateValue(a) - chapterDateValue(b);
+    });
+}
+
+function parseChapterNumber(chapter) {
+    if (chapter === null || chapter === undefined) {
+        return Number.POSITIVE_INFINITY;
+    }
+
+    const value = String(chapter).trim();
+    if (!value) {
+        return Number.POSITIVE_INFINITY;
+    }
+
+    const parsed = Number.parseFloat(value.replace(',', '.'));
+    return Number.isFinite(parsed) ? parsed : Number.POSITIVE_INFINITY;
+}
+
+function chapterDateValue(chapter) {
+    const value = chapter && (chapter.publishAt || chapter.readableAt || chapter.createdAt);
+    const time = value ? new Date(value).getTime() : 0;
+    return Number.isFinite(time) ? time : 0;
+}
+
+function firstNonBlank(...values) {
+    for (const value of values) {
+        if (value !== undefined && value !== null && String(value).trim()) {
+            return String(value).trim();
+        }
+    }
+    return '';
+}
+function normalizeCoverUrl(value) {
+    const coverUrl = value === undefined || value === null ? '' : String(value).trim();
+    if (!coverUrl) return '';
+    if (!coverUrl.includes('/covers/')) return coverUrl;
+    if (coverUrl.endsWith('.256.jpg') || coverUrl.endsWith('.512.jpg')) return coverUrl;
+    return `${coverUrl}.256.jpg`;
 }
 
 function parseJsonArray(value) {
@@ -340,6 +465,12 @@ function clampNumber(value, min, max, fallback) {
     return Math.max(min, Math.min(max, numberValue));
 }
 
+function getMangaCount() {
+    const database = getDatabase();
+    const row = database.prepare('SELECT COUNT(*) as count FROM mangas').get();
+    return row ? row.count : 0;
+}
+
 module.exports = {
     getDatabase,
     saveManga,
@@ -348,5 +479,8 @@ module.exports = {
     searchMangas,
     getMangaById,
     getMangaChapters,
+    getMangaCount,
+    getCachedGroupMangaCount,
+    setCachedGroupMangaCount,
     closeDatabase
 };

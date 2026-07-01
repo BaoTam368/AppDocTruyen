@@ -11,6 +11,7 @@ import com.example.appdoctruyen.models.Post;
 import com.example.appdoctruyen.models.User;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import retrofit2.Call;
@@ -285,7 +286,7 @@ public class MangaRepository {
 
     public void syncPopularMangas(int count, RepositoryCallback<List<Comic>> callback) {
         int total = Math.max(count, 1);
-        int limit = Math.min(total, 100);
+        int limit = Math.min(total, 50);
         int pages = (int) Math.ceil((double) total / limit);
         apiService.syncPopularMangas(total, limit, pages).enqueue(new Callback<MangaListResponse>() {
             @Override
@@ -310,7 +311,9 @@ public class MangaRepository {
         if (dtoList == null) return comics;
 
         for (MangaDto dto : dtoList) {
-            comics.add(mapManga(dto));
+            if (dto != null && !isBlank(dto.mangaId)) {
+                comics.add(mapManga(dto));
+            }
         }
         return comics;
     }
@@ -344,10 +347,43 @@ public class MangaRepository {
         if (dtoList == null) return chapters;
 
         for (ChapterDto dto : dtoList) {
-            String chapterName = isBlank(dto.chapterName) ? "Chapter " + (isBlank(dto.chapterNumber) ? "" : dto.chapterNumber) : dto.chapterName;
-            chapters.add(new Chapter(dto.chapterId, chapterName.trim(), dto.createdAt, true));
+            if (dto == null || isBlank(dto.chapterId)) continue;
+            String chapterNumber = firstNonBlank(dto.chapterNumber, dto.chapter);
+            String fallbackName = isBlank(chapterNumber) ? "Chapter" : "Chapter " + chapterNumber;
+            String chapterName = firstNonBlank(dto.chapterName, dto.title, fallbackName);
+            String date = firstNonBlank(dto.publishAt, dto.readableAt, dto.createdAt);
+            chapters.add(new Chapter(dto.chapterId, chapterName.trim(), date, true, chapterNumber));
         }
+
+        sortChaptersByNumber(chapters);
         return chapters;
+    }
+    private void sortChaptersByNumber(List<Chapter> chapters) {
+        Collections.sort(chapters, (a, b) -> {
+            double chapterA = parseChapterNumber(a != null ? a.getChapterNumber() : null);
+            double chapterB = parseChapterNumber(b != null ? b.getChapterNumber() : null);
+
+            int compare = Double.compare(chapterA, chapterB);
+            if (compare != 0) {
+                return compare;
+            }
+
+            String dateA = a != null && a.getDate() != null ? a.getDate() : "";
+            String dateB = b != null && b.getDate() != null ? b.getDate() : "";
+            return dateA.compareTo(dateB);
+        });
+    }
+
+    private double parseChapterNumber(String chapter) {
+        if (isBlank(chapter)) {
+            return Double.MAX_VALUE;
+        }
+
+        try {
+            return Double.parseDouble(chapter.trim().replace(',', '.'));
+        } catch (NumberFormatException ignored) {
+            return Double.MAX_VALUE;
+        }
     }
 
     private List<ComicPage> mapPageList(List<String> pageUrls) {
@@ -381,6 +417,7 @@ public class MangaRepository {
         if (dtoList == null) return groups;
 
         for (GroupDto dto : dtoList) {
+            if (dto == null || isBlank(dto.groupId)) continue;
             int comicCount = dto.comicCount > 0 ? dto.comicCount : dto.mangaCount;
             TranslationGroup group = new TranslationGroup(numericIdFromString(dto.groupId), isBlank(dto.name) ? "Translation Team" : dto.name, dto.description, R.drawable.placeholder_group, comicCount, dto.memberCount, dto.followerCount);
             group.setGroupId(dto.groupId);

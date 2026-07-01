@@ -107,7 +107,7 @@ public class SearchActivity extends AppCompatActivity {
                     searchRunnable = () -> searchManga(query);
                     searchHandler.postDelayed(searchRunnable, SEARCH_DELAY_MS);
                 } else if (query.isEmpty()) {
-                    loadDefaultResults();
+                    clearSearchResults("Search manga...");
                 } else {
                     clearSearchResults("Search manga...");
                 }
@@ -116,7 +116,7 @@ public class SearchActivity extends AppCompatActivity {
 
         ivClearSearch.setOnClickListener(v -> {
             edtSearchInput.setText("");
-            loadDefaultResults();
+            clearSearchResults("Search manga...");
         });
 
         setupSearchResult();
@@ -210,7 +210,7 @@ public class SearchActivity extends AppCompatActivity {
         }
 
         if (query.isEmpty()) {
-            loadFilteredResults(selectedTag);
+            clearSearchResults("Search manga...");
         } else if (query.length() >= 2) {
             searchMangaWithFilter(query, selectedTag);
         } else {
@@ -222,6 +222,10 @@ public class SearchActivity extends AppCompatActivity {
         resultList = new ArrayList<>();
 
         resultAdapter = new BookshelfAdapter(this, resultList, (comic, position) -> {
+            if (comic == null || isBlank(comic.getMangaId())) {
+                Toast.makeText(SearchActivity.this, "Unable to open this manga.", Toast.LENGTH_SHORT).show();
+                return;
+            }
             Intent intent = new Intent(SearchActivity.this, ComicDetailActivity.class);
             intent.putExtra("comic_id", comic.getId());
             intent.putExtra("mangaId", comic.getMangaId());
@@ -245,6 +249,7 @@ public class SearchActivity extends AppCompatActivity {
         mangaRepository.getLocalMangaList(20, 0, new MangaRepository.RepositoryCallback<List<Comic>>() {
             @Override
             public void onSuccess(List<Comic> data) {
+                if (!isActivityActive()) return;
                 resultList.clear();
                 if (data != null) {
                     for (Comic comic : data) {
@@ -261,6 +266,7 @@ public class SearchActivity extends AppCompatActivity {
 
             @Override
             public void onError(String message) {
+                if (!isActivityActive()) return;
                 showSearchState("Unable to load manga. Please try again.", true);
                 Toast.makeText(SearchActivity.this, message, Toast.LENGTH_SHORT).show();
             }
@@ -273,28 +279,20 @@ public class SearchActivity extends AppCompatActivity {
 
     private void searchMangaWithFilter(String query, String tag) {
         showSearchState("Searching manga...");
-        mangaRepository.searchAndSync(query, 20, 0, new MangaRepository.RepositoryCallback<List<Comic>>() {
+        mangaRepository.searchLocalMangas(query, 20, 0, new MangaRepository.RepositoryCallback<List<Comic>>() {
             @Override
             public void onSuccess(List<Comic> data) {
+                if (!isActivityActive()) return;
                 updateSearchResults(data, tag);
             }
 
             @Override
             public void onError(String message) {
-                mangaRepository.searchLocalMangas(query, 20, 0, new MangaRepository.RepositoryCallback<List<Comic>>() {
-                    @Override
-                    public void onSuccess(List<Comic> data) {
-                        updateSearchResults(data, tag);
-                    }
-
-                    @Override
-                    public void onError(String fallbackMessage) {
-                        resultList.clear();
-                        resultAdapter.notifyDataSetChanged();
-                        showSearchState("Unable to search manga. Please try again.", true);
-                        Toast.makeText(SearchActivity.this, fallbackMessage, Toast.LENGTH_SHORT).show();
-                    }
-                });
+                if (!isActivityActive()) return;
+                resultList.clear();
+                resultAdapter.notifyDataSetChanged();
+                showSearchState("Unable to search manga. Please try again.", true);
+                Toast.makeText(SearchActivity.this, message, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -336,7 +334,7 @@ public class SearchActivity extends AppCompatActivity {
 
     private void updateSearchStateForResults() {
         if (resultList == null || resultList.isEmpty()) {
-            showSearchState("No manga found. Try another keyword.");
+            showSearchState("No results found.");
         } else {
             hideSearchState();
         }
@@ -376,10 +374,16 @@ public class SearchActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        if (searchRunnable != null) {
-            searchHandler.removeCallbacks(searchRunnable);
-        }
+        searchHandler.removeCallbacksAndMessages(null);
         super.onDestroy();
+    }
+
+    private boolean isActivityActive() {
+        return !isFinishing() && !isDestroyed();
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
     }
 
     private boolean containsTag(List<String> tags, String tag) {

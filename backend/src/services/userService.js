@@ -2,10 +2,10 @@ const databaseService = require('./databaseService');
 
 function createOrUpdateUser(payload = {}) {
     const database = databaseService.getDatabase();
-    const userId = normalizeText(payload.userId || payload.user_id || 'local_user');
+    const userId = normalizeText(payload.userId || payload.user_id);
 
     if (!userId) {
-        throw createHttpError(400, 'Missing userId');
+        throw createHttpError(400, 'User is required.');
     }
 
     const stmt = database.prepare(`

@@ -13,12 +13,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.appdoctruyen.R;
+import com.example.appdoctruyen.data.api.MangaRepository;
+import com.example.appdoctruyen.models.Chapter;
 import com.example.appdoctruyen.views.activities.ComicDetailActivity;
 import com.example.appdoctruyen.views.activities.ComicReadingActivity;
-import com.example.appdoctruyen.R;
-import com.example.appdoctruyen.models.Chapter;
 import com.example.appdoctruyen.views.adapters.ChapterAdapter;
-import com.example.appdoctruyen.data.api.MangaRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,28 +64,25 @@ public class ComicChaptersFragment extends Fragment {
         lvChapters = view.findViewById(R.id.lvChapters);
         tvTotalChapters = view.findViewById(R.id.tvTotalChapters);
 
-        // 1. Khởi tạo danh sách và adapter
         chapterList = new ArrayList<>();
         chapterAdapter = new ChapterAdapter(getContext(), chapterList);
         lvChapters.setAdapter(chapterAdapter);
 
-        // 2. Tải chapters từ API
         loadChaptersFromApi();
 
-        // 3. XỬ LÝ SỰ KIỆN CLICK CHỌN CHƯƠNG
         lvChapters.setOnItemClickListener((parent, view1, position, id) -> {
-            // Lấy ra chương mà người dùng vừa bấm vào
             if (position < 0 || position >= chapterList.size()) return;
             Chapter clickedChapter = chapterList.get(position);
-            if (clickedChapter.getChapterId() == null || clickedChapter.getChapterId().trim().isEmpty()) {
+            if (clickedChapter == null || isBlank(clickedChapter.getChapterId())) {
                 Toast.makeText(getContext(), "This chapter is not available for reading.", Toast.LENGTH_SHORT).show();
                 return;
             }
+            if (isBlank(mangaId)) {
+                Toast.makeText(getContext(), "Unable to open reader for this manga.", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-            // Tạo Intent để chuyển sang màn hình Đọc truyện
             Intent intent = new Intent(getActivity(), ComicReadingActivity.class);
-
-            // Gửi kèm mangaId, mangaTitle và chapterId
             intent.putExtra("mangaId", mangaId);
             intent.putExtra("mangaTitle", mangaTitle);
             intent.putExtra("chapterId", clickedChapter.getChapterId());
@@ -93,27 +90,34 @@ public class ComicChaptersFragment extends Fragment {
             if (getActivity() instanceof ComicDetailActivity) {
                 intent.putExtra("comic_cover", ((ComicDetailActivity) getActivity()).getCoverUrl());
             }
-            startActivity(intent);
+            if (isAdded()) {
+                startActivity(intent);
+            }
         });
 
         return view;
     }
 
     private void loadChaptersFromApi() {
-        if (mangaId == null || mangaId.isEmpty()) {
-            Toast.makeText(getContext(), "Missing mangaId", Toast.LENGTH_SHORT).show();
+        if (isBlank(mangaId)) {
+            tvTotalChapters.setText("No chapters available.");
             return;
         }
 
         mangaRepository.getMangaChapters(mangaId, new MangaRepository.RepositoryCallback<List<Chapter>>() {
             @Override
             public void onSuccess(List<Chapter> data) {
+                if (!isAdded()) return;
                 chapterList.clear();
                 if (data != null) {
-                    chapterList.addAll(data);
+                    for (Chapter chapter : data) {
+                        if (chapter != null && !isBlank(chapter.getChapterId())) {
+                            chapterList.add(chapter);
+                        }
+                    }
                 }
                 if (chapterList.isEmpty()) {
-                    tvTotalChapters.setText("No chapters available");
+                    tvTotalChapters.setText("No chapters available.");
                 } else {
                     tvTotalChapters.setText("Total " + chapterList.size() + " chapters");
                 }
@@ -122,11 +126,16 @@ public class ComicChaptersFragment extends Fragment {
 
             @Override
             public void onError(String message) {
+                if (!isAdded()) return;
                 chapterList.clear();
                 chapterAdapter.notifyDataSetChanged();
-                tvTotalChapters.setText("Unable to load chapters");
+                tvTotalChapters.setText("Unable to load data. Please try again.");
                 Toast.makeText(getContext(), "Unable to load chapters", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
     }
 }
